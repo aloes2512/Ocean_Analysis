@@ -150,12 +150,13 @@ NOAA.Ocean.anomalies%>%ggplot(aes(x=dt.mnth))+
   labs(x="",y="anomaly K",title = "Ocean Temperature Anomalies",
        subtitle="Global Ocean Mean(blue) and Median(red)",caption = "data: noaa.ersst.v5.nc ")
 summary(NOAA.Ocean.anomalies)
-Ocean_temp.data=list(url.source="https://downloads.psl.noaa.gov/Datasets/noaa.ersst.v5/sst.mnmean.nc",
+Ocean_NOAA.data=list(url.source="https://downloads.psl.noaa.gov/Datasets/noaa.ersst.v5/sst.mnmean.nc",
                      update="2026-05-16",
                      data.grid=sst_stack,
                      data=NOAA.Ocean.anomalies)
 
-saveRDS(Ocean_temp.data,"data/NOAA.ocean.anomalies.rds")
-Ocean_temp.data=readRDS("data/NOAA.ocean.anomalies.rds")
-NOAA.Ocean.anomalies=Ocean_temp.data$data
+saveRDS(Ocean_NOAA.data,"data/NOAA.ocean.anomalies.rds")
+rm(Ocean_NOAA.data)
+Ocean_NOAA.data=readRDS("data/NOAA.ocean.anomalies.rds")
+NOAA.Ocean.anomalies=Ocean_NOAA.data$data
 
