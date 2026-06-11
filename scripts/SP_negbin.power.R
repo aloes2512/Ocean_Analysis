@@ -162,7 +162,8 @@ S_power=SP_NB_fit%>% mutate(TSI=a+b*SP_fit+c*SP_fit^2,TSI=1000*TSI/a)%>%dplyr::s
 saveRDS(S_power,"data/S_power.rds")
 S_power%>%ggplot(aes(x=date,y=TSI))+geom_line()+
   labs(y="Solar Peak Power [W/m^2]", title = "Solar Power Variation",
-       subtitle = "@ sea level,estimate from sunspot smoothed count")
+       subtitle = "@ sea level,estimate from sunspot smoothed count",
+       caption = "http://www.lajpe.org/dec11/LAJPE_576_Ambelu_Tebabal..")
  ggsave("figs/Solar_Irradiation_equator.png")
 
 
