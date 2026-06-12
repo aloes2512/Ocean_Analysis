@@ -1,0 +1,25 @@
+this text was produced with terminal cmd:
+MacBook-5:scripts alfloeffler$ git log --oneline > commit_summary.txt
+
+
+f0b999b Delete the scripts they teporary stored in the folder ~/Documents/to beckecked
+d1de9b3 Merge branch 'master' of https://github.com/aloes2512/Ocean_Analysis
+7bca60f solar power phase locked  and poly 3rd degree trends of global ocean anomalies
+d232388 Merge branch 'master' of https://github.com/aloes2512/Ocean_Analysis
+4db7833 Ocean anomalies season 12 and 6 month separatedTrend of 3rd order polynomial calculatedlocked to solar power variation cycles. Segments ocean anomalies spline deegree 3 fitted. (Avoids saw tooth edges of linear fit).2 trends compared and difference (periodic function) added to harmonic resids.3000 month extended backwards. Plot shows correlation with Maunder- and Dalton minimum
+9bf1b28 Merge branch 'master' of https://github.com/aloes2512/Ocean_Analysis
+ca80507 Calculating the smoothed SP from raw SILSO counts first and then average mean values. Power using the same polynomial as before
+427b6d2 Merge branch 'master' of https://github.com/aloes2512/Ocean_Analysis
+cef1769 Authors of article added
+daf00dc Merge branch 'master' of https://github.com/aloes2512/Ocean_Analysis
+91b5b63 Solar power variation at sealevel cloudless equatorial region. Calculated from SILSO sunspot counts (spline interpolated) using formula published :"http://www.lajpe.org/dec11/LAJPE_576_Ambelu_Tebabal_prreprint_corr.pdf". as polynomial with coeff: a= 1365.66 # W/m^2 b= 0.0136  # W/(SP*m^2) c=-0.0000076 # W/(SP*m)^2 at sealevel reduced from 1365.66 to 1000 W/m^2
+766cd66 Merge branch 'master' of https://github.com/aloes2512/Ocean_Analysis
+43f069c Merge branch 'master' of https://github.com/aloes2512/Ocean_Analysis names of file changed
+ea65f59 Merge branch 'master' of https://github.com/aloes2512/Ocean_Analysis
+700164e Merge branch 'master' of https://github.com/aloes2512/Ocean_Analysis names corrected to Ocean_NOAA.data
+b5168d9 Merge branch 'master' of https://github.com/aloes2512/Ocean_Analysis
+67be558 NOAA ERSSTv5 gridded 2x2° monthly data downloaded May,2026. Ocean data extracted using Berkley land ocean mask.The mask is corrected (weighted) for cell size and mean and median values calculated for each month.Result saved as "data/NOAA.ocean.anomalies.rds"
+065c9c9 Add updated NOAA ocean data processing and comparison scripts
+1462b45 test only
+45fa4ad just test the change
+4751a6b New Start of Ocean Analysis selecting only scripts that turned out to be usefull
