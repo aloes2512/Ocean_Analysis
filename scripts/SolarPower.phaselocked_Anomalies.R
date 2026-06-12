@@ -1,32 +1,30 @@
 df=readRDS("data/NOAA.ocean.anomalies.rds") #2068 obs
 library(tidyverse)
 # median not used here
-Ocean_anoma<-df$data%>%dplyr::select(-median.anom)
+Ocean_anoma<-df$data
+N=NROW(Ocean_anoma)
 # eliminate annual and semianual (at equator)
 library(itsmr)
 M=c("season",12,"season",6)
 
-Ocean_anomaly=Ocean_anoma%>%  mutate(anom=Resid(mean.anom,M),
+Ocean_anomaly=Ocean_anoma%>%  mutate(anom=Resid(anoma.mean,M),
                                      trd3=trend(anom,3),
                                      res3=Resid(anom,3))
 # format date as numeric (year decimals)
 library(lubridate)
 Ocean_anomaly=Ocean_anomaly%>%
-  mutate(Year=year(dt.mnth),
-         mnth= (month(dt.mnth)-1)/12,
-         dt.mnth=Year+mnth)
+  mutate(Year=year(date),mnth=month(date))
 Ocean_anomaly%>%ggplot(aes(x=dt.mnth))+
   geom_line(aes(y=anom),col="grey")+
   geom_line(aes(y=trd3),col=2,linewidth=1.3)
 # combine solar_monthly with ocean anomaly
-solar_mnthly=readRDS("data/solar_power.variation.rds")%>%
-  dplyr::select(Time,SI)
+solar_mnthly=readRDS("data/S_power.rds")%>%
+  mutate(SI=TSI-mean(TSI))
 
-solar_mnthly=solar_mnthly%>%rename("dt.mnth"=Time)
 # combine solar and ocean data
 Ocean_solar_anom=Ocean_anomaly%>%
   left_join(solar_mnthly,by="dt.mnth")%>%
-  dplyr::select(dt.mnth,mean.anom,"Solar_Variation"=SI,trd3)
+  dplyr::select(dt.mnth,anoma.mean,"Solar_Variation"=SI,trd3)
 # anchor timeseries solar power
 library(splines)
 # find zero crossings of SI
@@ -40,7 +38,7 @@ zero_crossing_times <- solar_mnthly$dt.mnth[find_nodes(solar_mnthly$SI)]
 # 2. Fit a continuous spline locked at these exact nodes
 # degree = 1 creates  sawtooth a continuous line that bends at the zero-crossings
 # spline degree = 3 creates a smooth, continuous curve through the zero-crossings
-trend_fit <- lm(mean.anom ~ bs(dt.mnth, knots = zero_crossing_times, degree = 3),
+trend_fit <- lm(anoma.mean ~ bs(dt.mnth, knots = zero_crossing_times, degree = 3),
                 data = Ocean_solar_anom)
 
 # 3. Extract the stable Baseline Trend and visualise
@@ -48,7 +46,9 @@ Ocean_solar_anom$Clean_Baseline_Trend <- predict(trend_fit)
 Ocean_solar_anom%>%ggplot(aes(x=dt.mnth))+
   geom_line(aes(y=Clean_Baseline_Trend ),col=2)+
   labs(title="Clean_Baseline_Trend",
-       subtitle = "extracted with spline fit solar power")
+       subtitle = "extracted with spline fit solar power degree= 3")
+
+# Compare spline fitted trend with baseline trend
 Ocean_solar_anom%>%ggplot(aes(x=dt.mnth,y=Clean_Baseline_Trend))+
   geom_line(col=2)+
   geom_line(aes(y=trd3),col=4)+
@@ -57,10 +57,10 @@ Ocean_solar_anom%>%ggplot(aes(x=dt.mnth,y=Clean_Baseline_Trend))+
        subtitle="3rd° poly(blue),Baseline Trend(red),\ndifference (black) ")
 # eliminate season & polynomial trend
 M3=c("season",12,"season",6,"trend",3)
-Ocean_solar_anom=Ocean_solar_anom%>%mutate(res3=Resid(mean.anom,M3))
+Ocean_solar_anom=Ocean_solar_anom%>%mutate(res3=Resid(anoma.mean,M3))
 # 4. Calculate residuals of solar phase locket ocean anomalies
 # residual will now fully retain the solar peaks, troughs, and historical minima!
-Ocean_solar_anom$Solar_Retained_Residuals <- Ocean_solar_anom$mean.anom - Ocean_solar_anom$Clean_Baseline_Trend
+Ocean_solar_anom$Solar_Retained_Residuals <- Ocean_solar_anom$anoma.mean - Ocean_solar_anom$Clean_Baseline_Trend
 Ocean_solar_anom%>%ggplot(aes(x=dt.mnth))+
   geom_line(aes(y=Solar_Retained_Residuals),col="grey")+
   geom_line(aes(y=Clean_Baseline_Trend),col=2)+
@@ -69,18 +69,20 @@ Ocean_solar_anom%>%ggplot(aes(x=dt.mnth))+
 saveRDS(Ocean_solar_anom,"data/Ocean_solar_anom.rds")
 #====================
 Ocean_solar_anom%>%
-  mutate(smth.res=smooth.fft(Solar_Retained_Residuals,f=0.02))%>%
+  mutate(smth.res.11=smooth.fft(Solar_Retained_Residuals,f=0.065),
+         smth.res.3.4=smooth.fft(Solar_Retained_Residuals,f=0.02))%>%
   ggplot(aes(x=dt.mnth))+
   geom_line(aes(y=Solar_Retained_Residuals),col="grey")+
-  geom_line(aes(y=smth.res),col=2)+
+  geom_line(aes(y=smth.res.11),col=2)+
+  geom_line(aes(y=smth.res.3.4),col=4)+
   labs(x="",title = "Resids of sol.phaselocked-trend",
-       subtitle="low-pass filtered (red); cutoff 3.4 years")
+       subtitle="low-pass filtered  \ncutoff 11.2 years (red) 3.4 years (blue)")
+
 #==================
 # dominant long periods from phase locked retained resids and phase locked trend
 #   diff trd3-Cleaned_Baseline_trend / smth.res = smooth.fft(Solar_Retained...)
 Long_periods=Ocean_solar_anom%>%
   mutate(smth.res=smooth.fft(Solar_Retained_Residuals,f=0.02))
-colnames(Long_periods)
 # Analyze trends: Clean_Baseline_Trend)-poly trend 3°
 
 Long_periods%>% mutate(trd.period=trd3-Clean_Baseline_Trend,
@@ -104,7 +106,6 @@ extend_backwards <- function(x, n_back = 3000) {
 #apply smth.res, trd.period, long.sum
 Long_periods=Long_periods%>% mutate(trd.period=trd3-Clean_Baseline_Trend,
                        long.sum=trd.period+smth.res)
-colnames(Long_periods)
 N =length(Long_periods$dt.mnth) # 2068
 n_back=3000
 #

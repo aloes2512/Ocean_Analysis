@@ -8,33 +8,15 @@ library(tidyverse)
 library(zoo)
 library(lubridate)
 df=readRDS("data/S_power.rds")
-df_monthly <- df %>%
-  mutate(
-    date = as.Date(date),
-    Year = year(date),
-    Month = month(date)
-  ) %>%
-  group_by(Year, Month) %>%
-  summarize(
-    TSI = mean(TSI, na.rm = TRUE),
-    .groups = "drop" # Automatically ungroups for you
-  ) %>%
-  mutate(
-    # Create a decimal date (e.g., 1881.08) for easier trend fitting
-    Time = Year + (Month - 1) / 12
-  )
+df_monthly <- df %>% rename("Time"=dt.mnth)
 solar_mnthly=df_monthly%>%mutate(SI=TSI-mean(TSI))
 #=======
 Ocean=readRDS("data/NOAA.ocean.anomalies.rds")
-Ocean_anomaly=Ocean$data%>%dplyr::select(-median.anom)%>%mutate(Year=year(dt.mnth),
-                                                  Month=month(dt.mnth))%>%
-              mutate(Time=Year+(Month-1)/12)
+Ocean_anomaly=Ocean$data%>%rename("Time"=dt.mnth)
 Ocean_solar_anom=Ocean_anomaly%>%
-  left_join(solar_mnthly,by=c("Time","Year","Month"))%>%
-  dplyr::select(Time,"Ocean_Anomaly"=mean.anom,"Solar_Variation"=SI)
+  left_join(solar_mnthly,by=c("Time"))%>%
+  dplyr::select(Time,"Ocean_Anomaly"=anoma.mean,"Solar_Variation"=SI)
 
-# --- 1. Data Preparation (Mockup of your data structure) ---
-# Ocean_solar_anom has columns: Time, Ocean_Anomaly, Solar_Variation
 # Solar_Variation: quadratic-transformed negative binomial model
 
 # Identify Solar Nodes (Minima) to define the 10.9-year windows
@@ -90,7 +72,7 @@ Ocean_solar_anom_final%>%ggplot(aes(x=Time,y=Detrended_Anomaly))+
        subtitle = "Linear Trends dependent on Schwabe Cyles")
 N.mnth=NROW(Ocean_solar_anom_final) #2068
 Ocean_solar_anom_final=Ocean_solar_anom_final%>% mutate(res.smth=smooth.fft(Detrended_Anomaly,f=0.003))
-  Ocean_solar_anom_final%>%  ggplot(aes(x=Time,y=res.smth))+geom_line()+
+Ocean_solar_anom_final%>%  ggplot(aes(x=Time,y=res.smth))+geom_line()+
   labs(title = "Ocean: Local Detrended Anomaly",
        subtitle = "phase_locked to solar power\nsmoothed fft f = 0.003")
 FFT.detrnd.loc=tibble(idx=1:N.mnth-1,
@@ -108,7 +90,7 @@ Y.detrnd.4=tibble(Time=Ocean_solar_anom_final$Time,
 Y.detrnd.4%>%ggplot(aes(x=Time,y=y.4mx))+
   geom_line(col="grey")+
   geom_line(aes(y=y.smth),col=2)+
-  labs(y="harmonics amp",title = "Resids Phase locked regression",
+  labs(y="harmonics amp",title = "Ocean Phase locked regression",
        subtitle = "locked to Solar Power Schwabe cycle (red)")
 N.mnth*0.06 # cutt-off 124.08 month 10.3 years
 #.4 Trend analysis
@@ -160,7 +142,7 @@ Ocean_anomaly_trend%>%
   geom_line()+
   labs(x="",title = "Ocean Anomaly Trend ",
        subtitle = "integrated from lin trends locked to \nsolar power Schwabe Cycle")
-FFT.seg_trd=tibble(idx=1:N.mnth,
+FFT.seg_trd=tibble(idx=1:N.mnth-1,
                    spc=fft(Ocean_anomaly_trend$Integrated_Scaled),
                    amp= Mod(spc))
 FFT.seg_trd%>%subset(idx<100)%>%arrange(desc(amp))
@@ -170,16 +152,16 @@ FFT.seg_trd=FFT.seg_trd%>%mutate(period.yr=N.mnth/(idx*12))
 #============
 # Filter for the post-1975 'Double Warming'?
 df_modern=Ocean_anomaly_trend%>%subset(Time>1975)
-df_modern$Time%>%range() # 1975 2026.25
+df_modern$Time%>%range() # 1975.083 2026.25
 
 # 1. Calculate the Solar Slope (Rate of natural recovery)
 modern_slope <- lm(Integrated_Scaled ~ Time, data = df_modern)$coefficients[2]
-modern_slope # 0.0155
+modern_slope # 0.01614356
 total_trend.slope <- lm(Integrated_Scaled ~ Time, data=Ocean_anomaly_trend)$coefficients[2]
-total_trend.slope # -0.003352184
+total_trend.slope # -0.003480114
 slope.trend_change=modern_slope-total_trend.slope #0.019
 ocean_slope <- lm(Ocean_Anomaly~Time,data=Ocean_solar_anom)$coefficients[2]
-ocean_slope # 0.0039
+ocean_slope # 0.004002899
 Ocean_anomaly.phaselocked= list(Ocean_anomaly_detrend=Ocean_anomaly_trend,
                                 periods=FFT.seg_trd,
                                 time.range=range(Ocean_anomaly$Time))
