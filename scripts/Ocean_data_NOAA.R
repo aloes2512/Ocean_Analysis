@@ -2,46 +2,60 @@
 library(terra)
 library(tidyverse)
 url.NOAA.psl="https://downloads.psl.noaa.gov/Datasets/noaa.ersst.v5/sst.mnmean.nc"
-#browseURL("https://downloads.psl.noaa.gov/Datasets/noaa.ersst.v5/")
+browseURL("https://psl.noaa.gov/site_index.html")
+browseURL("https://downloads.psl.noaa.gov/Datasets/noaa.ersst.v5/")
 #download.file(url.NOAA.psl,
 #              destfile = "data/sst.mnmean.nc",
 #             method = "libcurl",
 #             mode = "wb")
 # download did overwrite sst.mnmean.nc
 sst_stack <- rast("~/Downloads/sst.mnmean-2.nc")
-dim(sst_stack) #89 180 2068
+
 library(lubridate)
 date=time(sst_stack) # "1854-01-01" "2026-04-01"
+
 dt.mnth=year(date)+(month(date)-1)/12
+
 length(dt.mnth) # 2068
+
 berk_mask = terra::rast("data/Land_and_Ocean_1x1_SST_at_sea_ice.nc")$land_mask
 crs(berk_mask)=crs(sst_stack)
+
 # ocean cells to limit land included < 10%
 ocean_mask <- terra::mask(berk_mask, berk_mask < 0.1,maskvalues=F)
 ocean_frac <- 1 - berk_mask  # Ocean fraction [0,1]
 # 1. Force the mask to match the SST grid perfectly
 # 'near' is used because it's a categorical (0/1) mask
 ocean_mask_fixed <- terra::resample(ocean_frac, sst_stack, method = "near")
+
 # Convert 0 to NA so they are excluded from the "ranking"
 ocean_mask_na <- ocean_mask_fixed
+
 ocean_mask_na[ocean_mask_na == 0] <- NA
 #________
 weights_abs <- cellSize(sst_stack[[1]], unit="km")
+
 # 2. Convert to relative weights (0 to 1 scale)
 # This divides every cell by the area of an equatorial cell
 weights_rel <- weights_abs / global(weights_abs, "max", na.rm=TRUE)[1,1]
+
 #_________
 weighted_sst_stack <- sst_stack * ocean_mask_na*weights_rel
+
 #=====
 # not global mean corrected mean taking only ocean cells
 # Correct Mean = Sum of weighted values / Sum of weights
 #ocean.anom_noaa<- unlist(global(weighted_sst_stack, fun="mean", na.rm=TRUE))
 ocean.anom_noaa.sum=unlist(global(weighted_sst_stack, fun="sum", na.rm=TRUE))
+
 # Create a weight layer that only exists where the SST data exists
 active_weights <- mask(weights_rel, sst_stack[[1]])
+
 # Now your denominator is perfectly synced to the available data
 sum_of_ocean_weights <- global(active_weights, fun="sum", na.rm=TRUE)
+
 ocean_anom_noaa <- ocean.anom_noaa.sum / as.numeric(sum_of_ocean_weights)
+
 Ocean_mean.anom=tibble(dt.mnth=time(sst_stack),
                        anoma.mean=ocean_anom_noaa )
 # =========
@@ -140,6 +154,11 @@ NOAA.Ocean.anomalies=tibble(dt.mnth=dt.mnth,
                       anoma.median=sst.median-mean(sst.median,na.rm=T))
 
 summary(NOAA.Ocean.anomalies)
+NOAA.Ocean.anomalies%>%ggplot(aes(x=dt.mnth))+
+  geom_line(aes(y=anoma.mean),col="grey")+
+  geom_point(aes(y=anoma.mean),size=0.2,col=2)
+#-----
+summary(NOAA.Ocean.anomalies)
 
 
 
@@ -156,8 +175,6 @@ Ocean_NOAA.data=list(url.source="https://downloads.psl.noaa.gov/Datasets/noaa.er
                      data.grid=sst_stack,
                      data=NOAA.Ocean.anomalies)
 
-saveRDS(Ocean_NOAA.data,"data/NOAA.ocean.anomalies.rds")
+saveRDS(Ocean_NOAA.data,"data/NOAA.ocean.anomalies.v2.rds")
 rm(Ocean_NOAA.data)
-Ocean_NOAA.data=readRDS("data/NOAA.ocean.anomalies.rds")
-NOAA.Ocean.anomalies=Ocean_NOAA.data$data
 
