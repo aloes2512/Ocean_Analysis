@@ -64,3 +64,4 @@ AMO_Baseline_Trend.plt+ geom_line(data=Global_solar_anom,
             aes(x=dt.mnth,y=Baseline_Trend ),col=4)+
   labs(x="",title = "Solar Locked Baseline Trends",
        subtitle = "Global(blue)/AMO(red) ")
+ggsave("figs/Global.AMO_lcked.trends.png")
