@@ -46,12 +46,15 @@ Ocean_solar_anom%>%ggplot(aes(x=dt.mnth))+
   geom_line(aes(y=Clean_Baseline_Trend ),col=2)+
   labs(title="Clean_Baseline_Trend",
        subtitle = "extracted with spline fit solar power degree= 3")
+ggsave("figs/solarlockd.Baseline_Trend.png")
 #===========
 Ocean_solar_anom=Ocean_solar_anom%>%mutate(har.trd=Clean_Baseline_Trend-trd3)
 saveRDS(Ocean_solar_anom,"data/Ocean_solar_anom")
 FFT.har.trd=tibble(idx=1:N-1,
                    spc=fft(Ocean_solar_anom$har.trd),
                    amp=Mod(spc))
+FFT.har.trd%>%arrange(desc(amp))
+N/(12*c(3,2,7,5,8))
 #max periods N/2:9
 library(itsmr)
 Ocean_solar_anom=Ocean_solar_anom%>%
