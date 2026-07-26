@@ -1,20 +1,20 @@
-df=readRDS("data/NOAA.ocean.anomalies.list.rds") #2116 obs
+df=readRDS("data/Ocean_solar_anom.rds") #2068 obs
+colnames(df)
 library(tidyverse)
-# median not used here
-Ocean_anoma<-df$data%>%dplyr::select(dt.mnth,"Anomaly"=anoma.mean)
-N=NROW(Ocean_anoma) #2116
-# eliminate annual and semiannual (at equator) and linear trend
 library(itsmr)
+Ocean_anoma<-Ocean_anoma<-df%>%
+  dplyr::select(dt.mnth,"Anomaly"=anom,Clean_Baseline_Trend,Solar_Retained_Residuals)
+N=NROW(Ocean_anoma) #2116
+# eliminate annual and semianual (at equator)
+
 M=c("season",12,"season",6)
 Ocean_anomaly=Ocean_anoma%>%  mutate(anom=Resid(Anomaly,M),
-                                     trd3=trend(anom,3),
-                                     res3=Resid(anom,3))
-library(lubridate)
+                                     trd5=trend(anom,5),
+                                     res5=Resid(anom,5))
 
 Ocean_anomaly%>%ggplot(aes(x=dt.mnth))+
   geom_line(aes(y=anom),col="grey")+
-  geom_line(aes(y=trd3),col=2,linewidth=1.3)
-
+  geom_line(aes(y=trd5),col=2,linewidth=1.3)
 
 # combine solar_monthly with ocean anomaly
 solar_mnthly=readRDS("data/S_power.rds")%>%
@@ -23,7 +23,8 @@ solar_mnthly=readRDS("data/S_power.rds")%>%
 # combine solar and ocean data
 Ocean_solar_anom=Ocean_anomaly%>%
   left_join(solar_mnthly,by="dt.mnth")%>%
-  dplyr::select(dt.mnth,Anomaly,"Solar_Variation"=SI,trd3)
+  dplyr::select(dt.mnth,anom,"Solar_Variation"=SI,trd5)
+
 # anchor timeseries solar power
 library(splines)
 # find zero crossings of SI
@@ -37,8 +38,9 @@ zero_crossing_times <- solar_mnthly$dt.mnth[find_nodes(solar_mnthly$SI)]
 # 2. Fit a continuous spline locked at these exact nodes
 # degree = 1 creates  sawtooth a continuous line that bends at the zero-crossings
 # spline degree = 3 creates a smooth, continuous curve through the zero-crossings
-trend_fit <- lm(Anomaly ~ bs(dt.mnth, knots = zero_crossing_times, degree = 3),
+trend_fit <- lm(anom ~ bs(dt.mnth, knots = zero_crossing_times, degree = 3),
                 data = Ocean_solar_anom)
+
 
 # 3. Extract the stable Baseline Trend and visualise
 Ocean_solar_anom$Clean_Baseline_Trend <- predict(trend_fit)
@@ -46,71 +48,64 @@ Ocean_solar_anom%>%ggplot(aes(x=dt.mnth))+
   geom_line(aes(y=Clean_Baseline_Trend ),col=2)+
   labs(title="Clean_Baseline_Trend",
        subtitle = "extracted with spline fit solar power degree= 3")
-ggsave("figs/solarlockd.Baseline_Trend.png")
 #===========
-Ocean_solar_anom=Ocean_solar_anom%>%mutate(har.trd=Clean_Baseline_Trend-trd3)
-saveRDS(Ocean_solar_anom,"data/Ocean_solar_anom")
+Ocean_solar_anom=Ocean_solar_anom%>%mutate(har.trd=Clean_Baseline_Trend-trd5)
+
 FFT.har.trd=tibble(idx=1:N-1,
                    spc=fft(Ocean_solar_anom$har.trd),
                    amp=Mod(spc))
-FFT.har.trd%>%arrange(desc(amp))
-N/(12*c(3,2,7,5,8))
-#max periods N/2:9
-library(itsmr)
+FFT.ordrd<-FFT.har.trd%>%arrange(desc(amp))%>%subset(idx<N/2)
+prds.ordrd<-FFT.ordrd%>%mutate(prds=N/(idx))%>%pull(prds) # mx.prds yrs: 58.8;22;44.1;25.2;35.3;88.2
 Ocean_solar_anom=Ocean_solar_anom%>%
-  mutate(max.hr.trd=hr(har.trd,N/2:9)) # periods manually from FFT.har.trd
+  mutate(max.hr.trd=hr(har.trd,prds.ordrd[1:5])) # periods manually from FFT.har.trd
 Ocean_solar_anom%>%ggplot(aes(x=dt.mnth))+
-  geom_line(aes(y=har.trd,col="har.trd"))+
-  geom_line(aes(y=Clean_Baseline_Trend,col="Baseline"))+
-  geom_line(aes(y=trd3,col="trd3"))
+  geom_line(aes(y=max.hr.trd),col=2,linetype = 2)+
+  geom_line(aes(y=Clean_Baseline_Trend))+
+  geom_line(aes(y=Clean_Baseline_Trend-max.hr.trd))+
+  labs(x="",title = "5 max. harm in sol.lckd trd")
 #========
+
 # Compare spline fitted trend with baseline trend
 
-# eliminate season & polynomial trend
-#?M3=c("season",12,"season",6,"trend",3)
-#?Ocean_solar_anom=Ocean_solar_anom%>%mutate(res3=Resid(anoma.mean,M3))
-# 4. Calculate residuals of solar phase locket ocean anomalies
+Ocean_solar_anom%>%ggplot(aes(x=dt.mnth,y=Clean_Baseline_Trend))+
+  geom_line(col=2)+
+  geom_line(aes(y=trd5),col=4)+
+  geom_line(aes(y=Clean_Baseline_Trend-trd5),col=9)+
+  labs(title="Compare Ocean Anomaly Trends",
+       subtitle="5th° poly(blue),Baseline Trend(red),\ndifference (black) ")
 # residual will now fully retain the solar peaks, troughs, and historical minima!
-Ocean_solar_anom$Solar_Retained_Residuals <- Ocean_solar_anom$Anomaly - Ocean_solar_anom$Clean_Baseline_Trend
-Ocean_solar_anom%>%ggplot(aes(x=dt.mnth))+
-  geom_line(aes(y=Solar_Retained_Residuals),col="grey")+
-  geom_line(aes(y=har.trd,col="har.trd"))+
-  geom_line(aes(y=Clean_Baseline_Trend,col="Baseline"))+
-  geom_line(aes(y=trd3,col="trd3"))+
-  labs(x="",title = "Decomposed Solar_locked Anomalies",
-       subtitle = "Trends: Baseline, polytrd3\n harmonic part of Baseline")
- # total harmonics
-Ocean_decomp_anomalies<-Ocean_solar_anom%>%
-  mutate(Anomaly.total=Solar_Retained_Residuals+har.trd)%>%
-  dplyr::select(dt.mnth,Anomaly.total,trd3)
-Ocean_decomp_anomalies%>%ggplot(aes(x=dt.mnth))+
-  geom_line(aes(y=Anomaly.total))+
-  geom_smooth(aes(y=Anomaly.total))+
-  labs(x="",title="Solar Locked Anomalies")
-#=========================
-Ocean_solar_anom%>%ggplot(aes(x=dt.mnth))+
-  geom_line(aes(y=Solar_Retained_Residuals),col="grey")+
+Ocean_solar_anom$Solar_Retained_Residuals <- Ocean_solar_anom$anom - Ocean_solar_anom$Clean_Baseline_Trend
+Ocean_solar_anom%>%ggplot(aes(x=dt.mnth)) +
   geom_line(aes(y=Clean_Baseline_Trend),col=2)+
   labs(title = "Decomposition Ocean Anomalies",
-       subtitle = "phaselocked to solarpower\n trend fitted to solar power")
+       subtitle = " trend fitted to solar power")
 saveRDS(Ocean_solar_anom,"data/Ocean_solar_anom.rds")
 # Long_periods==Ocean_solar_anom+smth.res (Solar_Retained_Residuals,f=0.02)
 #====================
-Ocean_decomp_anomalies<-Ocean_decomp_anomalies%>%
-  mutate(hr15=hr(Anomaly.total,N/1:15), # 11.75 years
-         hr50=hr(Anomaly.total,N/1:50))
-
-Ocean_decomp_anomalies%>%  ggplot(aes(x=dt.mnth))+
-  geom_line(aes(y=Anomaly.total),col="grey")+
-  geom_line(aes(y=hr15),col=2)+
-  geom_line(aes(y=hr50),col=4)+
+Ocean_solar_anom%>%
+  mutate(smth.res.11=smooth.fft(anom,f=0.065),
+         smth.res.3.4=smooth.fft(anom,f=0.02))%>%
+  ggplot(aes(x=dt.mnth))+
+  geom_line(aes(y=anom),col="grey")+
+  #geom_line(aes(y=smth.res.11),col=2)+
+  geom_line(aes(y=smth.res.3.4),col=4)+
   labs(x="",title = "Resids of sol.phaselocked-trend",
-       subtitle="low-pass filtered hr min pperiods > 11.75 yr;> 3.5 yr")
+       subtitle="low-pass:cutoff 11.2 years (red) 3.4 years (blue)")
 
 #==================
 # dominant long periods from phase locked retained resids and phase locked trend
+#   diff trd5-Cleaned_Baseline_trend / smth.res = smooth.fft(Solar_Retained...)
+Ocean_solar_anom=Ocean_solar_anom%>%
+  mutate(smth.res=smooth.fft(Solar_Retained_Residuals,f=0.02))
 # Analyze trends: Clean_Baseline_Trend)-poly trend 3°
 
+Ocean_solar_anom%>% mutate(trd.period=trd5-Clean_Baseline_Trend,
+                       long.sum=trd.period+smth.res)%>%
+  ggplot(aes(x=dt.mnth))+geom_line(aes(y=long.sum),col=2)+
+  geom_line(aes(y=smth.res),col=3,linetype = 2)+
+  geom_line(aes(y=trd.period),col=4,linetype = 2)+
+  labs(x="",title = "Sum of dominant harmonics",
+       subtitle = "harmonic part of phaselocked trend \n smoothed sol. retained res")
 # ext backwards
 library(gsignal)
 extend_backwards <- function(x, n_back = 3000) {
@@ -122,29 +117,20 @@ extend_backwards <- function(x, n_back = 3000) {
   fft_ext <- fft_orig[idx_ext]
   Re(ifft(fft_ext) * N_ext)
 }
-# har.trd contains harmonic periods
-
-
-Ocean_solar_anom=Ocean_solar_anom%>%
-  mutate(har.trdres=trd3-Clean_Baseline_Trend,
-         sol.res=Anomaly-Clean_Baseline_Trend,
-         anomalies=har.trdres+sol.res)
-Ocean_solar_anom%>%ggplot(aes(x=dt.mnth))+
-  geom_line(aes(y=anomalies),col=2)+
-  geom_line(aes(y=sol.res),col="grey")
-
+# add trd.harm to anomaly to get long.sum
+#apply smth.res, trd.period, long.sum
+Ocean_solar_anom=Ocean_solar_anom%>% mutate(trd.period=trd5-Clean_Baseline_Trend,
+                                    long.sum=trd.period+smth.res)
 N =length(Ocean_solar_anom$dt.mnth) # 2116
 n_back=3000
 
-
-Solar_total_residuals=Ocean_solar_anom%>%
-  dplyr::select(dt.mnth,anomalies,sol.res)
-Solar_total_residuals$dt.mnth[1] # 1850
+Long_dominant=Ocean_solar_anom%>%
+  dplyr::select(dt.mnth,smth.res,trd.period,long.sum)
+Ocean_solar_anom$dt.mnth[1] # 1850
 # extend backwards
-my_dominant=Solar_total_residuals$anomalies
-Ext.dominant= tibble(dates_ext= seq(1600,by=1/12,length.out=N+n_back),
-                      anoma.ext=hr(extend_backwards(my_dominant,n_back = 3000),N/1:20)
-)
+my_dominant=Long_dominant$long.sum
+Ext.dominant= tibble(dates_ext= seq(1604,by=1/12,length.out=N+n_back),
+                     anoma.ext=smooth.fft(extend_backwards(my_dominant,n_back = 3000),f=0.01))
 
 #============
 Ext.dominant %>%
@@ -190,7 +176,7 @@ Ext.dominant %>%
 
   # NEW: Added Dalton Minimum Text
   annotate("text",
-           x = 1810,    # Centered between 1790 and 1830
+           x = 1810,                    # Centered between 1790 and 1830
            y = 0,
            label = "Dalton Minimum",
            angle = 90,
@@ -200,8 +186,7 @@ Ext.dominant %>%
            fontface = "bold") +
 
   theme_minimal() +
-  labs(title = "Ext.backwards of harmonic Residuals",
+  labs(title = "Ext. sum of Dominant Harmonics",
        subtitle = "harmonic part of phaselocked trend\n smoothed retained resids",
        x = "Year", y = "Dominant Harmonic")
-#=======================
 
