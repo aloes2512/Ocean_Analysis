@@ -37,7 +37,7 @@ plot(s,type="paired",idx=1:10)
 # 1. Extract the reconstructed trend component vector
 rc <- reconstruct(s, groups = list(Trend = 1:2))
 trend_vec <- as.numeric(rc$Trend)
-
+Time = Ocean_solar_anomaly$dt.mnth
 # 2. Build a data frame (replace time_vec with your actual time or index vector)
 df_trend <- tibble(
   Time = Ocean_solar_anomaly$dt.mnth, # or your date/year axis: Ocean_solar_anomaly$time
@@ -47,12 +47,12 @@ df_trend <- tibble(
 
 # 3. Plot isolated trend overlaid on original input
 ggplot(df_trend, aes(x = Time)) +
-  geom_line(aes(y = Original), color = "gray60", alpha = 0.6, size = 0.6) +
-  geom_line(aes(y = Trend), color = "firebrick", size = 1.2) +
+  geom_line(aes(y = Original), color = "black", linetype = 2, lwd = 1.2) +
+  geom_line(aes(y = Trend), color = "firebrick", lwd = 0.6) +
   labs(
     title = "SSA Reconstructed Trend (Components 1–2)",
-    x = "Time Index",
-    y = "Anomaly / Trend Units"
+    x = "",
+    y = "Anomaly / Trend "
   ) +
   theme_minimal()
 #===========
@@ -75,7 +75,8 @@ df_trend <- df_trend %>%
     industrial_logistic = predict(fit_log),
     natural_residual    = Trend - industrial_logistic
   )
-
+which.max(diff(df_trend$industrial_logistic)) #1987
+diff(df_trend$industrial_logistic)[1987]
 # 3. Visualize the separation
 ggplot(df_trend, aes(x = Time)) +
   geom_line(aes(y = Trend, color = "Trend.ssa"), size = 1) +
@@ -96,3 +97,4 @@ ggplot(df_trend, aes(x = Time)) +
   ) +
   theme_minimal() +
   theme(legend.position = "bottom")
+ggsave("figs/separ_industr.natural.png")
