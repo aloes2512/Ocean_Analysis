@@ -84,7 +84,7 @@ plt.ssa.decomp=res_df%>%ggplot(aes(x=dt.mnth))+
        subtitle= "decomposed original @ harmonics")
 print(plt.ssa.decomp)
 # 1. Fit standard 4-parameter logistic model to the 1-2 SSA trend
-L <- 64
+L <- 132
 s <- ssa(trd_solar, L = L)
 rc <- reconstruct(s, groups = list(Trend = 1:2))
 trend_vec <- as.numeric(rc$Trend)
@@ -100,8 +100,8 @@ fit_log <- nlsLM(
   start = list(L = 1.0, k = 0.03, t0 = 1990, b = -0.2)
 )
 round(coef(fit_log),3) #  L       k    t0       b
-                      # 1.082 0.047 2015.870 -0.126
-t0=coef(fit_log)[["t0"]] # 2015.87
+                      # 1.068 0.047 2015.345 -0.126
+t0=coef(fit_log)[["t0"]] # 2015.345
 Trend.max=coef(fit_log)["L"]+coef(fit_log)["b"] # 0.956
 Trend.min=coef(fit_log)["b"] # -0.1263
 Trend.range=coef(fit_log)["L"] # 1.082458
@@ -151,8 +151,9 @@ my_anomaly.resd%>%ggplot(aes(x=dt.mnth))+
   #geom_line(aes(y=gleis.low_pass,col="gleis"))+
   geom_line(aes(y=sum.low_pas,col="sum"),lwd= 1.2)+
   labs(x="",title = "Total Residuals (pre-industrial)",
-       subtitle = "harmonic parts (Schwabe, Hale)")
-# is the schwabe plot the consequence of an
+       subtitle = "band-pass (harmonic parts; Schwabe, Hale)")
+ggsave("figs/Schwabe.Hale.png")
+# the schwabe plot the consequence of an
 #interaction of two frequencies
 library(lomb)
 
