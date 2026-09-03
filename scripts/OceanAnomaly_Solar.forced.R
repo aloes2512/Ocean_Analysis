@@ -10,6 +10,7 @@ Ocean_solar_anomaly%>%ggplot(aes(x=dt.mnth))+
   geom_line(aes(y=pow.fit,col="lm"))+
   labs(x="",y="ocean anomaly",
        title = "Ocean Anomaly Response to\n Solar Forcing (1850–2020)")
+ggsave("figs/Anomaly.solarforced.png")
 # comparing AIC
 # Extract residual sum of squares and effective parameters
 n <- pow.loess$n #2112
@@ -58,10 +59,11 @@ Ocean_solar_anomaly%>%ggplot(aes(x=dt.mnth))+
   geom_line(aes(y=pow.fit,col="lm"))+
   labs(x="",y="ocean anomaly",
        title = "Ocean Anomaly Response to\n Solar Forcing (1850–2020)")
+ggsave("figs/Anomaly.solarforced.png")
 Ocean_solar_anomaly%>%ggplot(aes(x=dt.mnth))+
   geom_line(aes(y=pow.gam,col="gam"))+
   geom_line(aes(y=pow.loess,col="loess"),linetype = 4)+
   labs(x="",y="ocean anomaly",
        title = "Ocean Anomaly Response to\n Solar Forcing (1850–2020)",
        subtitle= " comparing: gam and loess fit")
-
+ggsave("figs/Anomaly.solar.loess.gam.png")
