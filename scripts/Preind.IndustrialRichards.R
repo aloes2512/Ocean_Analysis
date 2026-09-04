@@ -170,6 +170,7 @@ ggplot(df_results, aes(x = dt.mnth)) +
   geom_line(aes(y = industrial_gam, color = "GAM Trd"), lwd = 0.6) +
   geom_line(aes(y = richardsB, color = "Richards"), lwd = 1.1) +
   geom_vline(xintercept = p_B["t0"], linetype = 2,col=3) +
+  geom_hline(yintercept = p_B["L"]+p_B["Delta"],linetype= 2)+
   scale_color_manual(values = c("GAM Trd" = "grey40", "Richards" = "firebrick")) +
   labs(
     x = NULL, y = "Anomaly Trend",
@@ -177,4 +178,5 @@ ggplot(df_results, aes(x = dt.mnth)) +
     subtitle="GAM Trend vs. Richards Model"
   ) +
   theme_minimal()
-
+ggsave("figs/Industr.Richards.mdl.png")
+p_B["nu"] #  0.571017
