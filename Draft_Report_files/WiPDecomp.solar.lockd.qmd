@@ -1,0 +1,430 @@
+---
+title: "Decomposition of Solar-Locked Ocean SST   Anomalies"
+format: html
+editor: visual
+echo: false
+execute:
+  warning: false
+  message: false
+---
+
+### Executive Summary
+
+This study decomposes global ocean sea surface temperature (SST) anomalies (1850–2026) to isolate secular anthropogenic warming from natural climate variability. Utilizing Singular Spectrum Analysis (SSA) paired with ESPRIT parameter estimation, primary oscillatory modes were characterized: the \~20.1-year bidecadal/Hale magnetic cycle ($\vert{}z\vert{} \approx 1.0002$), a split \~11-year Schwabe solar band ($T_1 = 10.2$, $T_2 = 12.3$ years) exhibiting amplitude modulation, and a sub-decadal ENSO recharge oscillator mode ($3\text{--}6$ years).
+
+\
+
+To separate anthropogenic forcing without distorting low-frequency natural variability, a non-parametric Generalized Additive Model (GAM, $k=30$, $bs=\text{"cr"}$) was anchored to the pre-1938 baseline. Subtracting this extrapolated baseline isolates a near-zero pre-WWII industrial component ($0.0^\circ\text{C}$) that accelerates sharply post-1950.
+
+\
+
+Modeling this industrial signal using an asymmetric Richards growth curve—with the secular growth rate fixed to the independent solar-locked trend ($B \approx 0.05$)—yields a turning point at $t_0 = 1980.5$. This represents an 8.2-year forward shift compared to a standard symmetric logistic fit ($t_0 = 1988.7$). Unconstraining the shape parameter ($\nu \neq 1$) accommodates early-stage upper-ocean thermal buffering while dampening non-physical asymptotic runaway post-2010.
+
+\
+
+Crucially, superimposing the isolated components reveals that multi-decadal natural troughs at \~1910 and \~1998 ($\approx -0.35^\circ\text{C}$) masked the true anthropogenic trajectory. The mid-to-late 20th-century "plateau" in unadjusted surface anomalies was not a deceleration in forced warming, but the destructive interference of a deep natural anomaly trough spanning 1995–2002 over a rapidly steepening industrial trend. Consequently, the true post-1960 anthropogenic impact is significantly larger than raw surface anomaly records suggest.
+
+### Load Data: Global Solar Anomaly
+
+It has been shown that solar irradiation (sun-power) is a quadratic function of sunspot numbers. Cycles (Published by SILSO). The observed time is cut into segments which length is defined by the zero crossings of the solar power variation. Using these segments to interpolate the observed anomaly by 3rd order splines one gets a *periodic modeled trend*. The non periodic part is separated using a low-pass filter using a loess fit (span=0.25) and is named in the following *Ocean Solar Locked Trend* (variable name = trend.solar).
+
+```{r solar.locked}
+library(tidyverse)
+library(Rssa)
+library(itsmr)
+library(minpack.lm)
+library(gsignal)
+Ocean_solar_anomaly<-readRDS("../data/Ocean_solar_anomaly.rds")
+N<-NROW(Ocean_solar_anomaly)
+M.ssn=c("season",12,"season",6)
+my_dat<-Ocean_solar_anomaly%>%
+  mutate(anomaly=Resid(Anomaly,M.ssn))%>%
+  dplyr::select(dt.mnth,trend.solar,anomaly)
+# 1. Fit LOESS to extract non-harmonic solar trend
+ 
+lcked.trend<-Ocean_solar_anomaly$trend.solar
+time=Ocean_solar_anomaly$dt.mnth
+
+fit_loess <- loess(lcked.trend ~ time, span = 0.25, degree = 2)
+
+my_dat<-my_dat%>%mutate(trend_non_harmonic = predict(fit_loess))
+#  plot non harmonic locked trend
+Min_1910<-time[which.min(my_dat$trend_non_harmonic)]
+branch1950<-my_dat%>%subset(dt.mnth>1950)%>%
+  pull(trend_non_harmonic)
+x<-which.min(branch1950)/12
+# turning point around 2000
+branch1975<-my_dat%>%subset(dt.mnth>1975)%>%pull(trend_non_harmonic)
+Min_1960<-1950+which.min(branch1950)/12
+diff(branch1975)%>%which.min()
+Difmin_1975<-1975+which.min(diff(branch1975))/12
+plt.sol.lcked=my_dat%>%ggplot(aes(x=dt.mnth))+ 
+  geom_line(aes(y=trend_non_harmonic))+
+  geom_vline(xintercept =Min_1910,linetype = 2 )+
+  geom_vline(xintercept = Min_1960,linetype = 2 )+
+  geom_vline(xintercept = Difmin_1975,linetype = 3)+
+  labs(x="",title= "Ocean Solar Locked Trend",
+          subtitle = "smoothed: loess span = 0.25")
+print(plt.sol.lcked)
+```
+
+*Note:* The solar locked trend (harmonic part stripped) has two minima \@ ( 1910 and 1960) and a turning point \@ 1996. In the plot they are visualized by three vertical lines.
+
+#### Calculate Residuals of solar-locked trend
+
+The solar locked trend includes periodic parts. These need to be added to the residuals to get the total of all harmonic dependence of the global ocean anomalies.
+
+```{r resid.solar.lckd}
+# 2. Extract total residuals 
+my_dat<-my_dat%>%mutate(resids.total=anomaly-trend_non_harmonic)
+plt.total.harm<-my_dat%>%ggplot((aes(x=dt.mnth)))+
+  geom_line(aes(y=hr(resids.total,N/2:60)),col=5)+
+  geom_line(aes(y=trend_non_harmonic),col=2)+
+  labs(x="",title = "Anomaly and  Non-Harmonic-Trend",
+       subtitle="Anomaly Band-Pass: periods > 3 and < 88 yrs")
+print(plt.total.harm)
+```
+
+### Low-Pass Total Residuals
+
+The Low pass filtered total Residuals. All periods with cutoff length \* \> 5 years \* \> 11 years \* \> 15 years are dominated by the 11 years solar sunspots cycles visualized as part of the total harmonics:
+
+```{r lng.period_sol.lckd}
+N<-NROW(my_dat)
+my_dat=my_dat%>%mutate(long5_resds=hr(resids.total,N/1:35),
+                       long11_resds=hr(resids.total,N/1:16),
+                      long15_resds=hr(resids.total,N/1:12))
+Pks=findpeaks(my_dat$long11_resds,DoubleSided = T)
+Pks=tibble(loc=time[Pks$loc],
+           height=Pks$height)
+trgh1910<- Pks[c(7,9),]
+ampmx=Pks%>%arrange(desc(height))%>%{.[1:10,]}
+trgh1950=ampmx%>%arrange(loc)%>%{.[c(7,9),]}
+plt.total.harm2<-my_dat%>%ggplot(aes(x=dt.mnth))+
+  geom_line(aes(y=long5_resds,col=">5yrs"),linetype = 2)+
+  geom_line(aes(y=long11_resds,col=">11yrs"))+
+  geom_line(aes(y=long15_resds,col=">15yrs"))+
+  
+  labs(x="",title = "Anomaly Residuals: Long Periods",
+       subtitle = "all periods > 5 and 11 yrs")
+print(plt.total.harm2)
+```
+
+Ocean SST anomalies react on solar power irradiation depending on the size and depth of ocean area. (The area heat capacity ). On a global scale these frequency dependent anomalies are seen as superposition averaging the observed values. However looking on the average global trend of the first picture some interesting correlations are visible. There is a deep trough with minimum at 1911 and a second \~1940 to 1960.
+
+**Methodology & Spectral Parameter Estimation**
+
+> To objectively determine the fundamental periodicities, damping characteristics, and stationarity of the primary components isolated via Singular Spectrum Analysis (SSA), an ESPRIT (Estimation of Signal Parameters via Rotational Invariance Techniques) algorithm was applied to the leading reconstructed component pairs. The extracted complex roots ($z = \vert{}z\vert{}e^{i 2\pi f}$) yield both the characteristic oscillation frequencies ($f$) and their corresponding continuous growth/decay rates ($\lambda = \ln \vert{}z\vert{}$).
+
+```{r ssa_sol_resids}
+# 3. Clean SSA on residuals (no trend-interference)
+## resids.total= anomaly-trend.solar
+# 2. Extract stationary residuals for harmonic analysis
+## y_detrended = anomaly-trend_non_harmonic
+my_dat<-my_dat%>%mutate(y_detrended=anomaly-trend_non_harmonic)
+y_detrended<-my_dat$y_detrended
+s <- ssa(y_detrended, L = 1058) # adjust L to your primary harmonic window
+print(plot(s, type = "paired"))        # look for clean circular harmonic pairs
+```
+
+The plot of function pairs shows some perfect harmonic components:20 years Hale cycle and the quasi harmonic frequency band of the solar irradiation used to lock the trend .
+
+```{r cycles_sol.lckd}
+# 1. Structure clean periods grouped reconstructions
+seltd_grps=list(
+  Cycle1    = c(1, 2),
+  Cycle2 = c(3, 4),
+  Cycle3  = c(5, 6),
+  Cycle4  = c( 7, 8),
+  Cycle5 = c(9,10))
+# Estimate parameters for selected  harmonic components (z-transform of damped harmonic oscillations )
+res <- parestimate(
+  s, 
+  groups = seltd_grps, 
+  method = "esprit"
+)
+df <- map_dfr(res, ~ data.frame(
+  frequency = round(unlist(.x$frequencies),6),
+  rate      = round(unlist(.x$rates),5),
+  modulus   = round(unlist(.x$moduli),5)), 
+  .id = "Group") %>%
+  mutate(period = round(1 / frequency,1),Period_Y=round(period/12),2)
+df<- df[,1:6]
+library(knitr)
+
+kable(df, 
+      col.names = c("Cycle Group", "Frequency (f)",  "Rate (λ)", "Modulus (`z`)","Period(month)","Period(years)"),
+      caption = "ESPRIT Harmonic Parameter Estimates",
+      align = c("l", "r", "r", "r", "r","r"),
+      row.names = FALSE)%>% print()
+
+
+
+```
+
+> Parameter estimation reveals three distinct physical regimes within the ocean anomaly time series:
+>
+> 1.  **Bidecadal / Hale Magnetic Mode (Cycle 1):** Component Pair (1,2) isolates a dominant low-frequency cycle at $T \approx 20.14$ years ($241.7$ months). With a modulus $\vert{}z\vert{} = 1.00018$ ($\lambda = +0.00018$), this mode exhibits near-perfect stationarity ($\vert{}z\vert{} \approx 1$), consistent with stable multi-decadal solar-magnetic forcing (the \~22-year Hale cycle) coupled with intrinsic bidecadal ocean variability.
+>
+> 2.  **Split Schwabe Solar Band (Cycles 2 & 3):** The \~11-year Schwabe solar band splits into twin sideband components at $T_2 = 10.23$ years ($122.8$ months) and $T_3 = 12.32$ years ($147.8$ months). This doublet structure indicates amplitude and phase modulation of the solar cycle across the observational record. Cycle 3 displays the strongest damping rate ($\lambda = -0.00079, \vert{}z\vert{} = 0.99921$), reflecting non-stationary energy exchange or decay in the lower sideband, whereas Cycle 2 ($\lambda = +0.00057$) reflects slight local amplitude expansion.
+>
+> 3.  **Interannual Recharge Oscillator / ENSO Band (Cycles 4 & 5):** The higher-frequency component pairs (4,5) and (9,10) resolve periods at $T_4 = 5.25$ years ($63.0$ months) and $T_5 = 4.24$ years ($50.9$ months), capturing the characteristic sub-decadal bandwidth of the equatorial Pacific recharge oscillator and interannual climate modes.
+
+```{r loess_trd.sol}
+
+trend.sol<-Ocean_solar_anomaly$trend.solar
+tme=Ocean_solar_anomaly$dt.mnth
+trd.loess=predict(loess(trend.sol~ tme,span = 0.15),data=Ocean_solar_anomaly)
+loess.df=tibble(dt.mnth=tme,trd.loess=trd.loess)
+loess.df%>%ggplot(aes(x=dt.mnth))+geom_line(aes(y=trd.loess,col="loess"))+geom_line(data=Ocean_solar_anomaly,aes(y=trend.solar,col="trd.sol"))+
+  labs(x="",y="trends.anomaly",title = "Anomaly Trends",subtitle = "compare methods: Rssa vs LOESS")
+```
+
+```{r ssa decomp.trd.sol}
+library(Rssa)
+L <- 128
+trend.solar<-Ocean_solar_anomaly$trend.solar
+s_sol <- ssa(trend.solar, L = L)
+
+df_values <- data.frame(
+  Component = 1:length(s_sol$sigma),
+  SingularValue = s_sol$sigma,
+  VarianceExplained = (s_sol$sigma^2) / sum(s_sol$sigma^2) * 100
+)
+
+ggplot(df_values[1:20, ], aes(x = Component, y = SingularValue)) +
+  geom_point(color = "steelblue", size = 2) +
+  geom_line(color = "steelblue") +
+  scale_y_log10() +
+  scale_x_continuous(breaks = 1:20) +
+  labs(
+    title = "SSA Singular Values (Log Scale)",
+    x = "Component Index",
+    y = "Singular Value (Sigma)"
+  ) +
+  theme_minimal(base_size = 11)
+plot(s_sol, type = "paired", idx = 1:10)
+# plot cor matrix
+w <- wcor(s_sol, groups = 1:10)
+# 2. Extract matrix and convert to long-format tibble
+w_mat <- as.matrix(w)
+
+w_df <- expand.grid(F1 = 1:10, F2 = 1:10) %>%
+  mutate(value = abs(as.vector(w_mat)))
+
+# 3. Plot with clear axes
+ggplot(w_df, aes(x = F1, y = F2, fill = value)) +
+  geom_tile() +
+  scale_fill_gradient(low = "white", high = "blue", limits = c(0, 1)) +
+  scale_x_continuous(breaks = 1:10, expand = c(0, 0)) +
+  scale_y_continuous(breaks = 1:10, expand = c(0, 0)) +
+  coord_fixed() +
+  labs(
+    title = "W-Correlation Matrix",
+    x = "Eigenvector Index",
+    y = "Eigenvector Index",
+    fill = "W-Cor"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text = element_text(size = 8),
+    panel.grid = element_blank()
+  )
+# reconstruct
+res <- reconstruct(s_sol, groups = list(
+  Secular_Trend = c(1),
+  Multidecadal  = c(2, 3),
+  Decadal       = c(4, 5)
+))
+
+res_df=tibble(dt.mnth=Ocean_solar_anomaly$dt.mnth,
+              trend.solar=Ocean_solar_anomaly$trend.solar,
+              Secular.trd=res$Secular_Trend,
+              Multidecadal=res$Multidecadal,
+              Decadal=res$Decadal)
+time<-Ocean_solar_anomaly$dt.mnth
+plt.ssa.decomp=res_df%>%ggplot(aes(x=dt.mnth))+
+  geom_line(aes(y=Secular.trd),col = "firebrick", lwd = 1.5)+
+  geom_line(aes(y=trend.solar),col="grey",lwd=1)+
+  geom_line(aes(y=Decadal+Multidecadal),col="navy")+
+  labs(x="",y="anomaly",
+       title="SSA decomposed Solar Trend",
+       subtitle= "decomposed original @ harmonics")
+print(plt.ssa.decomp)
+```
+
+### Fit to logistic functio Separate Industrial Trend Natural Periods
+
+##### Preind.IndustrialRichards.R
+
+```{r sep_indus.natur}
+library(itsmr)
+Ocean_solar_anomaly=readRDS("../data/Ocean_solar_anomaly.rds")
+M.ssn <- c("season", 12, "season", 6)
+df_full <- Ocean_solar_anomaly %>%
+  mutate(anomaly = Resid(Anomaly, M.ssn)) %>%
+  dplyr::select(dt.mnth, anomaly)
+N <- nrow(df_full) # 2116
+df_train <- df_full[1:floor(N/2), ] # Data pre-1938
+gam_train <- mgcv::gam(anomaly ~ s(dt.mnth, k = 30, bs = "cc"), data = df_train)
+df_results <- df_full %>%
+  mutate(
+    extrapol_pre1938 = predict(gam_train, newdata = df_full),
+    # Difference from the projected pre-industrial trend
+    industrial_effect = anomaly - extrapol_pre1938 ,
+    industr.smth= hr(industrial_effect,N/1:20)
+  )
+plt.exp.preind<-df_results%>%ggplot(aes(x=dt.mnth))+
+  geom_line(aes(y=extrapol_pre1938,col="pre1938"))+
+  geom_line(aes(y=industr.smth,col="ind.smth"))+
+  labs(x="",subtitle= "anomaly split:pre 1938 @ industrial")
+
+fit_log <- nlsLM(
+  industrial_effect ~ b + L / (1 + exp(-k * (dt.mnth - t0))),
+  data = df_results,
+  start = list(
+    b = -0.15,  # Lower asymptote (allows negative shift)
+    L = 0.80,   # Total vertical span / scale
+    k = 0.05,   # Growth rate
+    t0 = 1988   # Inflection point
+  )
+)
+df_results$logist_fit <- predict(fit_log)
+params <- round(coef(fit_log),3)
+t0=params[["t0"]] # line 44
+lower_asymptote <- params["b"] # -0.003
+upper_asymptote <- params["b"] + params["L"] # 0.629
+plot.logistic=df_results %>%
+  ggplot(aes(x = dt.mnth)) +
+  geom_line(aes(y = industrial_effect, color = "Observed"), alpha = 0.5) +
+  geom_line(aes(y = logist_fit, color = "Logistic"), linewidth = 1.2) +
+  geom_hline(yintercept = lower_asymptote, linetype = 2, color = "blue") +
+  geom_hline(yintercept = upper_asymptote, linetype = 2, color = "red") +
+  geom_vline(xintercept = params["t0"], linetype = 3) +
+  scale_color_manual(values = c("Observed " = "grey50", "Logistic" = "cyan4")) +
+  labs(
+    x = "Year",
+    y = "Anomaly Effect",
+    title = "Industrial Model ",
+    subtitle = paste0(" Turning-point (t0): ", round(params["t0"], 1))
+    )
+
+########
+# step1 Richards line 122 -148
+log_coef <- coef(fit_log) #
+B_fixed  <- as.numeric(log_coef["k"]) # Fixed forcing rate coefficient
+
+# 2. Fit Richards model with FIXED B, 
+#leaving t0 free for ocean dynamics
+fit_richards_fixedB <- nlsLM(
+  industrial_effect ~ L + Delta / (1 + exp(-B_fixed * (dt.mnth - t0)))^(1 / nu),
+  data = df_results,
+  start = list(
+    L     = as.numeric(log_coef["b"]),
+    Delta = as.numeric(log_coef["L"]),
+    t0    = as.numeric(log_coef["t0"]), # Free to shift due to climate modes
+    nu    = 1.0
+  ),
+  lower = c(L = -0.5, Delta = 0.5, t0 = 1950, nu = 0.01), # Prevents asymptote collapse
+  control = nls.lm.control(maxiter = 500)
+)
+# Extract parameters
+p_B <- coef(fit_richards_fixedB) #
+round(p_B,3)
+lower_asymptote.rich <- p_B[["L"]] # -0.0005
+upper_asymptote.rich <- p_B[["Delta"]] +p_B[["L"]] # 
+#   L      Delta    t0       nu
+# 0.001    0.611 1980.529    0.571
+df_results$richardsB<-predict(fit_richards_fixedB )
+# 3. Compare timing shift
+t0_log     <- log_coef["t0"]
+t0_richard <- p_B[["t0"]]
+shift_years <- t0_richard - t0_log # -8.186014
+#---------
+library(knitr)
+
+
+shift_years   <- t0_richard - t0_log # -8.186 years
+
+turning_point_df <- data.frame(
+  Model = c("Simple Logistic", "Richards (Fixed B)", "Difference (Shift)"),
+  Inflection_Year = c(round(t0_log, 3), round(t0_richard, 3), round(shift_years, 3)),
+  Interpretation = c(
+    "Symmetrical constraint forces late midpoint",
+    "Earlier max acceleration; sharper upward bend",
+    "8.186-year earlier shift releasing symmetry constraint"
+  )
+)
+
+kable(turning_point_df,
+      col.names = c("Model Architecture", "Turning Point (t0)", "Physical Mechanics"),
+      caption = "Comparison of Turning Point Dynamics Between Symmetric and Asymmetric Fits",
+      align = c("l", "r", "l"))
+#---------
+print(paste("shift years:",round(shift_years,3)))
+plt.comp.logstc=ggplot(df_results,aes(x=dt.mnth))+
+  geom_line(aes(y=richardsB,col="Richar"))+
+  geom_line(aes(y=logist_fit,col="logstc"))+
+  geom_vline(xintercept = 1988,linetype = 2)+
+  geom_vline(xintercept = 1980,linetype = 3)+
+  geom_hline(yintercept = lower_asymptote.rich, linetype = 2, color = "red") +
+  geom_hline(yintercept = upper_asymptote.rich, linetype = 2, color = "darkgreen") +
+  labs(x=NULL,subtitle= "Compare:  simple-logistic vs Richards\nshifted turning point;slope kept identical")
+df_final<-df_results%>%dplyr::select(dt.mnth,anomaly,"indus.trend"=richardsB,"pre_ind"=extrapol_pre1938,industrial_effect) 
+```
+
+#### Plot the decomposition into pre- industrial (natural) and industrial effect
+
+Industrial trend ("indus.trend") built in several steps:
+
+- Splitting anomaly into pre WWII (1938) as gam training set
+
+- Extending the training set to full length of observed data using gam ( assumed to represent natural anomalies)
+
+- Fitting to a model that formulates zero effects industrial effects at times well before 1938 and
+
+- assumes that somehow the industrial emissions effect on ocean SST is limited by fundamental physical processes:
+
+- Vaporization at elevated temperatures ,
+
+- cloud formation,
+
+- albedo reflections...
+
+Fitting (first step) to logistic sigmoid to find the slope of the trend. \*\*\* Improving the fit using a generalize logistic (Richards growth curve) to take care of the assumption that the asymptotic trend of the anomalies is governed by different physical processes in the initial phase and is expected in the saturation phase
+
+```{r summary decomposition}
+plt.decomp<-df_final%>%ggplot(aes(x=dt.mnth))+
+  geom_line(aes(y=anomaly,col="anoma"))+
+  geom_line(aes(y=pre_ind,col="pre-ind"))+
+  geom_line(aes(y=industrial_effect,col="indust"))+ labs(x=NULL,title = "Industrial Natural Decomposed")
+print(plt.decomp)
+```
+
+### Notes
+
+- As the gam extended natural harmonics drop from \~ 1950 to \~ 2000, the natural periods reduce the increase of observed anomaly
+- at times \> 2000 the natural periods rise slowly and contribute to a steeper rise in these times
+- industrial effect turns at this times to a slower ascend.
+
+These effects are better visible by passing the data to lowpass filter with a cutoff frequency corresponding to a period of \~ 9 years
+
+```{r decom low pass}
+plt.final=df_final%>% mutate(anoma.long=hr(anomaly,N/1:20),
+              indus.long=hr(industrial_effect,N/1:20))%>%
+  subset(dt.mnth>1851& dt.mnth<2025)%>%
+  ggplot(aes(x=dt.mnth))+
+  geom_line(aes(y=anoma.long,col="anoma"))+
+  geom_line(aes(y=pre_ind,col="pre-ind"))+
+  geom_line(aes(y=indus.long,col="indust"))+
+  geom_line(aes(y=indus.trend,col="eff.model"),lwd=1.2)
+print(plt.final)
+```
+
+> Decomposing the observed surface anomaly record into its pre-industrial baseline (`pre-ind`) and isolated anthropogenic forcing (`indust`) reveals a crucial phase interaction between natural variability and industrial emissions post-1960:
+>
+> 1.  **Multidecadal Natural Troughs (\~1910 and \~1998):** The isolated pre-industrial baseline displays two major negative excursions reaching approximately $-0.35^\circ\text{C}$: one centered near 1910 and a second prolonged trough between 1995 and 2002.
+>
+> 2.  **Masking of Anthropogenic Acceleration:** During the mid-to-late 20th century, the accelerating industrial forcing (`eff.model`, Olive) was partially offset by a strong negative phase in natural multi-decadal cycles. As a result, the unadjusted anomaly record (`anoma`, Red) exhibits a suppressed slope between 1960 and 2000.
+>
+> 3.  **Implications for Climate Sensitivity:** Isolating the natural baseline demonstrates that the true industrial contribution (`indust`, Cyan) accelerated more rapidly after 1960 than suggested by raw "hockey stick" surface projections. The apparent late-20th-century "plateau" or moderated slope in raw SSTs was not a slowdown in forced warming, but rather the destructive superposition of a deep natural anomaly trough upon an aggressively steepening anthropogenic trend.
