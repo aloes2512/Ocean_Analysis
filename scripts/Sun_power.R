@@ -1,4 +1,5 @@
-# sunspots periodicity
+# Wikipedia "Radiative Forcing"
+# sunspots
 require(tidyverse)
 SP_path<-"http://www.sidc.be/silso"
 #browseURL(SP_path)
@@ -71,3 +72,7 @@ S_power.mnthly%>%ggplot(aes(x=dt.mnth,y=TSI))+geom_line()+
        caption = "http://www.lajpe.org/dec11/LAJPE_576_Ambelu_Tebabal..")
 ggsave("figs/Solar_Irradiation_equator.png")
 saveRDS(S_power.mnthly,"data/S_power.rds")
+# see Wikipedia on CO2 effect (Absorption) to be logarithmic
+browseURL("https://de.wikipedia.org/wiki/Klimasensitivit%C3%A4t")
+browseURL("https://gml.noaa.gov/aggi/aggi.html")
+
