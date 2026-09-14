@@ -1,15 +1,15 @@
 
 library(terra)
 library(tidyverse)
-url.NOAA.psl="https://downloads.psl.noaa.gov/Datasets/noaa.ersst.v5/sst.mnmean.nc"
-browseURL("https://psl.noaa.gov/site_index.html")
-browseURL("https://downloads.psl.noaa.gov/Datasets/noaa.ersst.v5/")
+#url.NOAA.psl="https://downloads.psl.noaa.gov/Datasets/noaa.ersst.v5/sst.mnmean.nc"
+#browseURL("https://psl.noaa.gov/site_index.html")
+#browseURL("https://downloads.psl.noaa.gov/Datasets/noaa.ersst.v5/")
 #download.file(url.NOAA.psl,
 #              destfile = "data/sst.mnmean.nc",
 #             method = "libcurl",
 #             mode = "wb")
 # download did overwrite sst.mnmean.nc
-sst_stack <- rast("~/Downloads/sst.mnmean-2.nc")
+sst_stack <- rast("~/Downloads/sst.mnmean-2.nc") # length 2069
 
 library(lubridate)
 date=time(sst_stack) # "1854-01-01" "2026-04-01"
@@ -41,6 +41,8 @@ weights_rel <- weights_abs / global(weights_abs, "max", na.rm=TRUE)[1,1]
 
 #_________
 weighted_sst_stack <- sst_stack * ocean_mask_na*weights_rel
+writeRaster(weighted_sst_stack, "data/weighted_sst_stack.tif", overwrite = TRUE)
+
 
 #=====
 # not global mean corrected mean taking only ocean cells
@@ -50,6 +52,9 @@ ocean.anom_noaa.sum=unlist(global(weighted_sst_stack, fun="sum", na.rm=TRUE))
 
 # Create a weight layer that only exists where the SST data exists
 active_weights <- mask(weights_rel, sst_stack[[1]])
+# 1. Save it properly as a GeoTIFF
+writeRaster(active_weights, "data/active_weights.tif", overwrite = TRUE)
+
 
 # Now your denominator is perfectly synced to the available data
 sum_of_ocean_weights <- global(active_weights, fun="sum", na.rm=TRUE)
@@ -174,7 +179,5 @@ Ocean_NOAA.data=list(url.source="https://downloads.psl.noaa.gov/Datasets/noaa.er
                      update="2026-05-16",
                      data.grid=sst_stack,
                      data=NOAA.Ocean.anomalies)
-
-saveRDS(Ocean_NOAA.data,"data/NOAA.ocean.anomalies.v2.rds")
-rm(Ocean_NOAA.data)
+#saveRDS(Ocean_NOAA.data,"data/NOAA.OCEAN.ANOMALIES.rds")
 

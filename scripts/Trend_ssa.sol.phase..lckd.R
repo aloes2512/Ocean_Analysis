@@ -29,6 +29,7 @@ ggplot(dfbase_wcor, aes(x = F1, y = F2, fill = W_baseline)) +
     fill = "|W-cor|"
   ) +
   theme_minimal(base_size = 10)
+ggsave("figs/ssa_correlation.matrix.tiff")
 w_tidy <- as.data.frame(as.table(as.matrix(W_baseline)))
 colnames(w_tidy) <- c("Comp1", "Comp2", "W_baseline")
 w_tidy <- w_tidy %>%

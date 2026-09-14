@@ -1,0 +1,103 @@
+---
+title: "Ocean Anomaly Timeseries"
+author: "Alf Loeffler"
+format: html
+editor: visual
+echo: false
+execute:
+  warning: false
+  message: false
+  
+
+---
+
+###  Summary
+
+Study the dependence of ascending heat content of the global oceans.The variation of solar irradiation is the principal force effecting the heat content.The periodic natural variation of the solar power absorbed by the earth atmosphere, land surface and oceans drives the climate. This process is effected by human produced emissions in modern times. As 90 % of the solar irradiation is stored in the oceans. 
+##### The objective of this study to separate the effect of the emissions from the natural periodic change.
+
+### Basic Data
+
+Instrumental records of atmospheric temperatures are kept since 1746 by the British Meteorologic sevice.
+---
+
+```{r read data}
+library(tidyverse)
+library(reader)
+library(itsmr)  
+library(readr)
+library(zoo)
+# 1. Read the text file using read_table()
+# Note: Adjust 'skip' if your local text file has extra header lines
+cet_raw <- read_table(
+  file = "data/meantemp_monthly_totals.txt",
+  skip = 5,
+  col_names = c("Year", "Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Annual"),
+  na = c("-99.99", "-999")
+)
+
+# 2. Reshape from wide to long format for easy plotting
+cet_clean <- cet_raw %>%
+  select(-Annual) %>%
+  pivot_longer(
+    cols = Jan:Dec,
+    names_to = "Month",
+    values_to = "Temp"
+  ) %>%
+  subset(!is.na(Temp)) %>%
+  mutate(
+    # Create a proper Date object for time-series axes
+    Date=parse_date_time(paste(Year, Month), "ym"),
+    dt.month = Date %>% floor_date(unit = "month") %>% as.yearmon()
+  )
+cet_clean<-cet_clean[1:4412,]
+N= 4412
+cet_anomaly=mutate(cet_clean,Anomaly=Temp-mean(Temp),
+                   anoma=hr(Anomaly,N/1:90))
+
+plt.ctr.england=cet_anomaly %>%
+  mutate(dt.month = as.Date(dt.month)) %>%
+  ggplot(aes(x = dt.month, y = anoma)) +
+  # Raw monthly/annual series in light neutral grey or thin line
+  geom_line(color = "grey70", linewidth = 0.4, alpha = 0.7) +
+  # Smoothed long-term trend (LOESS or moving average)
+  geom_smooth(method = "loess", span = 0.08, color = "firebrick", se = FALSE, linewidth = 1) +
+  # Zero anomaly reference line
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black", alpha = 0.6) +
+  # Formatting scales and clean theme
+  scale_x_date(date_breaks = "50 years", date_labels = "%Y", expand = c(0.01, 0)) +
+  labs(
+    title = "England Temp.-Anomaly ",
+    subtitle = "land monthly anomalies:\nlong-term smoothed trend",
+    x = NULL,
+    y = "Temp.- Anomaly (K)",
+    caption = "Data: Met Office Hadley Centre (Parker et al., 1992)"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    panel.grid.minor = element_blank(),
+    plot.title = element_text(face = "bold"),
+    axis.title = element_text(face = "bold")
+  )
+```
+
+```{r}
+#| echo: false
+#| fig-width: 8
+#| fig-height: 5
+
+plt.ctr.england
+```
+
+Before spacecraft and argo floats measured ocean parameters temperature measurements have been sparse and methods often not well documented. Using empirical correlations Hadley climate research center (HadCrut) constructed a monthly sequence of 5°x 5° gridded anomaly data which was cut into a 2°x2° grid by NOAA physical labs. These data named ERSSTv5 are published in the internet. Updating was terminated in march 2026. Separating ocean from land based cells can be done using a 1°x1° land ocean mask from Berkley (data are converted to the same coordinate reference system (crs). To get a global mean 
+1.  the different cell-size of the 2°x2° grid is taken into account by calculating a weighted mean.
+2.  the proportion of land has to be taken into account. What is especially important for all coastal areas. And ocean parts as Baltic seas, Mediterranean, Black Sea,...  
+
+```{r}
+source("scripts/Ocean_mean.median_ts.R")
+M.ssn=c("season",12,"season",6)
+Ocean_mean.anom<-Ocean_mean.anom%>%mutate(Anomaly=anoma.mean-mean(anoma.mean),anomaly=Resid(Anomaly,M.ssn))
+
+```
+

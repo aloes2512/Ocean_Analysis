@@ -5,15 +5,15 @@ library(tidyverse)
 Ocean_solar_anom<-readRDS("data/Ocean_solar_anom.rds")
 N_global<-NROW(Ocean_solar_anom)
 # check mean
-Ocean_solar_anom$Clean_Baseline_Trend%>%mean() # e-16
-modern.trend=subset(Ocean_solar_anom,dt.mnth>1975)%>%pull(Clean_Baseline_Trend)
+Ocean_solar_anom$trend.solar%>%mean() # e-16
+modern.trend=subset(Ocean_solar_anom,dt.mnth>1975)%>%pull(trend.solar)
 estim.TP=which.min(diff(modern.trend))%>%as.numeric()
 estim.TP=1975+estim.TP/12 # 1994.083
 Ocean_solar_anom%>%ggplot(aes(x=dt.mnth))+
-  geom_line(aes(y=Clean_Baseline_Trend))+
+  geom_line(aes(y=trend.solar))+
   geom_vline(xintercept=estim.TP,linetype=2,col=2)
-# fit logistic to the Clean_Baseline_Trend
-baseline.trd=Ocean_solar_anom$Clean_Baseline_Trend
+# fit logistic to the trend.solar
+baseline.trd=Ocean_solar_anom$trend.solar
 t.ctr=Ocean_solar_anom$dt.mnth-1850
 M.ctr=estim.TP-1850
 df.ctr=tibble(t.ctr=t.ctr,
@@ -45,11 +45,13 @@ M.opt=as.numeric(coef(fit_M.logistic))
 Richards=tibble(dt.mnth=Ocean_solar_anom$dt.mnth,
                 t.ctr=t.ctr,
   richards =  A0+K*(1+exp(-B*(t.ctr-M.opt)))^(-1/nu) )
+Ocean_solar_anom<-Ocean_solar_anom%>%mutate(richards=Richards$richards)
+saveRDS(Ocean_solar_anom,"data/Ocean_solar_anom.rds")
 plt.rich=Richards%>%ggplot(aes(x=dt.mnth))+
   geom_line(aes(y=richards,col="logistic"))+
   geom_vline(xintercept=1850+M.opt,linetype=2,col=2)
 plt.rich+geom_line(data=Ocean_solar_anom,
-                   aes(y=Clean_Baseline_Trend),col=4)+
+                   aes(y=trend.solar),col=4)+
   labs(x="",title = "Solar Phase Locked Trend",
        subtitle="approx with generalized logistic")
 
@@ -136,23 +138,25 @@ signal2=Preind2$Anomaly
 N2=length(signal2) #1666
 signal3=Preind3$Anomaly
 sgnx1=extendx_backwards(x=signal1,n_back=3000)
-summary(sgnx1)
+length(sgnx1) #4290
 dates1.ext=seq(1600,by=1/12,length.out=N1+3000)
 sgnx2=extendx_backwards(x=signal2,n_back=3000)
+length(sgnx2) #4666
 dates2.ext=seq(1600,by=1/12,length.out=N2+3000)
 sign3.ext=extendx_backwards(x=signal3,n_back=3000)
 dates3.ext=seq(1600,by=1/12,length.out=N3+3000)
+N<-NROW()
 Y1.ext=tibble(dates=seq(1600,by=1/12,length.out=N1+3000),
        sgn1=extendx_backwards(x=signal1,n_back=3000))%>%
         mutate(sgn1=sgn1-mean(sgn1),
-               hrsg1=hr(sgn1,N/1:5))
+               hrsg1=hr(sgn1,length(sgn1)/1:5))
 Y1.ext%>%ggplot(aes(x=dates))+
   geom_line(aes(y=sgn1),col="grey")+
   geom_line(aes(y=hrsg1),col=2)
 #======
 sgn2=extendx_backwards(x=signal2,n_back=3000)
 N2=length(sgn2)
-Y2.ext=tibble(dates=seq(1600,by=1/12,length.out=N2+3000),
+Y2.ext=tibble(dates=seq(1600,by=1/12,length.out=N2),
               sgn2=extendx_backwards(x=signal2,n_back=3000))%>%
   mutate(sgn2=sgn2-mean(sgn2),
          hrsg2=hr(sgn2,N2/1:5))
@@ -173,3 +177,4 @@ Y2.ext%>%ggplot(aes(x=dates))+
 Y3.ext%>%ggplot(aes(x=dates))+
   geom_line(aes(y=sgn3),col="grey")+
   geom_line(aes(y=hrsg3),col=2)
+

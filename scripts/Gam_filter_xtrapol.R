@@ -5,9 +5,6 @@ library(itsmr)
 df=readRDS("data/NOAA.ocean.anomalies.rds")
 summary(df) # 1850 : 2026 ; Anomaly, Median
 global.ts=df$data%>%dplyr::select(dt.mnth,"Anomaly"=anoma.mean)
-
-
-
 N=NROW(global.ts) # 2116
 global.ts$dt.mnth[N/2] # 1938.083
 # 1. Daten aufteilen in Kalibrierung (vor 1940) und Zukunft
@@ -20,17 +17,34 @@ gam_raw=gam(Anomaly ~ s(dt.mnth,k=180,bs="cc"),data = global.ts)
 # fitting with Penalized Maximum Likelihood Estimation 90 parameters say beta 1 t0 beta 90
 gam_train <- gam(Anomaly ~ s(dt.mnth, k = 90, bs = "cc"), data = df_train)
 gam_full <- predict(gam_train, newdata = df_full)
-# 3. predict = extension of pre-industrial
+# 3. PREDICT = extension of pre-industrial
 df_full$gam_full <- predict(gam_train, newdata = df_full)
 df_full%>%ggplot(aes(x=dt.mnth))+
   geom_line(aes(y=Anomaly,col="Anomaly"))+
   geom_line(aes(y=gam_full,col="gam_full"))+
   geom_line(aes(y=Anomaly-gam_full,col="difference"))
+# for better visualization low-pass filter 9 years
 df_full<-df_full%>%mutate(lowp.anoma=hr(Anomaly,N/1:20),
                  lowp.diffc=hr((Anomaly-gam_full),N/1:20))
-df_full%>%ggplot(aes(x=dt.mnth))+
+#-----------
+#gam_train <- gam(Anomaly ~ s(dt.mnth, k = 90, bs = "cc"), data = df_train)
+df_full$ext.preind<-predict(gam_train, newdata = df_full)
+
+df_full<-df_full%>%mutate(trend.ind=Anomaly-ext.preind)
+df_full<-df_full%>%
+  mutate(poly5=predict(lm(df_full$trend.ind~ stats::poly(df_full$dt.mnth,5))))
+TP5=which.max(diff(df_full$poly5))
+plt.GAM_diff.ext=df_full%>%ggplot(aes(x=dt.mnth))+
+  geom_line(aes(y=trend.ind,col="trend.ind"))+
+  geom_line(aes(y=poly5,col="poly5"))+
+  geom_vline(xintercept = 1850+TP5/12,linetype = 2)+
+  labs(x="",title= "GAM filtered: Anomaly \n Pre-WWII_extended",
+       subtitle = "trend.ind =Anomaly-ext.preind")
+
+#-----------
+low.plt.decomposed=df_full%>%ggplot(aes(x=dt.mnth))+
   geom_line(aes(y=lowp.anoma,col="Anomaly"))+
-  geom_line(aes(y=gam_full,col="gam_full"))+
+  geom_line(aes(y=gam_full,col="preind_ext"))+
   geom_line(aes(y=lowp.anoma-gam_full,col="difference"))+
   labs(x="",title="Anomaly Decomposed",
        subtitle="low pass filtered,pre 1940 gam extended ")
@@ -60,7 +74,7 @@ df_results <- df_full %>%
 
     difference = fit_total - extrapolation_pre1938
   )
-df_results%>%ggplot(aes(x=dt.mnth))+
+plt.gam.filt=df_results%>%ggplot(aes(x=dt.mnth))+
   geom_line(aes(y=extrapolation_pre1938,color="GAM xtrpol "), linewidth = 0.4) +
   geom_line(aes(y = fit_total, color = "fit_total ")) +
   geom_vline(xintercept = 1938, linetype = "dashed", color = 1) +
@@ -77,7 +91,7 @@ df_results$dt.mnth[1750] # 1995.75
 library(zoo)
 t0_fixed=df_results$dt.mnth[1750] # Oct 1997 == 1995.75
 
-df_results%>%  ggplot(aes(x=dt.mnth))+
+plt.poly5.diff=df_results%>%  ggplot(aes(x=dt.mnth))+
                 geom_line(aes(y=trd.dif))+
                 geom_vline(xintercept=1995.75,linetype="dashed")+
   labs(x="",y="anomaly K",title = "Polynomial 5°-Fit to Difference",
@@ -97,7 +111,7 @@ coef(fit_richards) #      L          Delta            B           nu
 TP=global.ts$dt.mnth[which.max(diff(predict(fit_richards)))] # 1991.833
 yearmon(TP)# Nov 1991 < 1997.75 (estimated t0_fixed)
 trd.data_GAM$richard<-predict(fit_richards)
-trd.data_GAM%>%ggplot(aes(x=dt.mnth))+
+plt.richards.trd=trd.data_GAM%>%ggplot(aes(x=dt.mnth))+
   geom_line(aes(y=difference,col= "difference"))+
   geom_line(aes(y=richard,col="Richards"))+
   geom_vline(xintercept = TP, linetype = "dashed", color = 1) +
@@ -113,7 +127,7 @@ global.ts<-global.ts%>%
 rich.resds<-global.ts$rich.resds
 
 N=length(rich.resds)
-global.ts%>%ggplot(aes(x=dt.mnth))+
+plt.difference=global.ts%>%ggplot(aes(x=dt.mnth))+
   geom_line(aes(y=rich.resds))+
   labs(x="",title = "Difference Anomalies Richards Trend")
 FFT.rich.rs= tibble(idx=1:N-1,
@@ -137,4 +151,4 @@ plt.rich.res=global.ts%>%ggplot(aes(x=dt.mnth))+
   geom_line(aes(y=hr1_10-hr6_10,col="perds < 45yr"))+
   labs(x="",title = "Difference: Anomaly/Richards-Trend",
        subtitle="Long Periods > 18yrs;18/30 yrs from Difference")
-print(plt.rich.res)
+

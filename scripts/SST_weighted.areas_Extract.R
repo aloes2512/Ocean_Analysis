@@ -48,6 +48,7 @@ total_weight=global(active_weights,"sum",na.rm=T)%>%as.numeric()
 sst_global=sst_global/total_weight
 global_anomaly<-   tibble(dt.mnth=year(t)+(month(t)-1)/12,
                           anomaly= sst_global-mean(sst_global,na.rm=T))
+saveRDS(global_anomaly,"data/Global_anomaly.rds")
 # CROP BOTH the raw data:sst_stack.new and  active_weights.new
 # --- Meditaranean Separation ---
 # 1. Crop the two pieces of the Mediterranean from the native 0:359 stack

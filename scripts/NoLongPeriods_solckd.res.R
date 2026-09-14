@@ -5,7 +5,7 @@ library(broom)
 # ==============================================================================
 # 0. SETUP & DATA PREPARATION
 # ==============================================================================
-# Assuming 'Ocean_solar_anom' contains:
+# 'Ocean_solar_anom' contains:
 #   - dt.mnth: monthly time index (e.g., 1850.0, 1850.083, ...)
 #   - Anomaly: global ocean SST anomaly
 #   - resids_solar: residuals from your solar-phase locked model

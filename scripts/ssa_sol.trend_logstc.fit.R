@@ -97,4 +97,5 @@ ggplot(df_trend, aes(x = Time)) +
   ) +
   theme_minimal() +
   theme(legend.position = "bottom")
+
 ggsave("figs/separ_industr.natural.png")

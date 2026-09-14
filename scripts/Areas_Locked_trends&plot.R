@@ -55,6 +55,7 @@ analyze_ocean_region <- function(data_list,
   return(df_combined)
 }
 Areas.ts=readRDS("data/Areas.ts.rds")
+names(Areas.ts)
 data_list=Areas.ts
 region_col="pdo"
 solar_data=readRDS("data/S_power.rds")%>%
@@ -102,3 +103,41 @@ Regions_long.trend <- bind_rows(regions_list)
 Regions_long.trend%>%
   ggplot(aes(x=dt.mnth,y=Baseline_Trend,col=Region))+
   geom_line()
+# =======
+# polar regions
+Area.10.ts<-readRDS("data/Area10.ts.rds")
+BaselineTrends.10<-vector("list",length=10)
+names(BaselineTrends.10)<-names(Area.10.ts)
+regions=toupper(names(Area.10.ts))
+regions.10=names(BaselineTrends.10)
+BaselineTrends.10 <- regions.10 %>%
+  purrr::map(~ {
+    # .x represents the current region string loop iteration
+    df <- analyze_ocean_region(data_list=Area.10.ts,
+                               region_col = .x,
+                               solar_data = solar_data,
+                               zero_crossing_times = zero_crossing_times,
+                               region_label = toupper(.x))
+
+    df %>% dplyr::select(dt.mnth, Baseline_Trend, Region)
+  }) %>%
+  setNames(regions)
+
+Regions10_long.trend <- bind_rows(BaselineTrends.10)
+Regions10_long.trend%>%subset(Region %in% c("ARCT.TS","ANTARC.TS"))%>%
+  ggplot(aes(x=dt.mnth,y=Baseline_Trend,col=Region))+
+  geom_line()+
+  labs(x="",title = "Arctic- Antarctic Ocean Trend",
+       subtitle= "area from polarcircles 66° polwards")
+#==========
+#NH and SH
+#---------
+Regions10_long.trend%>%subset(Region %in% c("NH.TS","SH.TS"))%>%
+  ggplot(aes(x=dt.mnth,y=Baseline_Trend,col=Region))+
+  geom_line()+
+  labs(x="",title = "Northern- Southern- Hemisphere Ocean Trend")
+
+saveRDS(BaselineTrends.10,"data/BaselineTrends.10.rds")
+dfr=readRDS("data/BaselineTrends.10.rds")
+summary(dfr)
+names(dfr)

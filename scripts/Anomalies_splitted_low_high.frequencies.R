@@ -91,18 +91,20 @@ global.ts_1.4  <- global.ts%>%mutate(anom.hr=hr(anomaly,N_global/1:4),
                                  res.hr_anom=anomaly-anom.hr)
 
 global.ts_1.4%>%ggplot(aes(x=dt.mnth))+
-  geom_line(aes(y=anom.hr))+
-  geom_line(aes(y=res.hr_anom))
+  geom_line(aes(y=anom.hr,col="anoma.hr1:4"))+
+  geom_line(aes(y=res.hr_anom,col="res.anoma.hr1:4"))+
+  labs(x="",title = "Decomposed Anomaly",
+       subtitle="periods > 45 yrs(hr1:4)")
 Anomaly.historic.hr=tibble(x=dts_historic,
                         anoma.hist=Preind.ext$ext.preind[circular_historic],
                         anomaly.historic=anoma.hist-mean(anoma.hist),
-                        longhr=hr(anomaly.historic,N_hist/5))
+                        longhr=hr(anomaly.historic,N_hist/5.2))
 
 Anomaly.historic.hr%>%ggplot(aes(x=dts_historic))+
   geom_line(aes(y=anomaly.historic,col="ext.preind"))+
   geom_line(aes(y=longhr,col="Gleisberg"))+
   labs(x="",title = "Preind. Anomalies+ Gleisberg",
-       subtitle = "anomalies 1850::1938 circular extended &\nmax.like fit : 1023.2 month period")
+       subtitle = "anomalies 1850::1938 circular extended &\nhr fit period: 82 years ")
 # Gemini :~1700: The trough aligns perfectly with the deep climax of the Maunder Minimum.
 #         ~1840: The next major trough catches the Dalton Minimum beautifully.
 #         In solar physics, 1749/1750 is a legendary boundary line.
@@ -155,7 +157,7 @@ t0.ctr=TP-1850 # 176.1667
 # difference observed - pre idustrial
 # formula
 t.ctr=global.ts$dt.mnth-1850
-M.ctr=TP-1850 # 146.333
+M.ctr=TP-1850 # 146.333 M =1996.333
 df.ctr=tibble(t.ctr=t.ctr,
               diff_anomaly=glob.data$difference)
 "Y(t.ctr)= A0+A1*t.ctr+K*(1+exp(-B*(t.ctr-M.ctr)))^(-1/nu)"
@@ -213,16 +215,19 @@ colnames(Pre.industrials)
 preind.plot=Pre.industrials%>%
   ggplot(aes(x=dt.mnth))+
   geom_line(aes(y=anoma.preind),col="grey")
-preind.plot+  geom_line(aes(y=anoma.hr1_6,col="anoma.hr1_6"))+
+preind.plot<-preind.plot+  geom_line(aes(y=anoma.hr1_6,col="anoma.hr1_6"))+
   geom_line(aes(y=anoma.hr1_20,col="anoma.hr1_20"))+
-  geom_line(aes(y=logistic.fit,col="logistic.fit"),linewidth = 1.5)
+  geom_line(aes(y=logistic.fit,col="logistic.fit"),linewidth = 1.2)+
+  labs(x="",y="anomalies",title = "Anomaly Decomposed",
+       subtitle="logistic -fit(Anomaly)\nextend pre-industr. ")
 
 Pre.industrials%>%
   ggplot(aes(x=dt.mnth)) +
   geom_line(aes(y=logistic.fit,col="logistic.fit"),linewidth = 1.2)+
   geom_line(aes(y=mdl0,col="model_hr1_6"))+
   geom_line(aes(y=mdl20,col="model_hr1_20"))+
-  labs(x="",title = "Ocean Anomaly Model",subtitle = "Trend Logistic Fit +\npre-industrial harmonics")
+  labs(x="",title = "Ocean Anomaly Model",
+       subtitle = "Trends: Logistic Fit \nLP(pre-industrial harmonics)")
 ggsave("figs/Preind_logistic.trd.png")
 global_mdl=global.ts%>%
   mutate(model_logist.hr1_20=Pre.industrials$mdl20,
@@ -234,7 +239,7 @@ global_mdl%>%ggplot(aes(x=dt.mnth))+
   labs(x="",title = "Model: Global Observed Anomalies",
        subtitle = "trd:Generalized Logistic Fit;\npre-industr: 20 harmonics model")
 ggsave("figs/global.logist.20har.model.tiff")
-# end of preindustrial?
+# end of pre-industrial?
 library(itsmr)
 observed_anomalies<-global.ts$Anomaly
 harmonic_model_observed<-hr(observed_anomalies,N_global/1:20)
@@ -274,16 +279,14 @@ rolling_corr <- slide_index_dbl(
 RollingCor=tibble(Time=dt.mnth,rolling_corr=as.numeric(rolling_corr))
 plt.cor=RollingCor%>%ggplot(aes(x=Time,y=rolling_corr))+
   geom_line(col="blue")+
-  labs(y="11-Year Rolling Correlation",
-       title="Correlation of harmonic fitted observations\n  and logistic detrended residuals")
-print(plt.cor)
-# Time> 1957 first min @ 1958.0
-##browseURL("https://gml.noaa.gov/aggi/aggi.html")
+  labs(y="Rolling Correlation",
+       title="Correlation: low-pass anomaly\n  residuals of logistic trend ")
+brk.cor=RollingCor%>%subset(Time>1975&Time<2000)%>%
+  pull(rolling_corr)%>%diff()%>%which.min()
+plt.cor=plt.cor+geom_vline(xintercept=1975+brk.cor/12,col=2,linetype=2)
+# Time> 1975  min @ 1975+154/12= 1987.833
+## browseURL("https://gml.noaa.gov/aggi/aggi.html")
 #browseURL("https://de.wikipedia.org/wiki/Klimasensitivit%C3%A4t")
-# "The Winter is coming" Atlantic Meridional Overturning Circulation (AMOC)
-path="~/Desktop/Klima_Energiewende/Berichte_Veröffentlichungen/"
-reports<-list.files(path)
-reports[79] # "Winter Is Coming_ .......
 
 
 

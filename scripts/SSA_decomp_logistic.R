@@ -103,4 +103,5 @@ plt.preind.sep=ggplot(df_trend, aes(x = Time)) +
   ) +
   theme_minimal() +
   theme(legend.position = "right")
+
 ggsave("figs/Separ.preind.png")

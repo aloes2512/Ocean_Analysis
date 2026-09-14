@@ -78,7 +78,7 @@ df_results%>%ggplot(aes(x=dt.mnth,y=signl))+
   geom_line(aes(y=logist_fit))+
   geom_vline(xintercept = 1997)+
   geom_vline(xintercept = t0)
-#
+########
 # fit richards
 ## step 1 take  t0 to from logistic fit, and optim  with t0 fixed
 t0_fixed= params[["t0"]] # estimated from logistic
