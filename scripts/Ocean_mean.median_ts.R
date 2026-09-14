@@ -1,12 +1,13 @@
 # load the data
 library(lubridate)
+library(terra)
 Ocean_data_update <- readRDS("data/Ocean_data_update.rds")
 # Unwrap the raster object
 download.time<-ymd(Ocean_data_update$downld.time)
 source.url<-Ocean_data_update$raw_path
 # data source
 Ocean_data_update$file_url
-sst_stack <- unwrap(Ocean_data_update$sst_stack)
+sst_stack <- terra::unwrap(Ocean_data_update$sst_stack)
 dim(sst_stack)# 2120
 
 
@@ -127,15 +128,15 @@ NOAA.Ocean.anomalies%>%ggplot(aes(x=dt.mnth))+
 ggsave("figs/Global_Ocean_Anomaly.png")
 #-----
 
-NOAA.Ocean.anomalies%>%ggplot(aes(x=dt.mnth))+
+plt.anomaly_mean.median<-NOAA.Ocean.anomalies%>%ggplot(aes(x=dt.mnth))+
   geom_line(aes(y=anoma.median ),col=4)+
   geom_line(aes(y=anoma.mean ),col= 2)+
 
   labs(x="",y="anomaly K",title = "Ocean Temperature Anomalies",
        subtitle="Global Ocean Mean(blue) and Median(red)",caption = "data: noaa.ersst.v5.nc ")
-summary(NOAA.Ocean.anomalies)
+
 Ocean_NOAA.data=list(url.source="https://downloads.psl.noaa.gov/Datasets/noaa.ersst.v5/sst.mnmean.nc",
-                     update="2026-09-13",
+                     update=Sys.time(),
                      data.grid=wrap(sst_stack),
                      data=NOAA.Ocean.anomalies)
 

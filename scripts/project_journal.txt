@@ -1,0 +1,150 @@
+cmd to produce complete journal:
+MacBook-5:scripts alfloeffler$ git log > project_journal.txt
+
+
+
+commit f0b999b2fcff827925835bb895f58964b398a07a
+Author: aloes2512 <alf.loeffler@icloud.com>
+Date:   Fri Jun 12 22:58:24 2026 +0200
+
+    Delete the scripts they teporary stored in the folder ~/Documents/to beckecked
+
+commit d1de9b302f20941cf6ed58de33ff84f60b657d91
+Merge: 7bca60f d232388
+Author: aloes2512 <alf.loeffler@icloud.com>
+Date:   Fri Jun 12 21:30:50 2026 +0200
+
+    Merge branch 'master' of https://github.com/aloes2512/Ocean_Analysis
+
+commit 7bca60f34a8cced97013b7ecfe5b6bbb2d23eb9a
+Merge: 4db7833 9bf1b28
+Author: aloes2512 <alf.loeffler@icloud.com>
+Date:   Fri Jun 12 21:13:15 2026 +0200
+
+    solar power phase locked  and poly 3rd degree trends of global ocean anomalies
+
+commit d232388c8988f42e7eef06f7a50999be75db9787
+Merge: 4db7833 9bf1b28
+Author: aloes2512 <alf.loeffler@icloud.com>
+Date:   Fri Jun 12 21:13:15 2026 +0200
+
+    Merge branch 'master' of https://github.com/aloes2512/Ocean_Analysis
+
+commit 4db78334f032285198b337f877005512bb5d3c33
+Merge: ca80507 427b6d2
+Author: aloes2512 <alf.loeffler@icloud.com>
+Date:   Fri Jun 12 13:12:31 2026 +0200
+
+    Ocean anomalies season 12 and 6 month separatedTrend of 3rd order polynomial calculatedlocked to solar power variation cycles. Segments ocean anomalies spline deegree 3 fitted. (Avoids saw tooth edges of linear fit).2 trends compared and difference (periodic function) added to harmonic resids.3000 month extended backwards. Plot shows correlation with Maunder- and Dalton minimum
+
+commit 9bf1b28565515ace81f0f2dafd99abd58fbc6fc7
+Merge: ca80507 427b6d2
+Author: aloes2512 <alf.loeffler@icloud.com>
+Date:   Fri Jun 12 13:12:31 2026 +0200
+
+    Merge branch 'master' of https://github.com/aloes2512/Ocean_Analysis
+
+commit ca80507b402ac6dda8175456a15cfba8b97c91eb
+Merge: cef1769 daf00dc
+Author: aloes2512 <alf.loeffler@icloud.com>
+Date:   Thu Jun 11 23:43:43 2026 +0200
+
+    Calculating the smoothed SP from raw SILSO counts first and then average mean values. Power using the same polynomial as before
+
+commit 427b6d2ba8d8746865caaef997347bff1c3082fd
+Merge: cef1769 daf00dc
+Author: aloes2512 <alf.loeffler@icloud.com>
+Date:   Thu Jun 11 23:43:43 2026 +0200
+
+    Merge branch 'master' of https://github.com/aloes2512/Ocean_Analysis
+
+commit cef1769078e63d2b693556ded52682d44b75191e
+Merge: 91b5b63 766cd66
+Author: aloes2512 <alf.loeffler@icloud.com>
+Date:   Thu Jun 11 23:39:46 2026 +0200
+
+    Authors of article added
+
+commit daf00dc994f6eb2e5a2cc41f454c145781136bd3
+Merge: 91b5b63 766cd66
+Author: aloes2512 <alf.loeffler@icloud.com>
+Date:   Thu Jun 11 23:39:46 2026 +0200
+
+    Merge branch 'master' of https://github.com/aloes2512/Ocean_Analysis
+
+commit 91b5b63184147dbcd2ba5c05d2ad9a8208d176ba
+Merge: 43f069c ea65f59
+Author: aloes2512 <alf.loeffler@icloud.com>
+Date:   Thu Jun 11 17:16:28 2026 +0200
+
+    Solar power variation at sealevel cloudless equatorial region. Calculated from SILSO sunspot counts (spline interpolated) using formula published :"http://www.lajpe.org/dec11/LAJPE_576_Ambelu_Tebabal_prreprint_corr.pdf". as polynomial with coeff: a= 1365.66 # W/m^2
+    b= 0.0136  # W/(SP*m^2)
+    c=-0.0000076 # W/(SP*m)^2
+    at sealevel reduced from 1365.66 to 1000 W/m^2
+
+commit 766cd661a05013b76bf89bd8bf0515c5104f11cc
+Merge: 43f069c ea65f59
+Author: aloes2512 <alf.loeffler@icloud.com>
+Date:   Thu Jun 11 17:16:28 2026 +0200
+
+    Merge branch 'master' of https://github.com/aloes2512/Ocean_Analysis
+
+commit 43f069ca6cafb83f21298c5aaf5f612743525eef
+Merge: 700164e b5168d9
+Author: aloes2512 <alf.loeffler@icloud.com>
+Date:   Thu Jun 11 17:15:17 2026 +0200
+
+    Merge branch 'master' of https://github.com/aloes2512/Ocean_Analysis
+    names of file changed
+
+commit ea65f5913a66632472df6c49ecffb668469ef48c
+Merge: 700164e b5168d9
+Author: aloes2512 <alf.loeffler@icloud.com>
+Date:   Thu Jun 11 17:15:17 2026 +0200
+
+    Merge branch 'master' of https://github.com/aloes2512/Ocean_Analysis
+
+commit 700164e8bdb154afb046de8a76666976bb4dc031
+Merge: 67be558 065c9c9
+Author: aloes2512 <alf.loeffler@icloud.com>
+Date:   Thu Jun 11 17:09:23 2026 +0200
+
+    Merge branch 'master' of https://github.com/aloes2512/Ocean_Analysis
+    names corrected to Ocean_NOAA.data
+
+commit b5168d9f6b08a303d9187388a6467fe326b32a1b
+Merge: 67be558 065c9c9
+Author: aloes2512 <alf.loeffler@icloud.com>
+Date:   Thu Jun 11 17:09:23 2026 +0200
+
+    Merge branch 'master' of https://github.com/aloes2512/Ocean_Analysis
+
+commit 67be5583a5ec733c33ea3a7e2cc55d851db03f40
+Author: aloes2512 <alf.loeffler@icloud.com>
+Date:   Wed Jun 10 21:59:29 2026 +0200
+
+    NOAA ERSSTv5 gridded 2x2° monthly data downloaded May,2026. Ocean data extracted using Berkley land ocean mask.The mask is corrected (weighted) for cell size and mean and median values calculated for each month.Result saved as "data/NOAA.ocean.anomalies.rds"
+
+commit 065c9c95de5d2f8a98d0fd5ebd5f96b2499fa4ec
+Author: aloes2512 <alf.loeffler@icloud.com>
+Date:   Wed Jun 10 21:59:29 2026 +0200
+
+    Add updated NOAA ocean data processing and comparison scripts
+
+commit 1462b45ee2a4faaad3af1ca79b2a5ffbdc71ae46
+Author: aloes2512 <alf.loeffler@icloud.com>
+Date:   Wed Jun 10 21:45:50 2026 +0200
+
+    test only
+
+commit 45fa4ad6e579afdae4f800c1756ed55385247d84
+Author: aloes2512 <alf.loeffler@icloud.com>
+Date:   Wed Jun 10 21:20:45 2026 +0200
+
+    just test the change
+
+commit 4751a6b38cbf276370637310274a4ebb5432281a
+Author: aloes2512 <alf.loeffler@icloud.com>
+Date:   Wed Jun 10 19:45:15 2026 +0200
+
+    New Start of Ocean Analysis selecting only scripts that turned out to be usefull
