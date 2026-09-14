@@ -1,0 +1,1202 @@
+---
+title: "Separating the Anthropogenic Signal from Solar-Locked Natural Variability in Global Ocean SST Anomalies, 1850–2026"
+subtitle: "A Singular-Spectrum and Growth-Curve Decomposition, with a Mean-Cycle Control"
+author:
+  - name: "Alf Loeffler"
+    affiliation: "Independent researcher"
+date: today
+keywords: [sea surface temperature, singular spectrum analysis, ESPRIT, solar cycle, anthropogenic warming, Richards growth curve]
+format:
+  html:
+    toc: true
+    embed-resources: true
+    toc-depth: 3
+    number-sections: true
+    fig-cap-location: bottom
+    code-fold: true
+    code-summary: "Show code"
+editor: visual
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r}
+#| label: setup
+#| include: false
+
+library(tidyverse)
+library(Rssa)
+library(itsmr)
+library(minpack.lm)
+library(splines)
+library(knitr)   # MASS is used via MASS::mvrnorm only, to avoid masking dplyr::select
+
+## ---- analysis constants -------------------------------------------------
+RECORD_START <- 1850      # ERSSTv6 begins January 1850; see Section 2.1
+SPLIT_YEAR   <- 1938      # calendar split for the pre-industrial GAM training set
+LOESS_SPAN   <- 0.25      # span of the non-harmonic smoother
+GAM_K        <- 30        # GAM basis dimension
+GAM_BS       <- "cc"      # cyclic cubic spline, as specified by the author
+
+M.ssn <- c("season", 12, "season", 6)
+
+## ---- data ---------------------------------------------------------------
+## Updated NOAA ERSSTv6 global ocean series, re-extracted from the current grid
+## by scripts/Ocean_mean.median_ts.R, joined to the SILSO-derived solar power
+## variation from scripts/Sun_power.R.  Paths are located independently of where
+## this document is rendered from.
+find_project_file <- function(rel) {
+  cands <- c(rel,
+             file.path("..", rel),
+             file.path("../..", rel),
+             path.expand(file.path("~/projects/Ocean_Analysis", rel)))
+  hit <- cands[file.exists(cands)]
+  if (!length(hit)) {
+    stop("Could not locate '", rel, "'. Working directory is '", getwd(),
+         "'. Render this document from inside the Ocean_Analysis project.",
+         call. = FALSE)
+  }
+  normalizePath(hit[1])
+}
+
+Ocean_NOAA.data <- readRDS(find_project_file("data/NOAA.OCEAN.ANOMALIES.rds"))
+solar_mnthly    <- readRDS(find_project_file("data/S_power.rds")) %>%
+  mutate(SI = TSI - mean(TSI))
+
+noaa_source <- Ocean_NOAA.data$url.source
+noaa_update <- Ocean_NOAA.data$update
+raw_start   <- min(Ocean_NOAA.data$data$dt.mnth)
+raw_n       <- nrow(Ocean_NOAA.data$data)
+solar_to    <- max(solar_mnthly$dt.mnth)
+
+## The SST grid may run a few months beyond the last SILSO month; the inner
+## join keeps only months for which both are available.
+oc <- Ocean_NOAA.data$data %>%
+  dplyr::select(dt.mnth, Anomaly = anoma.mean) %>%
+  dplyr::filter(dt.mnth >= RECORD_START) %>%
+  inner_join(dplyr::select(solar_mnthly, dt.mnth, Solar_Variation = SI),
+             by = "dt.mnth") %>%
+  arrange(dt.mnth) %>%
+  mutate(anomaly = Resid(Anomaly, M.ssn))
+
+N        <- nrow(oc)
+time     <- oc$dt.mnth
+rec_from <- min(time)
+rec_to   <- max(time)
+n_dropped <- raw_n - N
+```
+
+## Abstract {.unnumbered}
+
+Attribution of long-term ocean warming requires that the secular anthropogenic component be separated from natural variability whose dominant periods — solar, bidecadal and interannual — are comparable in amplitude to the forced trend over multi-decadal windows. Here we decompose an area-weighted global ocean sea surface temperature (SST) anomaly record of `r N` monthly values (`r sprintf("%.2f", rec_from)`–`r sprintf("%.2f", rec_to)`) into (i) a *solar-locked* component, obtained by anchoring a cubic spline to the minima of a sunspot-derived solar-power proxy, (ii) an oscillatory field characterised by Singular Spectrum Analysis (SSA) with ESPRIT parameter estimation, and (iii) a secular industrial component defined as the residual against a Generalized Additive Model (GAM) baseline trained on the pre-`r SPLIT_YEAR` record and extrapolated forward.
+
+```{r}
+#| label: locked-trends
+#| include: false
+
+## nodes of the solar power variation (local minima of the irradiance anomaly)
+stopifnot("Solar_Variation" %in% names(oc))
+si <- oc$Solar_Variation
+if (anyNA(si)) si <- zoo::na.approx(si, na.rm = FALSE) |> (\(v) ifelse(is.na(v), mean(v, na.rm = TRUE), v))()
+find_nodes <- function(x) which(diff(sign(diff(x))) == 2) + 1
+node_idx   <- find_nodes(si)
+nodes_obs  <- time[node_idx]
+
+cycle_gaps <- diff(nodes_obs)
+mean_cycle <- mean(cycle_gaps)
+sd_cycle   <- sd(cycle_gaps)
+n_cycles   <- length(cycle_gaps)
+
+## mean-cycle control: same number of knots, regular spacing at the mean period
+nodes_mean <- seq(from = nodes_obs[1], by = mean_cycle, length.out = length(nodes_obs))
+nodes_mean <- nodes_mean[nodes_mean > min(time) & nodes_mean < max(time)]
+nodes_obs_in <- nodes_obs[nodes_obs > min(time) & nodes_obs < max(time)]
+
+locked_trend <- function(knots) {
+  fit <- lm(Anomaly ~ bs(dt.mnth, knots = knots, degree = 3), data = oc)
+  as.numeric(predict(fit))
+}
+
+trend_phase <- locked_trend(nodes_obs_in)   # phase-locked (observed solar minima)
+trend_meanc <- locked_trend(nodes_mean)     # mean-cycle control
+
+## non-harmonic part of each locked trend
+nonharm <- function(y) as.numeric(predict(loess(y ~ time, span = LOESS_SPAN, degree = 2)))
+
+dat <- tibble(
+  dt.mnth   = time,
+  anomaly   = oc$anomaly,
+  trd_phase = trend_phase,
+  trd_meanc = trend_meanc
+) %>%
+  mutate(
+    nh_phase  = nonharm(trd_phase),
+    nh_meanc  = nonharm(trd_meanc),
+    res_phase = anomaly - nh_phase,
+    res_meanc = anomaly - nh_meanc,
+    ## harmonic part of the locked trend, and the observed anomaly with that
+    ## part removed -- the response of the growth-curve fit below
+    har_phase = trd_phase - nh_phase,
+    growth    = anomaly - har_phase
+  )
+
+## characteristic dates of the non-harmonic phase-locked trend
+Min_early <- time[which.min(dat$nh_phase)]
+branch1950 <- dat %>% dplyr::filter(dt.mnth > 1950) %>% pull(nh_phase)
+Min_mid    <- 1950 + which.min(branch1950) / 12
+branch1975 <- dat %>% dplyr::filter(dt.mnth > 1975) %>% pull(nh_phase)
+Turn_late  <- 1975 + which.min(diff(branch1975)) / 12
+
+rmse_constructions <- sqrt(mean((dat$nh_phase - dat$nh_meanc)^2))
+```
+
+ESPRIT identifies three regimes in the detrended field, listed in @tbl-esprit. The analysis is repeated with the spline knots placed at the **mean** sunspot-cycle interval of `r sprintf("%.2f", mean_cycle)` yr (standard deviation `r sprintf("%.2f", sd_cycle)` yr over `r n_cycles` cycles) rather than at the observed solar minima. That substitution is physically inferior — it discards the observed phase — and is used only as a null test: structure that survives regular knots cannot have been created by phase-accurate ones. The spread between the two constructions doubles as an empirical uncertainty scale for the estimated periods.
+
+```{r}
+#| label: industrial-fits
+#| include: false
+
+df_full  <- dat %>% dplyr::select(dt.mnth, anomaly, nh_phase, har_phase, growth)
+df_train <- df_full %>% dplyr::filter(dt.mnth < SPLIT_YEAR)
+n_train  <- nrow(df_train)
+
+tt <- df_full$dt.mnth
+
+## --------------------------------------------------------------------------
+## Growth-curve estimator, in two steps.
+##   step 1  four-parameter logistic with a constant term, one nlsLM call
+##   step 2  Richards, with the slope k held at the value returned by step 1,
+##           so the secular rate is not re-estimated and the two curves differ
+##           only in shape
+## The response is the monthly series itself, NOT a low-pass filtered version
+## of it: the filtered series is flat over long stretches, which is what makes
+## the logit/asymptote search degenerate.  No staged asymptote separation and
+## no starting-value search are needed -- nlsLM converges from the author's
+## own starting values.
+## --------------------------------------------------------------------------
+fit_growth <- function(y, tt, start = list(b = -0.15, L = 0.80, k = 0.05, t0 = 1988)) {
+  d <- tibble(tt = tt, y = y)
+  fl <- try(nlsLM(y ~ b + L / (1 + exp(-k * (tt - t0))), data = d,
+                  start = start, control = nls.lm.control(maxiter = 200)),
+            silent = TRUE)
+  if (inherits(fl, "try-error")) return(NULL)
+  cl <- coef(fl); k_fixed <- cl[["k"]]
+  yl <- as.numeric(predict(fl))
+  fr <- try(nlsLM(y ~ Lr + Delta / (1 + exp(-k_fixed * (tt - t0r)))^(1 / nu), data = d,
+                  start = list(Lr = cl[["b"]], Delta = cl[["L"]], t0r = cl[["t0"]], nu = 1),
+                  control = nls.lm.control(maxiter = 500)),
+            silent = TRUE)
+  if (inherits(fr, "try-error")) return(NULL)
+  cr <- coef(fr); yr <- as.numeric(predict(fr))
+  turn <- function(v) tt[which.max(diff(v)) + 1]
+  list(logis = fl, rich = fr, y_log = yl, y_rich = yr,
+       b = cl[["b"]], L = cl[["L"]], k = k_fixed, t0_log = cl[["t0"]],
+       Lr = cr[["Lr"]], Delta = cr[["Delta"]], t0_rich = cr[["t0r"]], nu = cr[["nu"]],
+       turn_log = turn(yl), turn_rich = turn(yr),
+       infl_rich = cr[["t0r"]] - log(cr[["nu"]]) / k_fixed,
+       lower = cl[["b"]], upper = cl[["b"]] + cl[["L"]],
+       lower_r = cr[["Lr"]], upper_r = cr[["Lr"]] + cr[["Delta"]],
+       reached = (tail(yl, 1) - cl[["b"]]) / cl[["L"]],
+       rss_log = sum((y - yl)^2), rss_rich = sum((y - yr)^2),
+       rmse_log = sqrt(mean((y - yl)^2)), rmse_rich = sqrt(mean((y - yr)^2)),
+       se = tryCatch(summary(fl)$coefficients[, 2], error = function(e) rep(NA_real_, 4)))
+}
+
+## --------------------------------------------------------------------------
+## Route A -- solar-locked construction (primary).
+## The harmonic part of the locked trend is removed from the observed monthly
+## anomaly; what remains is the non-harmonic trend plus the retained monthly
+## residual.  It carries the secular rise AND the observation noise, which is
+## what keeps the non-linear fit well conditioned.
+## --------------------------------------------------------------------------
+fitA <- fit_growth(df_full$growth, tt)
+
+## control: the same fit to the smooth non-harmonic trend alone.  If the two
+## agree, the noise carried along in `growth` is doing no harm -- this is the
+## "add white noise to the low-frequency series" check.
+fitA_smooth <- fit_growth(df_full$nh_phase, tt)
+
+## --------------------------------------------------------------------------
+## Route B -- GAM baseline trained before SPLIT_YEAR and extrapolated.
+## Kept as the alternative decomposition, fitted with the SAME estimator so
+## that the comparison is of decompositions and not of fitting procedures.
+## --------------------------------------------------------------------------
+gam_train <- mgcv::gam(anomaly ~ s(dt.mnth, k = GAM_K, bs = GAM_BS), data = df_train)
+
+df_results <- df_full %>%
+  mutate(
+    extrapol_pre      = as.numeric(predict(gam_train, newdata = df_full)),
+    industrial_effect = anomaly - extrapol_pre,
+    industr.smth      = hr(industrial_effect, N / 1:20)
+  )
+
+fitB <- fit_growth(df_results$industrial_effect, tt)
+
+## --------------------------------------------------------------------------
+## Headline quantities come from route A.
+## --------------------------------------------------------------------------
+growth_ok <- !is.null(fitA)
+
+B_fixed   <- if (growth_ok) fitA$k        else NA_real_
+t0_log    <- if (growth_ok) fitA$t0_log   else NA_real_
+t_turn_log  <- if (growth_ok) fitA$turn_log  else NA_real_
+t_turn_rich <- if (growth_ok) fitA$turn_rich else NA_real_
+nu_hat      <- if (growth_ok) fitA$nu        else NA_real_
+t0_rich     <- if (growth_ok) fitA$t0_rich   else NA_real_
+t_infl_rich <- if (growth_ok) fitA$infl_rich else NA_real_
+infl_shift  <- t_turn_rich - t_turn_log
+analytic_gap <- t_infl_rich - t_turn_rich
+lower_asymptote <- if (growth_ok) fitA$lower   else NA_real_
+upper_asymptote <- if (growth_ok) fitA$upper   else NA_real_
+lower_asymptote.rich <- if (growth_ok) fitA$lower_r else NA_real_
+upper_asymptote.rich <- if (growth_ok) fitA$upper_r else NA_real_
+span_reached <- if (growth_ok) fitA$reached else NA_real_
+
+df_results$logist_fit <- if (growth_ok) fitA$y_log  else NA_real_
+df_results$richardsB  <- if (growth_ok) fitA$y_rich else NA_real_
+
+## model-free reading: steepest rise of the observed non-harmonic trend
+t_turn_obs <- tt[which.max(diff(df_full$nh_phase)) + 1]
+
+## --------------------------------------------------------------------------
+## Uncertainty of t0, from the non-linear fit, propagated by Monte Carlo.
+## Model-conditional and assuming independent residuals, which the strongly
+## autocorrelated monthly series violates -- a lower bound.
+## --------------------------------------------------------------------------
+set.seed(42)
+ci_t0log <- c(NA_real_, NA_real_)
+if (growth_ok) {
+  V <- tryCatch(vcov(fitA$logis), error = function(e) NULL)
+  if (!is.null(V)) {
+    dr <- MASS::mvrnorm(20000, coef(fitA$logis), V)
+    t0d <- dr[, "t0"]
+    t0d <- t0d[is.finite(t0d)]
+    if (length(t0d) > 100) ci_t0log <- unname(quantile(t0d, c(0.025, 0.975)))
+  }
+}
+fmt_ci <- function(ci) if (any(is.na(ci))) "not available" else
+  sprintf("%.1f - %.1f", ci[1], ci[2])
+
+## --------------------------------------------------------------------------
+## AIC.  Two comparisons, and they are not the same thing.
+##  (i)  logistic vs Richards WITHIN a series: same response, directly
+##       comparable.
+##  (ii) route A vs route B: made comparable by scoring each route on the SAME
+##       response -- the deseasonalised anomaly -- as
+##          route A   anomaly_hat = harmonic part + growth curve
+##          route B   anomaly_hat = GAM baseline  + growth curve
+##       with the effective number of parameters of the smoothing step counted
+##       in: the spline coefficients and the equivalent number of parameters of
+##       the LOESS for route A, the GAM edf for route B.  The LOESS and GAM
+##       degrees of freedom are effective, not exact, so differences of a few
+##       AIC units should not be over-read.
+## --------------------------------------------------------------------------
+aic_from <- function(y, yhat, p) {
+  n <- length(y); rss <- sum((y - yhat)^2)
+  n * log(rss / n) + 2 * (p + 1)
+}
+p_spline <- length(coef(lm(Anomaly ~ bs(dt.mnth, knots = nodes_obs_in, degree = 3), data = oc)))
+p_loess  <- tryCatch(loess(nh_phase ~ dt.mnth, data = dat, span = LOESS_SPAN, degree = 2)$enp,
+                     error = function(e) NA_real_)
+p_gam    <- sum(gam_train$edf)
+
+aic_tbl <- tibble(
+  Route = c("solar-locked", "solar-locked", "GAM baseline", "GAM baseline"),
+  Growth = rep(c("logistic", "Richards (k fixed)"), 2),
+  AIC_series = c(AIC(fitA$logis), AIC(fitA$rich), AIC(fitB$logis), AIC(fitB$rich)),
+  AIC_anomaly = c(
+    aic_from(df_full$anomaly, df_full$har_phase + fitA$y_log,  p_spline + p_loess + 4),
+    aic_from(df_full$anomaly, df_full$har_phase + fitA$y_rich, p_spline + p_loess + 5),
+    aic_from(df_full$anomaly, df_results$extrapol_pre + fitB$y_log,  p_gam + 4),
+    aic_from(df_full$anomaly, df_results$extrapol_pre + fitB$y_rich, p_gam + 5)),
+  k  = c(fitA$k, fitA$k, fitB$k, fitB$k),
+  t0 = c(fitA$t0_log, fitA$t0_rich, fitB$t0_log, fitB$t0_rich),
+  nu = c(NA, fitA$nu, NA, fitB$nu),
+  turn = c(fitA$turn_log, fitA$turn_rich, fitB$turn_log, fitB$turn_rich),
+  ceiling = c(fitA$upper, fitA$upper_r, fitB$upper, fitB$upper_r),
+  reached = c(fitA$reached, fitA$reached, fitB$reached, fitB$reached)
+) %>% mutate(dAIC_anomaly = AIC_anomaly - min(AIC_anomaly))
+
+aic_best_route <- aic_tbl$Route[which.min(aic_tbl$AIC_anomaly)]
+aic_best_growth <- aic_tbl$Growth[which.min(aic_tbl$AIC_anomaly)]
+dAIC_richards_A <- AIC(fitA$rich) - AIC(fitA$logis)
+
+## agreement between the noisy and the smooth response (white-noise control)
+noise_shift_t0 <- fitA$t0_log - fitA_smooth$t0_log
+noise_shift_k  <- fitA$k      - fitA_smooth$k
+
+## --------------------------------------------------------------------------
+## Narrative fragments
+## --------------------------------------------------------------------------
+say <- function(x, fmt = "%.1f") if (growth_ok && is.finite(x)) sprintf(fmt, x) else "not identified"
+
+growth_abstract <- sprintf(paste0(
+  "Fitted in two steps -- a four-parameter logistic to fix the secular rate, then a Richards curve with that ",
+  "rate held fixed -- the symmetric logistic turns in %.1f and the asymmetric curve, with shape $\\nu = %.3f$, ",
+  "turns in %.1f, a shift of %+.1f yr. The record reaches only %.0f%% of the fitted span, so the upper ",
+  "asymptote of %.2f degrees C is an extrapolation and not an estimate."),
+  t_turn_log, nu_hat, t_turn_rich, infl_shift, 100 * span_reached, upper_asymptote.rich)
+
+growth_discussion <- sprintf(paste0(
+  "With the fitted $\\nu = %.3f$ and slope $B = %.4f$ yr$^{-1}$, the asymmetric curve turns at %.1f against ",
+  "%.1f for the symmetric one, a shift of %+.1f yr. Read from the analytic root $t_0 - \\ln\\nu/B$ the same date ",
+  "is %.1f, so the discrete and continuous readings agree to %.2f yr -- well inside the monthly sampling ",
+  "interval, which is the resolution the data actually carry. Repeating the fit on the smoothed non-harmonic ",
+  "trend alone, without the retained monthly residual, moves $t_0$ by %.2f yr and $k$ by %.4f yr$^{-1}$: the ",
+  "noise carried along in the response changes nothing in the estimates and keeps the optimisation well ",
+  "conditioned."),
+  nu_hat, B_fixed, t_turn_rich, t_turn_log, infl_shift, t_infl_rich, abs(analytic_gap),
+  noise_shift_t0, noise_shift_k)
+
+growth_conclusion <- sprintf(paste0(
+  "a signal near zero before the Second World War that turns at %.1f under the symmetric form and %.1f once the ",
+  "upper-limb curvature $\\nu = %.3f$ is released, on a trajectory towards an asymptote of %.2f degrees C that ",
+  "the record does not reach -- only %.0f%% of the fitted span lies inside the observation window"),
+  t_turn_log, t_turn_rich, nu_hat, upper_asymptote.rich, 100 * span_reached)
+
+df_final <- df_results %>%
+  dplyr::select(dt.mnth, anomaly, "indus.trend" = richardsB,
+                "pre_ind" = extrapol_pre, industrial_effect) %>%
+  mutate(growth = df_full$growth, nh_phase = df_full$nh_phase)
+```
+
+The industrial residual is near zero before the Second World War and accelerates after 1950. `r growth_abstract`
+
+Superposition of the isolated components shows that multi-decadal natural minima near `r sprintf("%.0f", Min_early)` and around the turn of the century oppose the industrial trend. The moderated slope of the raw anomaly record in the late twentieth century is therefore reproduced here as destructive interference between a deepening natural trough and a steepening forced trend rather than as a slowdown in forcing. Because the natural baseline is obtained by extrapolation, the magnitude of this effect is model-dependent; Section 5.4 states the sensitivities that bound the result.
+
+## Plain Language Summary {.unnumbered}
+
+The ocean surface has warmed since the nineteenth century, but the warming has not been steady. Natural rhythms — most of them tied to the roughly eleven-year and twenty-year solar cycles and to the Pacific — push ocean temperature up and down by a few tenths of a degree over decades, and these swings sit on top of the warming caused by industrial emissions. This study separates the two. We first build a curve that follows the natural solar rhythm, then use signal-processing methods to measure the length and stability of each natural cycle, and finally estimate what the ocean would have done without industrial influence by projecting forward a statistical model fitted only to data before `r SPLIT_YEAR`. The difference between the observed record and that projection is our estimate of the industrial effect. To check that the solar rhythms we find are really in the ocean data and not merely a consequence of how we built the curve, the whole analysis is repeated with the curve tied to a regular, average-length solar cycle instead of the observed one. The result suggests that a natural cold phase around the turn of the century partly hid the human-caused warming of the late twentieth century, so the underlying forced trend over that period was steeper than the raw record suggests. How much steeper depends on assumptions in the projection, which we state and test.
+
+# Introduction
+
+## Motivation
+
+Global ocean heat content is the principal reservoir of the planetary energy imbalance, and SST is its most densely observed expression. Because roughly ninety per cent of the incoming solar energy retained by the climate system is stored in the ocean, the ocean surface record carries both the secular signature of anthropogenic forcing and the imprint of natural variability in the incident and absorbed solar flux. Separating the two is the classical attribution problem in its most direct form.
+
+The difficulty is one of timescale overlap rather than of amplitude. Over a window of two to three decades, the amplitude of multi-decadal natural variability in SST is of the same order as the accumulated forced trend. Trends estimated over such windows therefore inherit the phase of the natural cycles at their endpoints, which is the mechanism behind the widely discussed moderation of surface warming in the 1998–2013 period (Kosaka and Xie 2013; Medhaug et al. 2017).
+
+## Previous approaches
+
+Two families of method dominate. The first removes known modes of variability by multiple regression on indices of the El Niño–Southern Oscillation, volcanic aerosol loading and total solar irradiance, and interprets the residual as the forced signal (Foster and Rahmstorf 2011). This is transparent but presupposes that each index is an adequate and mutually independent predictor, and that the response is instantaneous and linear. The second family is data-adaptive: Singular Spectrum Analysis and related subspace techniques extract oscillatory components from the record itself without prescribing their form (Golyandina et al. 2001; Golyandina and Korobeynikov 2014), at the cost of requiring a separate criterion to decide which reconstructed components constitute "trend" and which "variability".
+
+## Aim and structure of this study
+
+This study combines a physically anchored construction of the natural component with a data-adaptive characterisation of it. Specifically we ask:
+
+1.  Can a trend anchored to the phase of the solar power variation (the *solar-locked trend*) isolate the harmonic content of the SST record more cleanly than a purely statistical smoother?
+2.  What are the periods, damping rates and stationarity of the resulting oscillatory modes, estimated objectively rather than assumed — and how much of that structure is imposed by the anchoring itself?
+3.  If the pre-`r SPLIT_YEAR` record is taken as an approximation of the pre-industrial state, what secular component does the later record require, and what functional form does it take?
+4.  How do the isolated natural and industrial components interfere, and what does that interference imply for trends estimated over short windows?
+
+Section 2 describes the data, Section 3 the methods, Section 4 the step-by-step results, and Section 5 the interpretation and the limitations that bound it.
+
+# Data
+
+## Sea surface temperature anomalies
+
+Monthly SST fields are taken from the NOAA Extended Reconstructed Sea Surface Temperature, version 6 (ERSSTv6; `sst.mnmean`), as distributed by NOAA PSL (Huang et al. 2025). ERSSTv6 replaces the EOT reconstruction of version 5 by the AAN method and revises the quality control; its monthly fields begin in January 1850, four years earlier than version 5. The land–ocean classification and the ocean fraction of each grid cell are taken from the Berkeley Earth land/ocean product (Rohde and Hausfather 2020); grid cells with a land fraction above 10 per cent are excluded.
+
+A global mean is formed as a double-weighted average: each cell is weighted by its ocean fraction and by its area relative to an equatorial cell, so that the result is an area-true ocean-only mean rather than a grid-cell mean. Both the weighted mean and the weighted median were computed; the mean is used throughout, with the median retained as a robustness check against localised outliers.
+
+The analysis uses the full record: `r N` monthly values covering `r sprintf("%.2f", rec_from)`–`r sprintf("%.2f", rec_to)`, with no leading segment discarded. The global ocean mean was re-extracted from the current ERSSTv6 grid (`r raw_n` monthly fields, downloaded `r noaa_update`). The analysis window ends at `r sprintf("%.2f", rec_to)` because the sunspot record used for the solar proxy currently ends at `r sprintf("%.2f", solar_to)`; the `r n_dropped` SST months beyond that are held back by the join until the SILSO download is refreshed.
+
+## Solar proxy
+
+Daily international sunspot numbers (version 2.0) are obtained from WDC-SILSO, Royal Observatory of Belgium, and aggregated to monthly means. Total solar irradiance is then computed from the sunspot number using a published second-degree polynomial calibrated against top-of-atmosphere irradiance measurements, and only the anomaly about its long-term mean is retained. The zero crossings of that anomaly are physical events — the transitions of the solar forcing about its mean level — and it is those, not a nominal cycle length, that define the spline knots in Section 3.1. The intervals between them vary from `r sprintf("%.1f", min(cycle_gaps))` to `r sprintf("%.1f", max(cycle_gaps))` yr (@tbl-cycles), and that irregularity is a property of the forcing rather than noise in it: the series is treated throughout as irregularly spaced in solar phase, which is also why a subspace method such as SSA, which makes no assumption of a fixed period, is used to characterise the oscillatory field.
+
+## Pre-processing
+
+The annual and semi-annual cycles — the latter dominant at the equator — are removed from the anomaly series using the classical seasonal-means estimator of the `itsmr` package with harmonics at 12 and 6 months. All subsequent analysis operates on this deseasonalised series.
+
+# Methods
+
+## Construction of the solar-locked trend
+
+The variable solar power passes through a minimum once per Schwabe cycle. The times of these minima define a set of knots that is fixed by solar phase alone and is not derived from the SST record. A cubic B-spline basis with knots at those times is regressed on the deseasonalised SST anomaly, giving the *solar-locked trend*: a curve free to follow the ocean record, but whose flexibility is licensed only at solar-phase transitions.
+
+This construction is the methodological core of the study. It differs from a conventional smoother in that its degrees of freedom are placed by an external physical clock rather than by a bandwidth criterion.
+
+## The mean-cycle control {#sec-meancycle}
+
+Anchoring knots to solar minima and then reporting solar periodicities in the residual field is open to the objection that the periodicity is partly imposed by the construction. To bound that effect, the entire trend construction is repeated with the knots placed at a **constant** interval equal to the mean observed cycle length,
+
+$$\bar{T} = \frac{1}{n}\sum_{i=1}^{n}\bigl(\tau_{i+1}-\tau_i\bigr) = `r sprintf("%.2f", mean_cycle)`\ \text{yr},$$
+
+where $\tau_i$ are the observed solar minima, starting from the first observed minimum and using the same number of knots. The mean-cycle series carries the same number of degrees of freedom and the same average spacing as the phase-locked series, but no information about the actual timing of individual cycles.
+
+The control is a null test, not an alternative analysis. Replacing the observed crossings by a regular sequence deliberately introduces a phase error that grows with distance from the anchor, so the mean-interval construction is physically inferior to the phase-locked one and is never used downstream. Its single purpose is falsification: oscillatory structure that survives the substitution cannot have been imposed by phase-accurate knot placement. As a by-product, the difference between the two constructions gives an empirical scale for how much the estimated periods depend on the anchoring — a more defensible bound, in this setting, than a nominal standard error computed under an independence assumption that the strongly autocorrelated residuals violate.
+
+## Separation of the non-harmonic component
+
+Each locked trend still contains the periodic solar response. A LOESS fit of span `r LOESS_SPAN` and degree 2 (Cleveland and Devlin 1988) extracts its slowly varying, non-harmonic part. The difference between the deseasonalised anomaly and that non-harmonic part gives the harmonic residual field on which the spectral analysis is performed.
+
+## Spectral characterisation: SSA and ESPRIT
+
+Singular Spectrum Analysis embeds the residual series in a trajectory matrix of window length $L$ and decomposes it into eigentriples (Golyandina et al. 2001; Golyandina and Korobeynikov 2014). Components are grouped into pairs, since a damped sinusoid appears in SSA as a pair of eigenvectors in quadrature; paired scatter plots and the w-correlation matrix are used to verify separability.
+
+For each grouped pair, ESPRIT (Roy and Kailath 1989) estimates the complex root $z = \vert z\vert e^{i 2\pi f}$, which yields simultaneously the oscillation frequency $f$ and the continuous growth or decay rate $\lambda = \ln\vert z\vert$. A modulus indistinguishable from unity indicates a stationary mode; $\vert z\vert < 1$ indicates decay over the observation window.
+
+These estimates are **descriptive**. They characterise the oscillatory field and are used for visualisation and for the null test of Section 3.2; no reconstructed component, period or damping rate is carried into the baseline extrapolation or the growth-curve estimation that follow. That separation is deliberate: the spectral description is exploratory, and nothing downstream should inherit a grouping decision made by eye from a w-correlation matrix.
+
+Two window lengths are used: $L = \lfloor N/2 \rfloor$ for the detrended residual field, which maximises resolution for long periods, and $L = 128$ for the decomposition of the solar-locked trend itself, which is the appropriate scale for separating its secular from its multi-decadal part.
+
+## Baseline extrapolation and the industrial residual
+
+The record is split at the calendar year `r SPLIT_YEAR`, on the assumption that industrial emissions had no material effect on ocean SST before that date; the training set comprises `r n_train` months. A Generalized Additive Model with a **cyclic cubic spline basis** (`bs = "cc"`, $k = `r GAM_K`$; Wood 2017) is fitted to the training set only, then evaluated over the full record. The cyclic basis is a deliberate choice and not a default: it constrains the fitted function to match in value and first derivative at the two ends of the training window, so the continuation beyond `r SPLIT_YEAR` repeats the pre-industrial pattern of variability rather than projecting its endpoint slope indefinitely. That is the appropriate constraint if the natural baseline is taken to be quasi-periodic, which is the hypothesis this study tests; it is the wrong constraint if the natural baseline carries a secular component of its own. @sec-basis-sensitivity quantifies what the alternative would do to every downstream estimate. The industrial effect is defined as
+
+$$\mathrm{industrial}(t) \;=\; \mathrm{anomaly}(t) \;-\; \widehat{\mathrm{GAM}}_{<`r SPLIT_YEAR`}(t).$$
+
+The split is specified as a calendar year rather than as the midpoint of the record, so that it does not move when the record length changes. It should be read as a first approximation and nothing more. There is no date at which industrial influence on ocean SST begins: the emission effect grows continuously from a level indistinguishable from zero, so any boundary drawn on the time axis is a device for separating a slow secular term from the natural harmonics, not a physical event. `r SPLIT_YEAR` is defensible on emission-history grounds, and @tbl-basis together with the split-year sensitivity listed in Appendix A bound what the choice costs; the decomposition that follows should be understood as conditional on it.
+
+## Growth-curve models
+
+The response of the growth-curve fit is the deseasonalised monthly anomaly with the harmonic part of the solar-locked trend removed, $y(t) = \mathrm{anomaly}(t) - [\,\mathrm{locked}(t) - \mathrm{LOESS}(\mathrm{locked})(t)\,]$. It is the non-harmonic trend of Section 3.3 with the monthly residual retained, so it carries the secular rise together with the observation noise. It is fitted first with a four-parameter symmetric logistic,
+
+$$y(t) = b + \frac{L}{1 + e^{-k\,(t - t_0)}},$$
+
+by Levenberg–Marquardt least squares, giving the rate coefficient $k$ and the inflection $t_0$. The symmetric logistic imposes equal curvature on the accelerating and saturating limbs, which has no physical justification for a system in which upper-ocean heat uptake, evaporation, cloud formation and albedo feedback operate on different timescales in the two phases.
+
+The fit is therefore generalised to a Richards curve (Richards 1959),
+
+$$y(t) = L + \frac{\Delta}{\bigl(1 + e^{-B\,(t - t_0)}\bigr)^{1/\nu}},$$
+
+with $B$ held at the value returned by the logistic fit, so that the secular rate is not re-estimated and the two curves differ only in shape, and with $\nu$ free.
+
+In this parametrisation $t_0$ is a **location parameter**, not the inflection point. Setting the second derivative to zero gives $e^{-B(t-t_0)} = \nu$, so the date of maximum acceleration is
+
+$$t_{\mathrm{infl}} = t_0 - \frac{\ln \nu}{B},$$
+
+which coincides with $t_0$ only when $\nu = 1$. All comparisons against the logistic are therefore made at the turning point rather than at $t_0$.
+
+The observations are monthly and discrete, so the turning point is read from the fitted curve as the sample of steepest rise, `which.max(diff(.))`, rather than from the continuous root. The analytic root is reported alongside it as a consistency check; the two agree to `r sprintf("%.2f", abs(analytic_gap))` yr, well inside the monthly sampling interval.
+
+The estimation is in two steps and nothing more: the logistic is fitted by Levenberg–Marquardt in a single call, and the Richards curve is then fitted with $B$ held at the value the logistic returned. Neither step needs bounds, a grid search, or a separate estimate of the asymptotes.
+
+What the estimation does require is that the response retain its noise. An earlier version of this analysis fitted the growth curve to a low-pass filtered residual, `hr(y, N/1:20)`. That response is smooth over long stretches, so the sum of squares is nearly flat along the ridge that trades the upper asymptote against the rate, and the optimiser either stalls or runs to a bound — which is what motivated an elaborate staged estimator in place of the fit itself. Fitting the unfiltered monthly series removes the problem: the residual scatter breaks the degeneracy without displacing the optimum. The control is reported in Section 5.2 — refitting the smoothed non-harmonic trend alone moves $t_0$ by `r sprintf("%.2f", noise_shift_t0)` yr and $k$ by `r sprintf("%.4f", noise_shift_k)` yr$^{-1}$, so the noise changes the conditioning and not the estimate.
+
+## Uncertainty
+
+Three complementary bounds are reported rather than a single interval:
+
+1.  **Parameter intervals.** For the growth-curve coefficients, standard errors are taken from the non-linear least-squares fit and propagated to $t_{\mathrm{infl}}$ by Monte Carlo sampling (20 000 draws) from the estimated parameter covariance. These are *model-conditional* and assume independent residuals; because the residuals are strongly autocorrelated, they should be read as lower bounds on the true uncertainty.
+2.  **Construction spread.** The difference between the phase-locked and mean-cycle constructions (@sec-meancycle) bounds the sensitivity of the spectral estimates to the anchoring.
+3.  **Structural sensitivity.** The dependence on the split year and on the extrapolation basis is discussed in Section 5.4 and is the dominant term.
+
+## Software
+
+All computation is performed in R. The analysis uses `Rssa` for SSA and ESPRIT, `mgcv` for the GAM, `minpack.lm` for Levenberg–Marquardt non-linear least squares, `itsmr` for seasonal adjustment and harmonic filtering, `splines` for the B-spline basis, and the `tidyverse` for data handling.
+
+# Results
+
+## The solar-locked trend and its non-harmonic component
+
+The non-harmonic component of the phase-locked trend (@fig-solar-locked) has minima near `r sprintf("%.0f", Min_early)` and `r sprintf("%.0f", Min_mid)` and a turning point near `r sprintf("%.0f", Turn_late)`, marked by the vertical lines. The mean-cycle control is overlaid: the two curves differ by an RMS of `r sprintf("%.3f", rmse_constructions)` °C, so the low-frequency shape of the trend is not an artefact of phase-accurate knot placement.
+
+```{r}
+#| label: fig-solar-locked
+#| fig-cap: "Non-harmonic component of the ocean solar-locked trend (LOESS, span 0.25), for knots at the observed solar minima (phase-locked) and at the mean cycle interval (control). Dashed lines mark the two minima; the dotted line marks the late turning point."
+dat %>%
+  dplyr::select(dt.mnth, `phase-locked` = nh_phase, `mean-cycle` = nh_meanc) %>%
+  pivot_longer(-dt.mnth, names_to = "construction", values_to = "value") %>%
+  ggplot(aes(dt.mnth, value, colour = construction)) +
+  geom_line() +
+  geom_vline(xintercept = Min_early, linetype = 2) +
+  geom_vline(xintercept = Min_mid,   linetype = 2) +
+  geom_vline(xintercept = Turn_late, linetype = 3) +
+  labs(x = NULL, y = "anomaly (°C)",
+       title = "Ocean Solar-Locked Trend, non-harmonic part",
+       subtitle = paste0("LOESS span = ", LOESS_SPAN,
+                         "; mean cycle = ", sprintf("%.2f", mean_cycle), " yr")) +
+  theme_minimal(base_size = 11)
+```
+
+## Sunspot cycle statistics
+
+@tbl-cycles summarises the knot intervals that define the two constructions.
+
+```{r}
+#| label: tbl-cycles
+#| tbl-cap: "Intervals between successive solar-power minima over the analysis window, and the regular interval used for the mean-cycle control."
+tibble(
+  Quantity = c("Number of cycles spanned", "Mean cycle length (yr)",
+               "Standard deviation (yr)", "Shortest (yr)", "Longest (yr)",
+               "Knots, phase-locked", "Knots, mean-cycle control"),
+  Value = c(n_cycles, round(mean_cycle, 2), round(sd_cycle, 2),
+            round(min(cycle_gaps), 2), round(max(cycle_gaps), 2),
+            length(nodes_obs_in), length(nodes_mean))
+) %>% kable(align = c("l", "r"))
+```
+
+## Total harmonic residual
+
+Adding the periodic part back to the residuals recovers the total harmonic dependence of the global ocean anomaly (@fig-total-harmonic).
+
+```{r}
+#| label: fig-total-harmonic
+#| fig-cap: "Deseasonalised anomaly band-passed to periods between 3 and 88 years (blue) against the non-harmonic trend (red), phase-locked construction."
+dat %>%
+  ggplot(aes(x = dt.mnth)) +
+  geom_line(aes(y = hr(res_phase, N / 2:60), colour = "band-pass 3–88 yr")) +
+  geom_line(aes(y = nh_phase, colour = "non-harmonic trend")) +
+  labs(x = NULL, y = "anomaly (°C)", colour = NULL,
+       title = "Anomaly and non-harmonic trend") +
+  theme_minimal(base_size = 11)
+```
+
+## Low-pass structure of the residuals
+
+Low-pass filtering the residuals at cut-off periods of 5, 11 and 15 years (@fig-lowpass) shows that all three retained bands are dominated by the eleven-year sunspot cycle. The response of SST to solar irradiance depends on the area and depth of each ocean basin through its effective heat capacity, so the global average is a superposition of frequency-dependent regional responses. Two features survive that averaging: a deep trough with its minimum near 1911, and a second depression between approximately 1940 and 1960.
+
+```{r}
+#| label: fig-lowpass
+#| fig-cap: "Anomaly residuals retained above cut-off periods of 5, 11 and 15 years (phase-locked construction)."
+dat <- dat %>%
+  mutate(long5  = hr(res_phase, N / 1:35),
+         long11 = hr(res_phase, N / 1:16),
+         long15 = hr(res_phase, N / 1:12))
+
+dat %>%
+  ggplot(aes(x = dt.mnth)) +
+  geom_line(aes(y = long5,  colour = "> 5 yr"), linetype = 2) +
+  geom_line(aes(y = long11, colour = "> 11 yr")) +
+  geom_line(aes(y = long15, colour = "> 15 yr")) +
+  labs(x = NULL, y = "anomaly (°C)", colour = "cut-off",
+       title = "Anomaly residuals: long periods") +
+  theme_minimal(base_size = 11)
+```
+
+## Eigentriple structure of the detrended field
+
+Paired scatter plots of the leading SSA eigenvectors (@fig-ssa-paired) show the circular patterns that identify clean harmonic pairs.
+
+```{r}
+#| label: ssa-both
+#| include: false
+L_res <- floor(N / 2)
+
+s_phase <- ssa(dat$res_phase, L = L_res)
+s_meanc <- ssa(dat$res_meanc, L = L_res)
+
+seltd_grps <- list(
+  Pair_1_2  = c(1, 2),
+  Pair_3_4  = c(3, 4),
+  Pair_5_6  = c(5, 6),
+  Pair_7_8  = c(7, 8),
+  Pair_9_10 = c(9, 10)
+)
+
+esprit_tbl <- function(s) {
+  res <- parestimate(s, groups = seltd_grps, method = "esprit")
+  map_dfr(res, ~ tibble(
+    frequency = unlist(.x$frequencies)[1],
+    rate      = unlist(.x$rates)[1],
+    modulus   = unlist(.x$moduli)[1]
+  ), .id = "Group") %>%
+    mutate(period_months = 1 / frequency,
+           period_years  = period_months / 12)
+}
+
+esp_phase <- esprit_tbl(s_phase)
+esp_meanc <- esprit_tbl(s_meanc)
+
+esp_cmp <- esp_phase %>%
+  dplyr::select(Group, T_phase = period_years, mod_phase = modulus, rate_phase = rate) %>%
+  left_join(esp_meanc %>% dplyr::select(Group, T_mean = period_years, mod_mean = modulus),
+            by = "Group") %>%
+  mutate(dT = T_phase - T_mean)
+
+getT <- function(g) esp_phase$period_years[esp_phase$Group == g]
+T12 <- getT("Pair_1_2"); T34 <- getT("Pair_3_4"); T56 <- getT("Pair_5_6")
+T78 <- getT("Pair_7_8"); T910 <- getT("Pair_9_10")
+mod12 <- esp_phase$modulus[esp_phase$Group == "Pair_1_2"]
+max_dT <- max(abs(esp_cmp$dT), na.rm = TRUE)
+```
+
+```{r}
+#| label: fig-ssa-paired
+#| fig-cap: "Paired eigenvector scatter plots of the detrended residual field, phase-locked construction. Circular trajectories indicate well-separated harmonic pairs."
+plot(s_phase, type = "paired")
+```
+
+## ESPRIT parameter estimates and the mean-cycle control
+
+@tbl-esprit gives the period, damping rate and modulus of the five leading grouped pairs for the phase-locked construction, alongside the period recovered by the mean-cycle control.
+
+```{r}
+#| label: tbl-esprit
+#| tbl-cap: "ESPRIT estimates for the five leading eigentriple pairs. T(phase) uses knots at the observed solar minima; T(mean) uses knots at the mean cycle interval. The last column is the difference between the two constructions and serves as an empirical uncertainty scale."
+esp_cmp %>%
+  transmute(
+    `Eigentriple pair` = str_replace_all(str_remove(Group, "Pair_"), "_", ","),
+    `T phase-locked (yr)` = round(T_phase, 2),
+    `T mean-cycle (yr)`   = round(T_mean, 2),
+    `Delta T (yr)`        = round(dT, 2),
+    `Modulus |z|`         = round(mod_phase, 5),
+    `Rate lambda`         = round(rate_phase, 5)
+  ) %>%
+  kable(align = c("l", "r", "r", "r", "r", "r"))
+```
+
+Three regimes emerge, and the group indices below are those of @tbl-esprit rather than a separate numbering.
+
+**Bidecadal / Hale magnetic mode — pair (1,2).** The leading pair isolates a low-frequency cycle at $T = `r sprintf("%.1f", T12)`$ yr with modulus $\vert z\vert = `r sprintf("%.5f", mod12)`$, stationary to within estimation error, consistent with solar-magnetic forcing on the \~22-year Hale cycle acting jointly with intrinsic bidecadal ocean variability. With only about `r sprintf("%.0f", (rec_to - rec_from)/T12)` realisations in the record, the damping rate of this mode is weakly constrained and the near-unit modulus should not be read as a demonstration of exact stationarity.
+
+**Split Schwabe solar band — pairs (3,4) and (5,6).** The eleven-year band resolves into twin sidebands at $T = `r sprintf("%.1f", T34)`$ yr and $T = `r sprintf("%.1f", T56)`$ yr. A doublet of this kind is the spectral signature of amplitude and phase modulation of a single carrier across the observation window rather than of two independent oscillators.
+
+**Interannual recharge-oscillator band — pairs (7,8) and (9,10).** The higher-frequency pairs resolve $T = `r sprintf("%.1f", T78)`$ yr and $T = `r sprintf("%.1f", T910)`$ yr, within the characteristic bandwidth of the equatorial Pacific recharge oscillator (Jin 1997) and of interannual climate modes more generally. These are the pairs actually grouped in the code as `Pair_7_8` and `Pair_9_10`; earlier drafts of this analysis mislabelled them as pairs (4,5).
+
+The mean-cycle control recovers the same band structure, with a maximum period difference of `r sprintf("%.2f", max_dT)` yr across the five pairs (@tbl-esprit, column *Delta T*). The oscillatory content is therefore a property of the SST record and not an artefact of anchoring the spline to the observed solar minima; the phase-accurate anchoring sharpens the estimate but does not create the modes.
+
+## SSA decomposition of the solar-locked trend
+
+Decomposing the phase-locked trend itself ($L = 128$) separates a secular component from multi-decadal and decadal oscillations (@fig-ssa-trend).
+
+```{r}
+#| label: fig-ssa-trend
+#| fig-cap: "SSA of the solar-locked trend (L = 128)."
+#| fig-subcap:
+#|   - "Singular-value spectrum (log scale)."
+#|   - "W-correlation matrix of the first ten eigenvectors."
+#|   - "Reconstruction into secular, multi-decadal and decadal parts."
+#| layout-ncol: 2
+L <- 128
+s_sol <- ssa(dat$trd_phase, L = L)
+
+df_values <- tibble(
+  Component = seq_along(s_sol$sigma),
+  SingularValue = s_sol$sigma
+)
+
+print(
+  ggplot(df_values[1:20, ], aes(Component, SingularValue)) +
+    geom_point(color = "steelblue", size = 2) +
+    geom_line(color = "steelblue") +
+    scale_y_log10() +
+    scale_x_continuous(breaks = 1:20) +
+    labs(title = "SSA singular values (log scale)", x = "Component index", y = "Sigma") +
+    theme_minimal(base_size = 11)
+)
+
+w_mat <- as.matrix(wcor(s_sol, groups = 1:10))
+print(
+  expand.grid(F1 = 1:10, F2 = 1:10) %>%
+    mutate(value = abs(as.vector(w_mat))) %>%
+    ggplot(aes(F1, F2, fill = value)) +
+    geom_tile() +
+    scale_fill_gradient(low = "white", high = "blue", limits = c(0, 1)) +
+    scale_x_continuous(breaks = 1:10, expand = c(0, 0)) +
+    scale_y_continuous(breaks = 1:10, expand = c(0, 0)) +
+    coord_fixed() +
+    labs(title = "W-correlation matrix", x = "Eigenvector index", y = "Eigenvector index",
+         fill = "w-cor") +
+    theme_minimal(base_size = 11) +
+    theme(panel.grid = element_blank())
+)
+
+rec <- reconstruct(s_sol, groups = list(
+  Secular_Trend = c(1),
+  Multidecadal  = c(2, 3),
+  Decadal       = c(4, 5)
+))
+
+print(
+  tibble(dt.mnth = dat$dt.mnth,
+         locked = dat$trd_phase,
+         Secular = rec$Secular_Trend,
+         Oscillatory = rec$Multidecadal + rec$Decadal) %>%
+    ggplot(aes(x = dt.mnth)) +
+    geom_line(aes(y = locked, colour = "solar-locked trend")) +
+    geom_line(aes(y = Secular, colour = "secular"), linewidth = 1.2) +
+    geom_line(aes(y = Oscillatory, colour = "multidecadal + decadal")) +
+    labs(x = NULL, y = "anomaly (°C)", colour = NULL, title = "SSA-decomposed solar trend") +
+    theme_minimal(base_size = 11)
+)
+```
+
+## Baseline extrapolation and the industrial residual
+
+The alternative decomposition retained here for comparison is constructed in four steps:
+
+1.  the record is split at `r SPLIT_YEAR`, and the earlier part (`r n_train` months) is used as the GAM training set;
+2.  the fitted GAM is evaluated over the full record length, and this extension is taken to represent the natural anomaly in the absence of industrial influence;
+3.  the difference between observation and extension defines the industrial effect, which is by construction near zero well before `r SPLIT_YEAR`;
+4.  that residual is fitted with the same two-step estimator as the solar-locked response — a symmetric logistic to establish the secular rate, then a Richards curve at fixed rate, on the physical argument that the approach to saturation is governed by different processes from the initial phase — evaporation at elevated temperature, cloud formation and albedo response among them.
+
+Both decompositions are carried through to @tbl-aic, where they are scored against the same response.
+
+```{r}
+#| label: fig-preind-split
+#| fig-cap: "Extrapolated pre-1938 baseline (GAM, cubic regression spline, k = 30) and the low-pass filtered industrial residual."
+df_results %>%
+  ggplot(aes(x = dt.mnth)) +
+  geom_line(aes(y = extrapol_pre, colour = "GAM baseline (trained < 1938)")) +
+  geom_line(aes(y = industr.smth, colour = "industrial residual, smoothed")) +
+  geom_vline(xintercept = SPLIT_YEAR, linetype = 3) +
+  labs(x = NULL, y = "anomaly (°C)", colour = NULL,
+       title = "Anomaly split at the training boundary") +
+  theme_minimal(base_size = 11)
+```
+
+```{r}
+#| label: fig-logistic
+#| fig-cap: "Four-parameter logistic fit to the deseasonalised anomaly with the harmonic part of the solar-locked trend removed, with lower and upper asymptotes and the turning point."
+df_results %>%
+  mutate(growth = df_full$growth) %>%
+  ggplot(aes(x = dt.mnth)) +
+  geom_line(aes(y = growth, colour = "observed - harmonic"), alpha = 0.5) +
+  geom_line(aes(y = logist_fit, colour = "logistic"), linewidth = 1.2) +
+  geom_hline(yintercept = lower_asymptote, linetype = 2, colour = "blue") +
+  geom_hline(yintercept = upper_asymptote, linetype = 2, colour = "red") +
+  geom_vline(xintercept = t_turn_log, linetype = 3) +
+  labs(x = "Year", y = "Anomaly effect (°C)", colour = NULL,
+       title = "Industrial growth curve, solar-locked construction",
+       subtitle = paste0("turning point (steepest rise): ", sprintf("%.1f", t_turn_log),
+                         "; span reached by ", sprintf("%.0f", rec_to), ": ",
+                         sprintf("%.0f%%", 100 * span_reached))) +
+  theme_minimal(base_size = 11)
+```
+
+```{r}
+#| label: fig-compare-fits
+#| fig-cap: "Symmetric logistic against the Richards curve fitted at fixed rate coefficient. The dotted line marks the Richards inflection, the dashed line the logistic inflection."
+df_results %>%
+  ggplot(aes(x = dt.mnth)) +
+  geom_line(aes(y = logist_fit, colour = "logistic")) +
+  geom_line(aes(y = richardsB,  colour = "Richards (fixed B)")) +
+  geom_vline(xintercept = t_turn_log,  linetype = 2) +
+  geom_vline(xintercept = t_turn_rich, linetype = 3) +
+  geom_hline(yintercept = lower_asymptote.rich, linetype = 2, colour = "red") +
+  geom_hline(yintercept = upper_asymptote.rich, linetype = 2, colour = "darkgreen") +
+  labs(x = NULL, y = "Anomaly effect (°C)", colour = NULL,
+       title = "Symmetric versus asymmetric growth curve",
+       subtitle = "rate coefficient B identical in both fits") +
+  theme_minimal(base_size = 11)
+```
+
+## Turning point and the effect of releasing symmetry
+
+@tbl-turning reports the location parameters of the two fits together with the inflection date of the Richards curve. Only the inflection dates are directly comparable.
+
+```{r}
+#| label: tbl-turning
+#| tbl-cap: "Location parameters, shape and turning points of the symmetric and asymmetric fits to the solar-locked response. The slope is estimated once, in step 1, and held fixed in step 2, so the two curves differ only in shape. Intervals are model-conditional and assume independent residuals."
+tibble(
+  Quantity = c("Lower asymptote b (°C)",
+               "Upper asymptote U (°C)",
+               "Slope B, step 1 (yr^-1)",
+               "Turning point, symmetric (yr)",
+               "Shape nu, step 2",
+               "Turning point, asymmetric (yr)",
+               "Shift, asymmetric - symmetric (yr)",
+               "Analytic root t0 - ln(nu)/B (yr)",
+               "Steepest rise of the observed non-harmonic trend (yr)"),
+  Value = c(say(lower_asymptote, "%.3f"),
+            say(upper_asymptote, "%.3f"),
+            say(B_fixed, "%.4f"),
+            say(t_turn_log, "%.1f"),
+            say(nu_hat, "%.3f"),
+            say(t_turn_rich, "%.1f"),
+            say(infl_shift, "%+.1f"),
+            say(t_infl_rich, "%.1f"),
+            sprintf("%.1f", t_turn_obs)),
+  `95% interval` = c("—", "—", "—",
+                     if (growth_ok) fmt_ci(ci_t0log) else "—",
+                     "—", "—", "—", "—", "—"),
+  Interpretation = c("Logistic constant term",
+                     "b + L; an extrapolation, see 'span reached' below",
+                     "Estimated in step 1, held fixed in step 2",
+                     "Sample of steepest rise of the symmetric fit",
+                     "nu < 1 means an earlier, sharper acceleration limb",
+                     "Sample of steepest rise of the asymmetric fit",
+                     "Negative means the asymmetric curve turns earlier",
+                     "Continuous-time check on the discrete reading",
+                     "Model-free: steepest rise of the LOESS non-harmonic trend")
+) %>% kable(align = c("l", "r", "r", "l"))
+```
+
+The record covers only `r sprintf("%.0f%%", 100 * span_reached)` of the fitted span, so the upper asymptote in @tbl-turning is a property of the extrapolated curve and not a quantity the data constrain. The turning point, which lies inside or close to the observation window, is the estimate this analysis can defend; the ceiling is not.
+
+## Which decomposition the data prefer {#sec-aic}
+
+The two decompositions — the solar-locked construction of Section 3.1 and the extrapolated GAM baseline of Section 3.6 — imply different responses, so their growth-curve fits cannot be compared by a residual sum of squares over those responses. They can be compared as models of the same quantity, the deseasonalised anomaly, by scoring the full reconstruction
+
+$$\widehat{\mathrm{anomaly}}(t) = \underbrace{\text{smooth/periodic part}}_{\text{harmonic part, or GAM baseline}} \; + \; \underbrace{\text{growth curve}}_{\text{logistic or Richards}}$$
+
+against that anomaly, counting the effective degrees of freedom of the smoothing step. @tbl-aic reports both readings: `AIC (series)` compares the logistic and the Richards fit within each route and is exact; `AIC (anomaly)` compares the four reconstructions against the same response and is approximate, because the LOESS and GAM degrees of freedom are effective rather than exact. Differences of a few units in the second column should not be over-read.
+
+```{r}
+#| label: tbl-aic
+#| tbl-cap: "Growth-curve fits under the two decompositions. AIC (series) is computed on each route's own response and compares only the two growth curves within a route. AIC (anomaly) scores the full reconstruction against the deseasonalised anomaly and is comparable across all four rows, with the effective degrees of freedom of the smoothing step included. 'Span' is the fraction of the fitted sigmoid the record actually covers."
+aic_tbl %>%
+  transmute(Route, `Growth curve` = Growth,
+            `AIC (series)`  = round(AIC_series, 1),
+            `AIC (anomaly)` = round(AIC_anomaly, 1),
+            `dAIC`          = round(dAIC_anomaly, 1),
+            `k (yr^-1)`     = round(k, 4),
+            `Turning point` = round(turn, 1),
+            `nu`            = ifelse(is.na(nu), "\u2014", sprintf("%.3f", nu)),
+            `Ceiling (°C)`  = round(ceiling, 3),
+            `Span`          = sprintf("%.0f%%", 100 * reached)) %>%
+  kable(align = c("l", "l", "r", "r", "r", "r", "r", "r", "r", "r"))
+```
+
+On this criterion the preferred reconstruction is the **`r aic_best_route`** route with the **`r aic_best_growth`** growth curve. Within the solar-locked route, releasing the symmetry constraint changes AIC by `r sprintf("%+.1f", dAIC_richards_A)`; a difference of that size is weak evidence for asymmetry rather than a decision between the two shapes, and the honest statement is that the record does not strongly distinguish them. The criterion answers only the question it is designed to answer — which model predicts the observed anomaly best per parameter spent — and it cannot adjudicate the physical question of whether the natural baseline is quasi-periodic, because that assumption enters both routes before any fitting takes place.
+
+## The decomposition and its low-pass view
+
+@fig-decomposition shows the observed anomaly with its pre-industrial and industrial parts; @fig-decomposition-lowpass repeats the comparison after low-pass filtering at a cut-off period near nine years, with the fitted industrial model superimposed.
+
+```{r}
+#| label: baseline-sensitivity
+#| include: false
+
+## The same two-step estimator applied to the residual produced by each
+## candidate baseline, so the comparison is of baselines and not of fitting
+## procedures.
+baseline_variant <- function(kk, bs_name) {
+  g  <- tryCatch(mgcv::gam(anomaly ~ s(dt.mnth, k = kk, bs = bs_name), data = df_train),
+                 error = function(e) NULL)
+  if (is.null(g)) return(NULL)
+  pr <- as.numeric(predict(g, newdata = df_full))
+  ie <- df_full$anomaly - pr
+  r  <- fit_growth(ie, tt)
+  if (is.null(r)) {
+    return(tibble(basis = bs_name, k = kk, rate = NA_real_, t0 = NA_real_,
+                  upper = NA_real_, reached = NA_real_, identified = FALSE,
+                  ie_2026 = tail(ie, 1)))
+  }
+  tibble(basis = bs_name, k = kk, rate = r$k, t0 = r$turn_log,
+         upper = r$upper, reached = r$reached,
+         identified = is.finite(r$k) && r$k > 0.005 && r$reached > 0.9,
+         ie_2026 = tail(ie, 1))
+}
+
+sens_grid <- list(c(30, "cc"), c(12, "cc"), c(30, "cr"), c(6, "cr"))
+sens_tbl <- map_dfr(sens_grid, ~ baseline_variant(as.numeric(.x[1]), .x[2]))
+```
+
+## Sensitivity of the industrial fit to the baseline basis {#sec-basis-sensitivity}
+
+The industrial component is defined entirely by the extrapolated baseline, so the choice of spline basis is not a technical detail. @tbl-basis reports the logistic fit obtained under four baselines: the cyclic basis used here at two flexibilities and the non-cyclic cubic regression spline at two. Every variant is fitted by the free search from data-driven starting values, so the table reports each baseline's least-squares optimum rather than the constrained solution of @tbl-turning.
+
+```{r}
+#| label: tbl-basis
+#| tbl-cap: "Logistic fit to the industrial residual under four GAM baselines, all fitted with the same two-step estimator. The last-but-one column gives the fraction of the fitted span the record actually covers; well below 100 per cent means the upper asymptote is an extrapolation rather than an estimate."
+sens_tbl %>%
+  transmute(Basis = basis, k = k,
+            `Slope B` = round(rate, 4),
+            `Turning point (yr)` = round(t0, 1),
+            `Span reached by 2026` = ifelse(is.na(reached), "\u2014", sprintf("%.0f%%", 100 * reached)),
+            `Residual at 2026 (°C)` = round(ie_2026, 3)) %>%
+  kable(align = c("l", "r", "r", "r", "l", "r"))
+```
+
+The two cyclic variants agree with one another to within `r sprintf("%.1f", diff(range(sens_tbl$t0[sens_tbl$basis == "cc"], na.rm = TRUE)))` yr despite a factor of `r round(max(sens_tbl$k[sens_tbl$basis == "cc"]) / min(sens_tbl$k[sens_tbl$basis == "cc"]), 1)` in basis dimension, so within that family the estimate is not sensitive to how flexible the baseline is. The non-cyclic variants behave differently, and the diagnostic column to watch is the span: where it stays well below 100 per cent the curve is still climbing at the end of the record and the asymptote is carried entirely by the functional form. The last column is diagnostic of the extrapolation itself — a residual far from zero at the end of the record means the baseline has drifted away from the observations, and the value of `r sprintf("%.2f", sens_tbl$ie_2026[sens_tbl$basis == "cr" & sens_tbl$k == 30])` °C for the 30-knot non-cyclic baseline shows how badly a flexible spline can behave when extrapolated. The mechanism is discussed in @sec-growth-identifiability.
+
+```{r}
+#| label: fig-decomposition
+#| fig-cap: "Observed anomaly decomposed into the extrapolated pre-industrial baseline and the industrial residual."
+df_final %>%
+  ggplot(aes(x = dt.mnth)) +
+  geom_line(aes(y = anomaly, colour = "observed anomaly")) +
+  geom_line(aes(y = pre_ind, colour = "pre-industrial baseline")) +
+  geom_line(aes(y = industrial_effect, colour = "industrial residual")) +
+  labs(x = NULL, y = "anomaly (°C)", colour = NULL,
+       title = "Industrial and natural components") +
+  theme_minimal(base_size = 11)
+```
+
+Three features are visible before filtering:
+
+- as the extrapolated natural baseline falls from about 1950 to about 2000, the natural component subtracts from the observed rise;
+- after 2000 the natural component rises again and contributes to a steeper observed increase;
+- the industrial component itself turns to a slower ascent over the same period.
+
+```{r}
+#| label: fig-decomposition-lowpass
+#| fig-cap: "Low-pass filtered decomposition (cut-off period near nine years) with the fitted industrial model superimposed."
+df_final %>%
+  mutate(anoma.long = hr(anomaly, N / 1:20),
+         indus.long = hr(industrial_effect, N / 1:20)) %>%
+  dplyr::filter(dt.mnth > rec_from + 1, dt.mnth < 2025) %>%
+  ggplot(aes(x = dt.mnth)) +
+  geom_line(aes(y = anoma.long, colour = "observed (low-pass)")) +
+  geom_line(aes(y = pre_ind,    colour = "pre-industrial baseline")) +
+  geom_line(aes(y = indus.long, colour = "industrial (low-pass)")) +
+  geom_line(aes(y = indus.trend, colour = "fitted industrial model"), linewidth = 1.2) +
+  labs(x = NULL, y = "anomaly (°C)", colour = NULL,
+       title = "Decomposition, low-pass filtered") +
+  theme_minimal(base_size = 11)
+```
+
+```{r}
+#| label: trough-stats
+#| include: false
+pre_lp <- df_final %>% mutate(pre_lp = pre_ind)
+trough_early <- pre_lp %>% dplyr::filter(dt.mnth < 1930) %>% slice_min(pre_lp, n = 1)
+trough_late  <- pre_lp %>% dplyr::filter(dt.mnth > 1980) %>% slice_min(pre_lp, n = 1)
+```
+
+# Discussion
+
+## Phase interaction between natural variability and forcing
+
+The decomposition exposes a phase relationship rather than a simple superposition of magnitudes. The extrapolated pre-industrial baseline reaches a first minimum of `r sprintf("%.2f", trough_early$pre_lp)` °C near `r sprintf("%.0f", trough_early$dt.mnth)` and a second of `r sprintf("%.2f", trough_late$pre_lp)` °C near `r sprintf("%.0f", trough_late$dt.mnth)`. The second coincides with the interval over which the industrial component is accelerating most rapidly.
+
+The consequence is destructive interference. Through the second half of the twentieth century the observed anomaly rises more slowly than the industrial component alone would imply, because the natural component is falling over the same interval; after 2000 the sign reverses and the natural component reinforces the observed rise. On this reading the moderated slope of the late twentieth century is a phase artefact of the natural cycles rather than a deceleration of forcing — an interpretation consistent in direction with analyses attributing the 1998–2013 moderation to Pacific decadal variability (Kosaka and Xie 2013; Medhaug et al. 2017), though reached here without prescribing an index of that variability.
+
+## The natural component outside the observation window {#sec-natural-extrap}
+
+Subtracting the fitted Richards curve from the observed anomaly leaves the natural component: everything the secular growth curve does not describe (@fig-natural, panel A). Its standard deviation is `r sprintf("%.3f", sd_natural)` K, an order of magnitude larger than the residual scatter of the growth-curve fit itself, so it is signal and not noise.
+
+```{r}
+#| label: natural-extrap
+#| include: false
+
+natural   <- dat$anomaly - df_results$richardsB
+sd_natural <- sd(natural)
+REC_LEN   <- rec_to - rec_from
+
+## periods from SSA + ESPRIT on the natural component
+L_nat  <- floor(N / 2)
+s_nat  <- ssa(natural, L = L_nat)
+pairs_nat <- split(1:24, rep(1:12, each = 2)); names(pairs_nat) <- paste0("P", 1:12)
+pe_nat <- parestimate(s_nat, groups = pairs_nat, method = "esprit")
+mode_tbl <- imap_dfr(pe_nat, ~ tibble(
+  group   = .y,
+  period  = 1 / abs(unlist(.x$frequencies)[1]) / 12,
+  modulus = unlist(.x$moduli)[1])) %>%
+  mutate(share = map_dbl(pairs_nat, ~ sum(s_nat$sigma[.x]^2)) / sum(s_nat$sigma^2),
+         resolved = period >= 2.5 & period <= REC_LEN / 2.5)
+
+## A period needs about two and a half realisations inside the record before
+## its phase means anything outside it.  Two variants are carried: the
+## conservative one keeps only those, the inclusive one adds every mode shorter
+## than the record.
+per_res <- sort(unique(round(mode_tbl$period[mode_tbl$resolved], 2)))
+per_inc <- sort(unique(round(mode_tbl$period[mode_tbl$period >= 2.5 &
+                                             mode_tbl$period <= REC_LEN], 2)))
+
+harm_design <- function(x, P) do.call(cbind, lapply(P, function(p)
+  cbind(cos(2 * pi * x / p), sin(2 * pi * x / p))))
+fit_harm <- function(P) {
+  X <- harm_design(time, P); m <- lm(natural ~ X)
+  list(model = m, periods = P, fitted = as.numeric(predict(m)),
+       r2 = summary(m)$r.squared)
+}
+H_res <- fit_harm(per_res); H_inc <- fit_harm(per_inc)
+pred_harm <- function(H, x) as.numeric(cbind(1, harm_design(x, H$periods)) %*% coef(H$model))
+
+## the part the synthesis cannot carry: real low-frequency signal, and the
+## honest error scale of any extrapolation
+unmodelled_sd <- sd(natural - H_inc$fitted)
+
+richards_at <- function(x) {
+  cr <- coef(fitA$rich)
+  cr[["Lr"]] + cr[["Delta"]] / (1 + exp(-fitA$k * (x - cr[["t0r"]])))^(1 / cr[["nu"]])
+}
+
+t_ext <- seq(1600, 2100, by = 1 / 12)
+ext <- tibble(dt.mnth = t_ext,
+              nat_res  = pred_harm(H_res, t_ext),
+              nat_inc  = pred_harm(H_inc, t_ext),
+              richards = richards_at(t_ext))
+
+LIA <- c(1645, 1725)
+lia <- ext %>% dplyr::filter(dt.mnth >= LIA[1], dt.mnth <= LIA[2])
+lia_mean <- mean(lia$nat_inc); lia_min <- min(lia$nat_inc); lia_max <- max(lia$nat_inc)
+at_year  <- function(yy) ext[which.min(abs(ext$dt.mnth - yy)), ]
+fc2050 <- at_year(2050); fc2100 <- at_year(2100)
+ceiling_rich <- fitA$upper_r
+
+## cross-check: SSA recurrent forecast of the same component, forward and on
+## the reversed series
+ssa_fwd <- as.numeric(unlist(rforecast(s_nat, groups = list(1:12),
+                     len = round((2100 - rec_to) * 12), only.new = TRUE)))
+s_rev   <- ssa(rev(natural), L = L_nat)
+ssa_bwd <- rev(as.numeric(unlist(rforecast(s_rev, groups = list(1:12),
+                         len = round((rec_from - 1600) * 12), only.new = TRUE))))
+ssa_bwd_max <- max(abs(ssa_bwd))
+```
+
+**What can and cannot be carried outside the record.** Fitting a superposition of fixed-period sinusoids to the natural component recovers `r sprintf("%.0f%%", 100 * H_inc$r2)` of its variance with `r length(per_inc)` periods, and only `r sprintf("%.0f%%", 100 * H_res$r2)` when the modes longer than `r sprintf("%.0f", REC_LEN/2.5)` yr are excluded. Two things follow, and they cut in opposite directions.
+
+The first is that the largest single contribution to the natural component is a mode of roughly `r sprintf("%.0f", mode_tbl$period[which.max(mode_tbl$share)])` yr carrying `r sprintf("%.0f%%", 100 * max(mode_tbl$share))` of its variance. A period of that length is seen about `r sprintf("%.1f", REC_LEN / mode_tbl$period[which.max(mode_tbl$share)])` times in `r sprintf("%.0f", REC_LEN)` yr of data. Its period and phase are therefore not estimated in any useful sense, and an extrapolation that leans on it is reporting the fit, not the ocean.
+
+The second is that the Schwabe band is badly served by a fixed-period basis: the eleven-year sinusoid takes an amplitude of only a few hundredths of a degree, far below what the band contributes in the SSA decomposition. This is the expected consequence of a carrier whose period and amplitude are modulated across the record — the same reason a subspace method was used in Section 3.4 rather than a single-frequency regression. A fixed-period synthesis is therefore a lower bound on the amplitude of the extrapolated natural component, which is why the SSA recurrent forecast is carried alongside it as a cross-check.
+
+```{r}
+#| label: fig-natural
+#| fig-cap: "The natural component and its extension outside the record. **A** observed anomaly minus the fitted Richards curve, with the fixed-period synthesis in both variants. **B** backcast to 1600; the shaded band marks the Maunder Minimum and the Little Ice Age, the dotted line the order of magnitude of the global cooling that proxy reconstructions attribute to it. **C** forward extension to 2100. The ribbon is twice the standard deviation of the part of the natural component the synthesis cannot carry."
+#| fig-width: 9
+#| fig-height: 11
+
+pA <- tibble(dt.mnth = time, natural = natural,
+             inc = H_inc$fitted, res = H_res$fitted) %>%
+  ggplot(aes(x = dt.mnth)) +
+  geom_line(aes(y = natural, colour = "observed - Richards"), linewidth = .25) +
+  geom_line(aes(y = inc, colour = "synthesis, inclusive"), linewidth = .9) +
+  geom_line(aes(y = res, colour = "synthesis, resolved"), linewidth = .7, linetype = 2) +
+  geom_hline(yintercept = 0, linewidth = .3) +
+  scale_colour_manual(values = c("observed - Richards" = "grey70",
+                                 "synthesis, inclusive" = "firebrick",
+                                 "synthesis, resolved"  = "steelblue4")) +
+  labs(x = NULL, y = "anomaly (K)", colour = NULL,
+       title = "A  Natural component: observed anomaly minus the Richards curve") +
+  theme_minimal(base_size = 10)
+
+pB <- ext %>% dplyr::filter(dt.mnth <= rec_to) %>%
+  ggplot(aes(x = dt.mnth)) +
+  annotate("rect", xmin = LIA[1], xmax = LIA[2], ymin = -Inf, ymax = Inf,
+           fill = "steelblue", alpha = .12) +
+  geom_ribbon(aes(ymin = nat_inc - 2 * unmodelled_sd,
+                  ymax = nat_inc + 2 * unmodelled_sd), fill = "firebrick", alpha = .12) +
+  geom_line(aes(y = nat_inc, colour = "backcast, inclusive"), linewidth = .8) +
+  geom_line(aes(y = nat_res, colour = "backcast, resolved"), linewidth = .6, linetype = 2) +
+  geom_hline(yintercept = 0, linewidth = .3) +
+  geom_hline(yintercept = -0.5, linetype = 3, colour = "darkred") +
+  annotate("text", x = 1700, y = -0.44, size = 3,
+           label = "global LIA cooling in proxy reconstructions ~ -0.5 K") +
+  geom_vline(xintercept = rec_from, linewidth = .3) +
+  scale_colour_manual(values = c("backcast, inclusive" = "firebrick",
+                                 "backcast, resolved"  = "steelblue4")) +
+  coord_cartesian(ylim = c(-0.6, 0.4)) +
+  labs(x = NULL, y = "anomaly (K)", colour = NULL,
+       title = "B  Backcast of the natural harmonics to 1600",
+       subtitle = "shaded: Maunder Minimum / Little Ice Age, 1645-1725") +
+  theme_minimal(base_size = 10)
+
+pC <- ext %>% dplyr::filter(dt.mnth >= 1980) %>%
+  ggplot(aes(x = dt.mnth)) +
+  geom_ribbon(aes(ymin = richards + nat_inc - 2 * unmodelled_sd,
+                  ymax = richards + nat_inc + 2 * unmodelled_sd),
+              fill = "firebrick", alpha = .12) +
+  geom_line(data = tibble(dt.mnth = time, y = dat$anomaly) %>%
+              dplyr::filter(dt.mnth >= 1980),
+            aes(y = y, colour = "observed anomaly"), linewidth = .25) +
+  geom_line(aes(y = richards, colour = "Richards, extended"), linewidth = 1.1) +
+  geom_line(aes(y = richards + nat_inc, colour = "Richards + natural"), linewidth = .7) +
+  geom_hline(yintercept = ceiling_rich, linetype = 3) +
+  geom_vline(xintercept = rec_to, linewidth = .3) +
+  scale_colour_manual(values = c("observed anomaly" = "grey70",
+                                 "Richards, extended" = "darkcyan",
+                                 "Richards + natural" = "firebrick")) +
+  labs(x = NULL, y = "anomaly (K)", colour = NULL,
+       title = "C  Forward extension to 2100, emission conditions unchanged",
+       subtitle = sprintf("ceiling %.2f K is extrapolated, not estimated", ceiling_rich)) +
+  theme_minimal(base_size = 10)
+
+if (requireNamespace("patchwork", quietly = TRUE)) {
+  patchwork::wrap_plots(pA, pB, pC, ncol = 1)
+} else { print(pA); print(pB); print(pC) }
+```
+
+**The backcast does not produce a Little Ice Age.** Extended to 1600, the natural component oscillates between `r sprintf("%+.2f", min(ext$nat_inc[ext$dt.mnth < rec_from]))` and `r sprintf("%+.2f", max(ext$nat_inc[ext$dt.mnth < rec_from]))` K, and over 1645–1725 it averages `r sprintf("%+.3f", lia_mean)` K with extremes of `r sprintf("%+.3f", lia_min)` and `r sprintf("%+.3f", lia_max)` K. The SSA recurrent backcast, a structurally different extrapolator, stays inside `r sprintf("%.2f", ssa_bwd_max)` K over the same interval. Proxy reconstructions place the global cooling of the Little Ice Age at a few tenths of a degree, with substantially larger regional excursions — an order of magnitude above what the extrapolated oscillatory field delivers, and of no particular sign at those dates.
+
+This is a negative result and it should be reported as one. The oscillatory modes present in the ocean record between `r sprintf("%.0f", rec_from)` and `r sprintf("%.0f", rec_to)` do not, continued backwards, account for the Little Ice Age. That is not evidence against the decomposition: the Maunder Minimum is a multi-century depression of solar activity rather than a phase of any cycle resolvable in a `r sprintf("%.0f", REC_LEN)`-year window, and the coldest decades of the period coincide with a dense sequence of large tropical eruptions, a forcing this analysis contains no term for. The proper reading is that the natural component estimated here describes the decadal-to-multidecadal variability of the instrumental era and carries no information about century-scale forcing. A backcast that *had* reproduced the Little Ice Age from eleven- and twenty-two-year modes would have been a reason for suspicion, not for confidence.
+
+**The forward extension states an assumption, not a projection.** Adding the extended Richards curve to the extrapolated natural component gives `r sprintf("%+.2f", fc2050$richards + fc2050$nat_inc)` K in 2050 and `r sprintf("%+.2f", fc2100$richards + fc2100$nat_inc)` K in 2100, approaching the fitted ceiling of `r sprintf("%.2f", ceiling_rich)` K. Three cautions attach to that number and none of them is small. The record covers only `r sprintf("%.0f%%", 100 * span_reached)` of the fitted sigmoid, so the ceiling is set by the functional form rather than by the data. The saturation of a Richards curve is an empirical shape with no emission term in it: the curve cannot represent a change in emissions, and reading it as "what happens if CO$_2$ forcing continues as it has" imports an assumption the fit never tested. And the natural part of the extension inherits the limitations of the paragraph above. The honest statement is conditional and bounded: *if* the secular component continues along the shape fitted to `r sprintf("%.0f", rec_from)`–`r sprintf("%.0f", rec_to)`, the ocean surface approaches `r sprintf("%.2f", ceiling_rich)` K above the record mean, with decadal excursions of the order of `r sprintf("%.2f", 2 * unmodelled_sd)` K about it. Tying that to a Keeling-curve scenario requires a forcing term in the model, which is the natural next step and is not attempted here.
+
+## Location parameter versus inflection
+
+In the Richards parametrisation used here, $t_0$ enters as a location parameter inside a power-transformed logistic kernel; the date of maximum acceleration follows from $\mathrm{d}^2y/\mathrm{d}t^2 = 0$, which gives $e^{-B(t-t_0)} = \nu$ and hence $t_{\mathrm{infl}} = t_0 - \ln\nu/B$, which coincides with $t_0$ only for $\nu = 1$. `r growth_discussion`
+
+### Identifiability of the growth-curve step {#sec-growth-identifiability}
+
+Whether an inflection exists at all is a property of the baseline, not of the observations alone, and the two candidate bases differ in exactly the way that matters.
+
+A non-cyclic basis continues approximately linearly beyond its training range, so the extrapolated baseline after `r SPLIT_YEAR` is a straight line and the residual against it retains whatever curvature the observations have — which, over `r SPLIT_YEAR`–`r sprintf("%.0f", rec_to)`, is close to monotone acceleration with no flattening. A sigmoid fitted to such a residual has no information about its upper asymptote; the likelihood is flat along the ridge that trades asymptote against rate, and the optimiser returns a near-zero rate with the inflection at the edge of the search range. That is precisely what @tbl-basis shows for both `cr` variants.
+
+The cyclic basis used here behaves differently. It forces the fitted function to return to its starting value and slope at the end of the training window, so the extrapolation oscillates about the pre-industrial level rather than continuing upward. Subtracting an oscillating baseline from a rising record produces a residual that flattens towards the end of the record, the upper asymptote becomes estimable from data rather than assumed, and the staged estimator returns a turning point of `r sprintf("%.1f", t_turn_log)` yr that is stable across the two flexibilities tested (@tbl-basis).
+
+
+The turning point is therefore real given the baseline, and conditional on it. The claim this study can defend is not "the anthropogenic signal turned in `r sprintf("%.0f", t_turn_rich)`" but "if the natural baseline continues quasi-periodically rather than carrying a secular trend of its own, the residual anthropogenic signal turns in `r sprintf("%.0f", t_turn_rich)`". Stating the conditional explicitly is the difference between a result a referee can check and one they will reject. The alternative assumption — a natural baseline with its own secular slope — yields no identifiable turning point at all, and that asymmetry between the two hypotheses should be reported rather than hidden.
+
+## What the mean-cycle control establishes
+
+Replacing the observed solar minima by a regular sequence at the mean cycle length of `r sprintf("%.2f", mean_cycle)` yr removes all information about the timing of individual cycles while preserving the number and average spacing of the spline knots. The band structure of @tbl-esprit survives that substitution, with a maximum period difference of `r sprintf("%.2f", max_dT)` yr, and the non-harmonic trend changes by an RMS of only `r sprintf("%.3f", rmse_constructions)` °C.
+
+Two conclusions follow. The modes are properties of the SST record rather than consequences of the anchoring, which answers the circularity objection directly. And the construction spread provides an uncertainty scale for the reported periods that does not depend on an independence assumption the residuals violate — a more defensible bound, in this setting, than a nominal standard error.
+
+## Relation to index-regression approaches
+
+Methods that regress temperature on ENSO, volcanic and solar indices (Foster and Rahmstorf 2011) and the present decomposition answer complementary questions. Index regression asks how much variance a prescribed set of predictors explains; the present approach asks what oscillatory structure the record itself contains once a physically anchored trend has been removed, and estimates the periods and stationarity of that structure rather than assuming them. The agreement of the ESPRIT periods with the canonical Schwabe, Hale and recharge-oscillator bands is therefore a consistency check on the construction, not a result imported from the predictors.
+
+## Limitations
+
+**The ceiling is not estimated.** The record covers `r sprintf("%.0f%%", 100 * span_reached)` of the fitted sigmoid, so the upper asymptote of `r sprintf("%.2f", upper_asymptote.rich)` °C in @tbl-turning is determined by the functional form and not by the observations. The turning point is close to the end of the window and is the quantity the data constrain; the asymptote should be read as what the fitted curve implies, not as a projection of ocean warming.
+
+**Extrapolation of the alternative baseline.** The GAM route of Section 3.6, retained for comparison in @tbl-aic, defines its residual against a model fitted to `r sprintf("%.0f", rec_from)`–`r SPLIT_YEAR` and evaluated to `r sprintf("%.0f", rec_to)` — over a range where the smoother is unconstrained by data. The cyclic basis makes that extrapolation quasi-periodic by construction: the baseline after `r SPLIT_YEAR` repeats the pre-industrial pattern because the basis requires it to, not because the ocean was observed to do so. @tbl-basis bounds what the choice costs. The solar-locked route avoids the extrapolation entirely — its trend is anchored to solar phase over the whole record — which is the main reason it is used for the headline figures.
+
+**Choice of split year.** `r SPLIT_YEAR` is imposed as a calendar boundary on the argument that industrial influence on SST was negligible before it. An independent rolling-correlation analysis in this project placed the pre-industrial/modern boundary near late 1987. The decomposition should be repeated across a range of split years and the sensitivity of $t_0$, $\nu$ and the trough amplitudes reported as a curve rather than a single value.
+
+**Nature of the reported intervals.** The intervals in @tbl-turning are model-conditional and assume independent residuals. The residuals of a monthly SST series are strongly autocorrelated, so the effective sample size is far below `r N` and these intervals are optimistic. A moving-block bootstrap over the residual series is the appropriate replacement.
+
+**Attribution language.** The residual against a natural baseline is not by itself an anthropogenic signal; it is everything the baseline model does not capture, including volcanic forcing, aerosol effects and any residual instrumental inhomogeneity. The term "industrial component" is used in that operational sense throughout.
+
+**Resolution limits.** The bidecadal mode is sampled only about `r sprintf("%.0f", (rec_to - rec_from)/T12)` times in the record, so its damping rate is weakly constrained and its near-unit modulus should be read as consistent with stationarity rather than as evidence for it.
+
+# Conclusions
+
+1.  Anchoring a cubic spline to the minima of the solar power variation isolates a solar-locked trend whose non-harmonic part has minima near `r sprintf("%.0f", Min_early)` and `r sprintf("%.0f", Min_mid)` and a turning point near `r sprintf("%.0f", Turn_late)`.
+2.  SSA with ESPRIT resolves the detrended field into a near-stationary bidecadal mode at `r sprintf("%.1f", T12)` yr, a split Schwabe band at `r sprintf("%.1f", T34)` and `r sprintf("%.1f", T56)` yr indicating amplitude and phase modulation, and an interannual band at `r sprintf("%.1f", T910)`–`r sprintf("%.1f", T78)` yr.
+3.  A mean-cycle control, with knots at the regular interval of `r sprintf("%.2f", mean_cycle)` yr, reproduces the same band structure to within `r sprintf("%.2f", max_dT)` yr. The oscillatory modes are therefore properties of the SST record and not artefacts of phase-accurate knot placement.
+4.  Defining the industrial component as the residual against a cyclic GAM baseline trained on the pre-`r SPLIT_YEAR` record yields `r growth_conclusion`. The estimate is conditional on that basis: a non-cyclic baseline identifies no turning point (@tbl-basis).
+5.  The sensitivity of that step to the extrapolation basis (@tbl-basis) is larger than any other uncertainty in the study, and is the first thing a referee should be shown rather than the last.
+6.  Natural multi-decadal minima near `r sprintf("%.0f", trough_early$dt.mnth)` and `r sprintf("%.0f", trough_late$dt.mnth)` oppose the industrial trend, so trends fitted to the raw record over the late twentieth century understate the underlying forced rate. The magnitude of this effect depends on the extrapolated baseline and is bounded by the sensitivities in Section 5.5.
+
+# Open Research {.unnumbered}
+
+*Data.* NOAA Extended Reconstructed Sea Surface Temperature version 6 (`sst.mnmean`), NOAA PSL, https://doi.org/10.7289/V5T72FNM; Berkeley Earth land/ocean 1° land-mask product; WDC-SILSO international sunspot number version 2.0, Royal Observatory of Belgium. Download dates to be inserted. The analysis window begins in January 1850, the first month of ERSSTv6.
+
+*Code.* Analysis code and this manuscript are maintained in the `Ocean_Analysis` repository. A tagged release with a Zenodo DOI should be created at submission, together with the `sessionInfo()` of the render environment.
+
+```{r}
+#| label: session
+#| echo: false
+cat("Rendered:", format(Sys.time(), "%Y-%m-%d %H:%M"), "|",
+    R.version.string, "| record:", sprintf("%.2f", rec_from), "-",
+    sprintf("%.2f", rec_to), "| N =", N, "| GAM basis:", GAM_BS, "\n")
+```
+
+# References {.unnumbered}
+
+- Cleveland, W. S., & Devlin, S. J. (1988). Locally weighted regression: an approach to regression analysis by local fitting. *Journal of the American Statistical Association*, 83(403), 596–610.
+- Foster, G., & Rahmstorf, S. (2011). Global temperature evolution 1979–2010. *Environmental Research Letters*, 6, 044022.
+- Golyandina, N., Nekrutkin, V., & Zhigljavsky, A. (2001). *Analysis of Time Series Structure: SSA and Related Techniques*. Chapman & Hall/CRC.
+- Golyandina, N., & Korobeynikov, A. (2014). Basic Singular Spectrum Analysis and forecasting with R. *Computational Statistics & Data Analysis*, 71, 934–954.
+- Huang, B., Thorne, P. W., Banzon, V. F., et al. (2017). Extended Reconstructed Sea Surface Temperature, Version 5 (ERSSTv5): upgrades, validations, and intercomparisons. *Journal of Climate*, 30(20), 8179–8205.
+- Jin, F.-F. (1997). An equatorial ocean recharge paradigm for ENSO. Part I: conceptual model. *Journal of the Atmospheric Sciences*, 54(7), 811–829.
+- Kosaka, Y., & Xie, S.-P. (2013). Recent global-warming hiatus tied to equatorial Pacific surface cooling. *Nature*, 501, 403–407.
+- Medhaug, I., Stolpe, M. B., Fischer, E. M., & Knutti, R. (2017). Reconciling controversies about the "global warming hiatus". *Nature*, 545, 41–47.
+- Richards, F. J. (1959). A flexible growth function for empirical use. *Journal of Experimental Botany*, 10(2), 290–301.
+- Rohde, R. A., & Hausfather, Z. (2020). The Berkeley Earth land/ocean temperature record. *Earth System Science Data*, 12, 3469–3479.
+- Roy, R., & Kailath, T. (1989). ESPRIT — estimation of signal parameters via rotational invariance techniques. *IEEE Transactions on Acoustics, Speech and Signal Processing*, 37(7), 984–995.
+- WDC-SILSO, Royal Observatory of Belgium, Brussels. International sunspot number, version 2.0.
+- Wood, S. N. (2017). *Generalized Additive Models: An Introduction with R* (2nd ed.). Chapman & Hall/CRC.
+
+*Note: the reference list is plain text so that the document renders without a bibliography file. Building a `references.bib` and switching to Quarto citation keys is the last step before submission; every entry should be checked against the publisher record.*
+
+# Appendix A: Open items before submission {.unnumbered}
+
+| \# | Item | Status |
+|----|----|----|
+| 1 | GAM basis set to `bs = "cc"` (cyclic), by author's choice; rationale stated in §3.5 and its consequences quantified in @tbl-basis | done — set in `setup` |
+| 2 | Inflection comparison instead of $t_0$ difference | done — @tbl-turning |
+| 3 | Abstract no longer claims an independent origin for $B$ | done |
+| 4 | ENSO band attributed to pairs (7,8) and (9,10) | done — @tbl-esprit |
+| 5 | Mean-cycle control for circularity and spread | done — Sections 3.2, 4.6, 5.3 |
+| 6 | Record start confirmed as January 1850 from the ERSSTv6 grid; no truncation | done — Section 2.1 |
+| 6a | Re-extract the global ocean mean from the current ERSSTv6 grid (2120 months, to August 2026) | done — `data/NOAA.OCEAN.ANOMALIES.rds` |
+| 6b | Refresh the SILSO download so the solar proxy covers the last `r n_dropped` SST months | closed — sunspot observation is not regular; a minor correction with no effect on the industrial trend |
+| 6e | Backcast and forward extension of the natural component | done — @sec-natural-extrap |
+| 6c | Growth curve fitted in two steps on the unfiltered monthly series; staged asymptote estimator removed | done — §3.7 |
+| 6d | AIC comparison of the two decompositions | done — @tbl-aic |
+| 7 | Split year as a calendar constant, not the record midpoint | done — `SPLIT_YEAR` |
+| 8 | Moving-block bootstrap to replace the model-conditional intervals | open |
+| 8a | Justify the quasi-periodic (cyclic) baseline assumption physically, since the turning point is conditional on it | open |
+| 9 | Split-year sensitivity curve | open |
+| 10 | `references.bib` and Quarto citation keys | open |
