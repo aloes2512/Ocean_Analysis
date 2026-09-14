@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Decomposition of Solar-Locked Ocean SST Anomalies</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="WiPDecomp.solar.lockd_files/libs/clipboard/clipboard.min.js"></script>
+<script src="WiPDecomp.solar.lockd_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="WiPDecomp.solar.lockd_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="WiPDecomp.solar.lockd_files/libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="WiPDecomp.solar.lockd_files/libs/quarto-html/popper.min.js"></script>
+<script src="WiPDecomp.solar.lockd_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="WiPDecomp.solar.lockd_files/libs/quarto-html/anchor.min.js"></script>
+<link href="WiPDecomp.solar.lockd_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="WiPDecomp.solar.lockd_files/libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="WiPDecomp.solar.lockd_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="WiPDecomp.solar.lockd_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="WiPDecomp.solar.lockd_files/libs/bootstrap/bootstrap-d6a003b94517c951b2d65075d42fb01b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="fullcontent quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Decomposition of Solar-Locked Ocean SST Anomalies</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="executive-summary" class="level3">
+<h3 class="anchored" data-anchor-id="executive-summary">Executive Summary</h3>
+<p>This study decomposes global ocean sea surface temperature (SST) anomalies (1850–2026) to isolate secular anthropogenic warming from natural climate variability. Utilizing Singular Spectrum Analysis (SSA) paired with ESPRIT parameter estimation, primary oscillatory modes were characterized: the ~20.1-year bidecadal/Hale magnetic cycle (<span class="math inline">\(\vert{}z\vert{} \approx 1.0002\)</span>), a split ~11-year Schwabe solar band (<span class="math inline">\(T_1 = 10.2\)</span>, <span class="math inline">\(T_2 = 12.3\)</span> years) exhibiting amplitude modulation, and a sub-decadal ENSO recharge oscillator mode (<span class="math inline">\(3\text{--}6\)</span> years).</p>
+<p><br>
+</p>
+<p>To separate anthropogenic forcing without distorting low-frequency natural variability, a non-parametric Generalized Additive Model (GAM, <span class="math inline">\(k=30\)</span>, <span class="math inline">\(bs=\text{"cr"}\)</span>) was anchored to the pre-1938 baseline. Subtracting this extrapolated baseline isolates a near-zero pre-WWII industrial component (<span class="math inline">\(0.0^\circ\text{C}\)</span>) that accelerates sharply post-1950.</p>
+<p><br>
+</p>
+<p>Modeling this industrial signal using an asymmetric Richards growth curve—with the secular growth rate fixed to the independent solar-locked trend (<span class="math inline">\(B \approx 0.05\)</span>)—yields a turning point at <span class="math inline">\(t_0 = 1980.5\)</span>. This represents an 8.2-year forward shift compared to a standard symmetric logistic fit (<span class="math inline">\(t_0 = 1988.7\)</span>). Unconstraining the shape parameter (<span class="math inline">\(\nu \neq 1\)</span>) accommodates early-stage upper-ocean thermal buffering while dampening non-physical asymptotic runaway post-2010.</p>
+<p><br>
+</p>
+<p>Crucially, superimposing the isolated components reveals that multi-decadal natural troughs at ~1910 and ~1998 (<span class="math inline">\(\approx -0.35^\circ\text{C}\)</span>) masked the true anthropogenic trajectory. The mid-to-late 20th-century “plateau” in unadjusted surface anomalies was not a deceleration in forced warming, but the destructive interference of a deep natural anomaly trough spanning 1995–2002 over a rapidly steepening industrial trend. Consequently, the true post-1960 anthropogenic impact is significantly larger than raw surface anomaly records suggest.</p>
+</section>
+<section id="load-data-global-solar-anomaly" class="level3">
+<h3 class="anchored" data-anchor-id="load-data-global-solar-anomaly">Load Data: Global Solar Anomaly</h3>
+<p>It has been shown that solar irradiation (sun-power) is a quadratic function of sunspot numbers. Cycles (Published by SILSO). The observed time is cut into segments which length is defined by the zero crossings of the solar power variation. Using these segments to interpolate the observed anomaly by 3rd order splines one gets a <em>periodic modeled trend</em>. The non periodic part is separated using a low-pass filter using a loess fit (span=0.25) and is named in the following <em>Ocean Solar Locked Trend</em> (variable name = trend.solar).</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 251</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="WiPDecomp.solar.lockd_files/figure-html/solar.locked-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><em>Note:</em> The solar locked trend (harmonic part stripped) has two minima @ ( 1910 and 1960) and a turning point @ 1996. In the plot they are visualized by three vertical lines.</p>
+<section id="calculate-residuals-of-solar-locked-trend" class="level4">
+<h4 class="anchored" data-anchor-id="calculate-residuals-of-solar-locked-trend">Calculate Residuals of solar-locked trend</h4>
+<p>The solar locked trend includes periodic parts. These need to be added to the residuals to get the total of all harmonic dependence of the global ocean anomalies.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="WiPDecomp.solar.lockd_files/figure-html/resid.solar.lckd-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="low-pass-total-residuals" class="level3">
+<h3 class="anchored" data-anchor-id="low-pass-total-residuals">Low-Pass Total Residuals</h3>
+<p>The Low pass filtered total Residuals. All periods with cutoff length * &gt; 5 years * &gt; 11 years * &gt; 15 years are dominated by the 11 years solar sunspots cycles visualized as part of the total harmonics:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="WiPDecomp.solar.lockd_files/figure-html/lng.period_sol.lckd-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Ocean SST anomalies react on solar power irradiation depending on the size and depth of ocean area. (The area heat capacity ). On a global scale these frequency dependent anomalies are seen as superposition averaging the observed values. However looking on the average global trend of the first picture some interesting correlations are visible. There is a deep trough with minimum at 1911 and a second ~1940 to 1960.</p>
+<p><strong>Methodology &amp; Spectral Parameter Estimation</strong></p>
+<blockquote class="blockquote">
+<p>To objectively determine the fundamental periodicities, damping characteristics, and stationarity of the primary components isolated via Singular Spectrum Analysis (SSA), an ESPRIT (Estimation of Signal Parameters via Rotational Invariance Techniques) algorithm was applied to the leading reconstructed component pairs. The extracted complex roots (<span class="math inline">\(z = \vert{}z\vert{}e^{i 2\pi f}\)</span>) yield both the characteristic oscillation frequencies (<span class="math inline">\(f\)</span>) and their corresponding continuous growth/decay rates (<span class="math inline">\(\lambda = \ln \vert{}z\vert{}\)</span>).</p>
+</blockquote>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="WiPDecomp.solar.lockd_files/figure-html/ssa_sol_resids-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The plot of function pairs shows some perfect harmonic components:20 years Hale cycle and the quasi harmonic frequency band of the solar irradiation used to lock the trend .</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>
+
+Table: ESPRIT Harmonic Parameter Estimates
+
+|Cycle Group | Frequency (f)| Rate (λ)| Modulus (`z`)| Period(month)| Period(years)|
+|:-----------|-------------:|--------:|-------------:|-------------:|-------------:|
+|Cycle1      |      0.004138|  0.00018|       1.00018|         241.7|            20|
+|Cycle1      |     -0.004138|  0.00018|       1.00018|        -241.7|           -20|
+|Cycle2      |      0.008146|  0.00057|       1.00057|         122.8|            10|
+|Cycle2      |     -0.008146|  0.00057|       1.00057|        -122.8|           -10|
+|Cycle3      |      0.006764| -0.00079|       0.99921|         147.8|            12|
+|Cycle3      |     -0.006764| -0.00079|       0.99921|        -147.8|           -12|
+|Cycle4      |      0.015861| -0.00059|       0.99941|          63.0|             5|
+|Cycle4      |     -0.015861| -0.00059|       0.99941|         -63.0|            -5|
+|Cycle5      |      0.019650|  0.00038|       1.00038|          50.9|             4|
+|Cycle5      |     -0.019650|  0.00038|       1.00038|         -50.9|            -4|</code></pre>
+</div>
+</div>
+<blockquote class="blockquote">
+<p>Parameter estimation reveals three distinct physical regimes within the ocean anomaly time series:</p>
+<ol type="1">
+<li><p><strong>Bidecadal / Hale Magnetic Mode (Cycle 1):</strong> Component Pair (1,2) isolates a dominant low-frequency cycle at <span class="math inline">\(T \approx 20.14\)</span> years (<span class="math inline">\(241.7\)</span> months). With a modulus <span class="math inline">\(\vert{}z\vert{} = 1.00018\)</span> (<span class="math inline">\(\lambda = +0.00018\)</span>), this mode exhibits near-perfect stationarity (<span class="math inline">\(\vert{}z\vert{} \approx 1\)</span>), consistent with stable multi-decadal solar-magnetic forcing (the ~22-year Hale cycle) coupled with intrinsic bidecadal ocean variability.</p></li>
+<li><p><strong>Split Schwabe Solar Band (Cycles 2 &amp; 3):</strong> The ~11-year Schwabe solar band splits into twin sideband components at <span class="math inline">\(T_2 = 10.23\)</span> years (<span class="math inline">\(122.8\)</span> months) and <span class="math inline">\(T_3 = 12.32\)</span> years (<span class="math inline">\(147.8\)</span> months). This doublet structure indicates amplitude and phase modulation of the solar cycle across the observational record. Cycle 3 displays the strongest damping rate (<span class="math inline">\(\lambda = -0.00079, \vert{}z\vert{} = 0.99921\)</span>), reflecting non-stationary energy exchange or decay in the lower sideband, whereas Cycle 2 (<span class="math inline">\(\lambda = +0.00057\)</span>) reflects slight local amplitude expansion.</p></li>
+<li><p><strong>Interannual Recharge Oscillator / ENSO Band (Cycles 4 &amp; 5):</strong> The higher-frequency component pairs (4,5) and (9,10) resolve periods at <span class="math inline">\(T_4 = 5.25\)</span> years (<span class="math inline">\(63.0\)</span> months) and <span class="math inline">\(T_5 = 4.24\)</span> years (<span class="math inline">\(50.9\)</span> months), capturing the characteristic sub-decadal bandwidth of the equatorial Pacific recharge oscillator and interannual climate modes.</p></li>
+</ol>
+</blockquote>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="WiPDecomp.solar.lockd_files/figure-html/loess_trd.sol-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="WiPDecomp.solar.lockd_files/figure-html/ssa%20decomp.trd.sol-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="WiPDecomp.solar.lockd_files/figure-html/ssa%20decomp.trd.sol-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="WiPDecomp.solar.lockd_files/figure-html/ssa%20decomp.trd.sol-3.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="WiPDecomp.solar.lockd_files/figure-html/ssa%20decomp.trd.sol-4.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="fit-to-logistic-functio-separate-industrial-trend-natural-periods" class="level3">
+<h3 class="anchored" data-anchor-id="fit-to-logistic-functio-separate-industrial-trend-natural-periods">Fit to logistic functio Separate Industrial Trend Natural Periods</h3>
+<section id="preind.industrialrichards.r" class="level5">
+<h5 class="anchored" data-anchor-id="preind.industrialrichards.r">Preind.IndustrialRichards.R</h5>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>       L    Delta       t0       nu 
+   0.001    0.611 1980.529    0.571 </code></pre>
+</div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Comparison of Turning Point Dynamics Between Symmetric and Asymmetric Fits</caption>
+<colgroup>
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 59%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Model Architecture</th>
+<th style="text-align: right;">Turning Point (t0)</th>
+<th style="text-align: left;">Physical Mechanics</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Simple Logistic</td>
+<td style="text-align: right;">1988.715</td>
+<td style="text-align: left;">Symmetrical constraint forces late midpoint</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Richards (Fixed B)</td>
+<td style="text-align: right;">1980.529</td>
+<td style="text-align: left;">Earlier max acceleration; sharper upward bend</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Difference (Shift)</td>
+<td style="text-align: right;">-8.186</td>
+<td style="text-align: left;">8.186-year earlier shift releasing symmetry constraint</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "shift years: -8.186"</code></pre>
+</div>
+</div>
+</section>
+<section id="plot-the-decomposition-into-pre--industrial-natural-and-industrial-effect" class="level4">
+<h4 class="anchored" data-anchor-id="plot-the-decomposition-into-pre--industrial-natural-and-industrial-effect">Plot the decomposition into pre- industrial (natural) and industrial effect</h4>
+<p>Industrial trend (“indus.trend”) built in several steps:</p>
+<ul>
+<li><p>Splitting anomaly into pre WWII (1938) as gam training set</p></li>
+<li><p>Extending the training set to full length of observed data using gam ( assumed to represent natural anomalies)</p></li>
+<li><p>Fitting to a model that formulates zero effects industrial effects at times well before 1938 and</p></li>
+<li><p>assumes that somehow the industrial emissions effect on ocean SST is limited by fundamental physical processes:</p></li>
+<li><p>Vaporization at elevated temperatures ,</p></li>
+<li><p>cloud formation,</p></li>
+<li><p>albedo reflections…</p></li>
+</ul>
+<p>Fitting (first step) to logistic sigmoid to find the slope of the trend. *** Improving the fit using a generalize logistic (Richards growth curve) to take care of the assumption that the asymptotic trend of the anomalies is governed by different physical processes in the initial phase and is expected in the saturation phase</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="WiPDecomp.solar.lockd_files/figure-html/summary%20decomposition-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="notes" class="level3">
+<h3 class="anchored" data-anchor-id="notes">Notes</h3>
+<ul>
+<li>As the gam extended natural harmonics drop from ~ 1950 to ~ 2000, the natural periods reduce the increase of observed anomaly</li>
+<li>at times &gt; 2000 the natural periods rise slowly and contribute to a steeper rise in these times</li>
+<li>industrial effect turns at this times to a slower ascend.</li>
+</ul>
+<p>These effects are better visible by passing the data to lowpass filter with a cutoff frequency corresponding to a period of ~ 9 years</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="WiPDecomp.solar.lockd_files/figure-html/decom%20low%20pass-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<blockquote class="blockquote">
+<p>Decomposing the observed surface anomaly record into its pre-industrial baseline (<code>pre-ind</code>) and isolated anthropogenic forcing (<code>indust</code>) reveals a crucial phase interaction between natural variability and industrial emissions post-1960:</p>
+<ol type="1">
+<li><p><strong>Multidecadal Natural Troughs (~1910 and ~1998):</strong> The isolated pre-industrial baseline displays two major negative excursions reaching approximately <span class="math inline">\(-0.35^\circ\text{C}\)</span>: one centered near 1910 and a second prolonged trough between 1995 and 2002.</p></li>
+<li><p><strong>Masking of Anthropogenic Acceleration:</strong> During the mid-to-late 20th century, the accelerating industrial forcing (<code>eff.model</code>, Olive) was partially offset by a strong negative phase in natural multi-decadal cycles. As a result, the unadjusted anomaly record (<code>anoma</code>, Red) exhibits a suppressed slope between 1960 and 2000.</p></li>
+<li><p><strong>Implications for Climate Sensitivity:</strong> Isolating the natural baseline demonstrates that the true industrial contribution (<code>indust</code>, Cyan) accelerated more rapidly after 1960 than suggested by raw “hockey stick” surface projections. The apparent late-20th-century “plateau” or moderated slope in raw SSTs was not a slowdown in forced warming, but rather the destructive superposition of a deep natural anomaly trough upon an aggressively steepening anthropogenic trend.</p></li>
+</ol>
+</blockquote>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

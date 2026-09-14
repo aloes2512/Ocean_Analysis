@@ -141,6 +141,7 @@ Ocean_NOAA.data=list(url.source="https://downloads.psl.noaa.gov/Datasets/noaa.er
 
 saveRDS(Ocean_NOAA.data,"data/NOAA.OCEAN.ANOMALIES.rds")
 # check saving
+library(terra)
 Ocean_NOAA.data=readRDS("data/NOAA.OCEAN.ANOMALIES.rds")
 NOAA.Ocean.anomalies=Ocean_NOAA.data$data
 sst_stack<-unwrap(Ocean_NOAA.data$data.grid)
