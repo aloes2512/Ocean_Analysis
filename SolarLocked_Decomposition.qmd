@@ -1,0 +1,47 @@
+---
+title: "Separating the Anthropogenic Signal from Solar-Locked Natural Variability in Global Ocean SST Anomalies, 1850–2026"
+subtitle: "A Singular-Spectrum and Growth-Curve Decomposition, with a Mean-Cycle Control"
+author:
+  - name: "Alf Loeffler"
+    affiliation: "Independent researcher"
+date: today
+bibliography: references.bib
+keywords: [sea surface temperature, singular spectrum analysis, ESPRIT, solar cycle, anthropogenic warming, Richards growth curve]
+format:
+  html:
+    toc: true
+    embed-resources: true
+    toc-depth: 3
+    number-sections: true
+    fig-cap-location: bottom
+    code-fold: true
+    code-summary: "Show code"
+editor: visual
+execute:
+  echo: false
+  warning: false
+  message: false
+  cache: true
+---
+
+```{r setup}
+#| include: false
+
+library(tidyverse)
+library(Rssa)
+library(itsmr)
+library(minpack.lm)
+library(splines)
+library(gsignal)
+library(knitr)   # MASS is used via MASS::mvrnorm only, to avoid masking dplyr::select
+
+## ---- analysis constants -------------------------------------------------
+RECORD_START <- 1850      # ERSSTv6 begins January 1850; see Section 2.1
+SPLIT_YEAR   <- 1938      # calendar split for the pre-industrial GAM training set
+LOESS_SPAN   <- 0.25      # span of the non-harmonic smoother
+GAM_K        <- 30        # GAM basis dimension
+GAM_BS       <- "cc"      # cyclic cubic spline, as specified by the author
+SST_SERIES   <- "anoma.mean"   # alternative "anoma.median"; see @sec-median
+
+M.ssn <- c("season", 12, "season", 6)
+---
