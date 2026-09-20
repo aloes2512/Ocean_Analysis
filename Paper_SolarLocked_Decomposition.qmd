@@ -20,9 +20,10 @@ execute:
   echo: false
   warning: false
   message: false
+  cache: true
 ---
 
-```{r}
+```{r parameters }
 #| label: setup
 #| include: false
 
@@ -31,6 +32,7 @@ library(Rssa)
 library(itsmr)
 library(minpack.lm)
 library(splines)
+library(gsignal)
 library(knitr)   # MASS is used via MASS::mvrnorm only, to avoid masking dplyr::select
 
 ## ---- analysis constants -------------------------------------------------
@@ -39,60 +41,50 @@ SPLIT_YEAR   <- 1938      # calendar split for the pre-industrial GAM training s
 LOESS_SPAN   <- 0.25      # span of the non-harmonic smoother
 GAM_K        <- 30        # GAM basis dimension
 GAM_BS       <- "cc"      # cyclic cubic spline, as specified by the author
-SST_SERIES   <- "anoma.mean"   # "anoma.mean" or "anoma.median"; see @sec-median
+SST_SERIES   <- "anoma.mean"   # alternative "anoma.median"; see @sec-median
 
 M.ssn <- c("season", 12, "season", 6)
+## Import data
+## Updated NOAA ERSSTv6 global ocean series, re-extracted from the current grid
+```
+NOAA psl  2° gridded global temperatures have been downloaded ERSSTv5. Using Berkley grid land ocean mask to calculate global ocean weighted averages for each month.The stack data are converted into a matrix and taken to get global median. (The terra package is used )
 
+
+
+```{r updated mean median ts}
+source("scripts/Ocean_mean.median_ts.R")
+ls(environment())
+Ocean_NOAA.data$update
+Ocean_NOAA.data$data%>%colnames()
+dim(sst_stack) # 89 180 2120
+my_dat<-Ocean_NOAA.data$data%>%dplyr::select(dt.mnth,anoma.mean,anoma.median)
+print(plt.anomaly_mean.median)
 ## Rssa::parestimate returns a single "fdimpars.1d" object when `groups` has
 ## one element and a list of them otherwise.  Normalise to a list so the same
 ## extraction code works in both cases.
 as_par_list <- function(pe) if (inherits(pe, "fdimpars.1d")) list(pe) else pe
 esprit_period <- function(p) 1 / abs(unlist(p$frequencies)[1]) / 12   # years
 
-## ---- data ---------------------------------------------------------------
-## Updated NOAA ERSSTv6 global ocean series, re-extracted from the current grid
-## by scripts/Ocean_mean.median_ts.R, joined to the SILSO-derived solar power
-## variation from scripts/Sun_power.R.  Paths are located independently of where
-## this document is rendered from.
-find_project_file <- function(rel) {
-  cands <- c(rel,
-             file.path("..", rel),
-             file.path("../..", rel),
-             path.expand(file.path("~/projects/Ocean_Analysis", rel)))
-  hit <- cands[file.exists(cands)]
-  if (!length(hit)) {
-    stop("Could not locate '", rel, "'. Working directory is '", getwd(),
-         "'. Render this document from inside the Ocean_Analysis project.",
-         call. = FALSE)
-  }
-  normalizePath(hit[1])
-}
+```
 
-Ocean_NOAA.data <- readRDS(find_project_file("data/NOAA.OCEAN.ANOMALIES.rds"))
-solar_mnthly    <- readRDS(find_project_file("data/S_power.rds")) %>%
-  mutate(SI = TSI - mean(TSI))
 
-noaa_source <- Ocean_NOAA.data$url.source
-noaa_update <- Ocean_NOAA.data$update
-raw_start   <- min(Ocean_NOAA.data$data$dt.mnth)
-raw_n       <- nrow(Ocean_NOAA.data$data)
-solar_to    <- max(solar_mnthly$dt.mnth)
+## Updated SILSO-derived solar power
+# Load the file
+```{r sun power}  
+source("scripts/Sun_power.R")
+print(plt.sol.power)
+solar_mnthly=S_power.mnthly
 
 ## The SST grid may run a few months beyond the last SILSO month; the inner
 ## join keeps only months for which both are available.
-oc <- Ocean_NOAA.data$data %>%
-  dplyr::select(dt.mnth, Anomaly = all_of(SST_SERIES)) %>%
-  dplyr::filter(dt.mnth >= RECORD_START) %>%
-  inner_join(dplyr::select(solar_mnthly, dt.mnth, Solar_Variation = SI),
+oc <- my_dat %>%
+  dplyr::select(dt.mnth, "Anomaly" = anoma.mean) %>%
+  inner_join(solar_mnthly,
              by = "dt.mnth") %>%
-  arrange(dt.mnth) %>%
   mutate(anomaly = Resid(Anomaly, M.ssn))
+oc<-oc%>%mutate(SI=TSI-mean(TSI,na.rm=T))
+N<-NROW(oc) #2120
 
-N        <- nrow(oc)
-time     <- oc$dt.mnth
-rec_from <- min(time)
-rec_to   <- max(time)
-n_dropped <- raw_n - N
 ```
 
 ## Abstract {.unnumbered}
@@ -104,17 +96,17 @@ Attribution of long-term ocean warming requires that the secular anthropogenic c
 #| include: false
 
 ## nodes of the solar power variation (local minima of the irradiance anomaly)
-stopifnot("Solar_Variation" %in% names(oc))
-si <- oc$Solar_Variation
+si <- oc$SI
+time= oc$dt.mnth
 if (anyNA(si)) si <- zoo::na.approx(si, na.rm = FALSE) |> (\(v) ifelse(is.na(v), mean(v, na.rm = TRUE), v))()
 find_nodes <- function(x) which(diff(sign(diff(x))) == 2) + 1
 node_idx   <- find_nodes(si)
 nodes_obs  <- time[node_idx]
 
 cycle_gaps <- diff(nodes_obs)
-mean_cycle <- mean(cycle_gaps)
-sd_cycle   <- sd(cycle_gaps)
-n_cycles   <- length(cycle_gaps)
+mean_cycle <- mean(cycle_gaps) # 10.9
+sd_cycle   <- sd(cycle_gaps) # 0.84
+n_cycles   <- length(cycle_gaps) #15
 
 ## mean-cycle control: same number of knots, regular spacing at the mean period
 nodes_mean <- seq(from = nodes_obs[1], by = mean_cycle, length.out = length(nodes_obs))
@@ -148,14 +140,21 @@ dat <- tibble(
     har_phase = trd_phase - nh_phase,
     growth    = anomaly - har_phase
   )
-
+plt.trends=dat%>%pivot_longer(cols = -dt.mnth,names_to = "Trend",values_to ="Anomaly")%>%
+  subset(Trend %in% c("trd_phase","nh_phase","anomaly"))%>%
+           ggplot(aes(x=dt.mnth))+
+  geom_line(aes(y=Anomaly,col=Trend))
 ## characteristic dates of the non-harmonic phase-locked trend
 Min_early <- time[which.min(dat$nh_phase)]
 branch1950 <- dat %>% dplyr::filter(dt.mnth > 1950) %>% pull(nh_phase)
 Min_mid    <- 1950 + which.min(branch1950) / 12
-branch1975 <- dat %>% dplyr::filter(dt.mnth > 1975) %>% pull(nh_phase)
-Turn_late  <- 1975 + which.min(diff(branch1975)) / 12
-
+# 1959.417
+branch1975 <- dat %>% dplyr::filter(dt.mnth > 1975) %>% pull(nh_phase) 
+Turn_late  <- 1975 + which.min(diff(branch1975)) / 12 # 1996.167
+plt.segmnt=plt.trends+geom_vline(xintercept = Min_early)+
+  geom_vline(xintercept = Min_mid)+
+  geom_vline(xintercept = Turn_late)
+print(plt.segmnt)
 rmse_constructions <- sqrt(mean((dat$nh_phase - dat$nh_meanc)^2))
 ```
 
@@ -1225,7 +1224,6 @@ ceiling_rich <- fitA$upper_r
 
 Subtracting the fitted Richards curve from the observed anomaly leaves the total harmonic component: everything the secular growth curve does not describe. Its standard deviation is `r sprintf("%.3f", sd_natural)` K, so it is signal and not fitting error, and any statement about the record outside the observation window has to carry it in full rather than in part.
 
-
 **A model of the harmonic component has to carry the whole of it.** A superposition of fixed-period sinusoids does not: with `r length(per_fix)` periods it recovers `r sprintf("%.0f%%", 100 * cov_fix_total)` of the variance of the component and `r sprintf("%.0f%%", 100 * cov_fix_low)` of the part above two years. The reason is visible in the fitted amplitudes — the eleven-year sinusoid takes only a few hundredths of a degree, far below what the Schwabe band contributes in the SSA decomposition. A single frequency cannot represent a carrier whose amplitude and phase are modulated across the record, which is the same reason a subspace method was used in Section 3.4 rather than a single-frequency regression.
 
 The SSA reconstruction does carry it. With a window of `r L_nat` months and the leading `r R_COMP` eigentriples it reproduces `r sprintf("%.0f%%", 100 * cov_total)` of the variance of the component and `r sprintf("%.0f%%", 100 * cov_low)` of the part above two years, against a ceiling of `r sprintf("%.0f%%", 100 * frac_low)` set by the fraction of the variance that lies above that cut-off at all — the remainder being month-to-month and interannual noise that no deterministic model should reproduce. The extrapolation is then the linear recurrence of that reconstruction, applied forward and, on the reversed series, backward. The fixed-period synthesis is retained in @fig-natural as a structurally different comparison, and the difference between the two extrapolators is a more honest uncertainty scale than either one's internal error.
@@ -1357,7 +1355,6 @@ A non-cyclic basis continues approximately linearly beyond its training range, s
 
 The cyclic basis used here behaves differently. It forces the fitted function to return to its starting value and slope at the end of the training window, so the extrapolation oscillates about the pre-industrial level rather than continuing upward. Subtracting an oscillating baseline from a rising record produces a residual that flattens towards the end of the record, the upper asymptote becomes estimable from data rather than assumed, and the staged estimator returns a turning point of `r sprintf("%.1f", t_turn_log)` yr that is stable across the two flexibilities tested (@tbl-basis).
 
-
 The turning point is therefore real given the baseline, and conditional on it. The claim this study can defend is not "the anthropogenic signal turned in `r sprintf("%.0f", t_turn_rich)`" but "if the natural baseline continues quasi-periodically rather than carrying a secular trend of its own, the residual anthropogenic signal turns in `r sprintf("%.0f", t_turn_rich)`". Stating the conditional explicitly is the difference between a result a referee can check and one they will reject. The alternative assumption — a natural baseline with its own secular slope — yields no identifiable turning point at all, and that asymmetry between the two hypotheses should be reported rather than hidden.
 
 ## What the mean-cycle control establishes
@@ -1428,7 +1425,7 @@ cat("Rendered:", format(Sys.time(), "%Y-%m-%d %H:%M"), "|",
 # Appendix A: Open items before submission {.unnumbered}
 
 | \# | Item | Status |
-|----|----|----|
+|------------------------|------------------------|------------------------|
 | 1 | GAM basis set to `bs = "cc"` (cyclic), by author's choice; rationale stated in §3.5 and its consequences quantified in @tbl-basis | done — set in `setup` |
 | 2 | Inflection comparison instead of $t_0$ difference | done — @tbl-turning |
 | 3 | Abstract no longer claims an independent origin for $B$ | done |
