@@ -17,21 +17,11 @@ SP_path<-"http://www.sidc.be/silso"
 #v.names<-c("Jahr","Monat","Tag","dat.dec","SP","SD","N.calc","N.station")
 Source="WDC-SILSO, Royal Observatory of Belgium, Brussels"
 #=========
-sn_data <- read_csv2("https://www.sidc.be/SILSO/DATA/SN_d_tot_V2.0.csv",
-                     col_names = c("year", "month", "day", "dec_date", "SN", "SN_err", "N_obs"),
-                     na = "-1")  # safe better than converting dec_date
-
-sn_data=sn_data%>% mutate(month=as.integer(month),
-                          day=as.integer(day),
-                          SN_err=as.double(SN_err))%>%
-  mutate(dt.mnth=year+(month-1)/12,dec.yr=dt.mnth+day/364.25)%>%
-  dplyr::select(dt.mnth,dec.yr,month,SN)
-#=====================
 library(tidyverse)
 
-sn_data <- read_csv2(
+sn_data.new <- read_csv2(
   "https://www.sidc.be/SILSO/DATA/SN_d_tot_V2.0.csv",
-  col_names = c("year", "month", "day", "dec_date", "SN", "SN_err", "N_obs", "definitive"),
+  col_names = c("year", "month", "day", "dec_date", "SN", "SN_err", "N_obs", "Nr_stations"),
   col_types = "iiidddii",
   na = c("-1", "-1.0")
 ) %>%
@@ -42,7 +32,7 @@ sn_data <- read_csv2(
   dplyr::select(dt.mnth, dec.yr, month, SN)
 
 #======================
-SP_daily=sn_data%>%subset(SN>0 & !is.na(SN)) # first 7 SN in 1801-01 are NA
+SP_daily=sn_data.new%>%subset(SN>0 & !is.na(SN)) # first 7 SN in 1801-01 are NA
 SP_intpol.spl=spline(x=SP_daily$dec.yr,y=SP_daily$SN,
                      xout = seq(from = first(SP_daily$dec.yr),
                                 to= last(SP_daily$dec.yr),by= 1/365.24))
@@ -72,6 +62,7 @@ plt.sol.power=S_power.mnthly%>%ggplot(aes(x=dt.mnth,y=TSI))+geom_line()+
        subtitle = "@ sea level,estimate from sunspot smoothed count",
        caption = "http://www.lajpe.org/dec11/LAJPE_576_Ambelu_Tebabal..")
 
+ggsave("figs/sol.power.png")
 saveRDS(S_power.mnthly,"data/S_power.rds")
 # see Wikipedia on CO2 effect (Absorption) to be logarithmic
 #browseURL("https://de.wikipedia.org/wiki/Klimasensitivit%C3%A4t")
