@@ -109,7 +109,7 @@ Long_periods=Long_periods%>% mutate(trd.period=trd3-Clean_Baseline_Trend,
                        long.sum=trd.period+smth.res)
 N =length(Long_periods$dt.mnth) # 2068
 n_back=3000
-#
+# Extend backwards to 1600
 Long_dominant=Long_periods%>%
   dplyr::select(dt.mnth,smth.res,trd.period,long.sum)
 Long_periods$dt.mnth[1] # 1854
