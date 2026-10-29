@@ -1,14 +1,17 @@
 # load the data
+library(tidyverse)
 library(lubridate)
 library(terra)
-Ocean_data_update <- readRDS("data/Ocean_data_update.rds")
+library(here)
+
+Ocean_data_update <- readRDS(here("data", "Ocean_data_update.rds"))
 # Unwrap the raster object
 download.time<-ymd(Ocean_data_update$downld.time)
 source.url<-Ocean_data_update$raw_path
 # data source
-Ocean_data_update$file_url
-sst_stack <- terra::unwrap(Ocean_data_update$sst_stack)
-dim(sst_stack)# 2120
+ocean_stack=Ocean_data_update$sst_stack
+sst_stack <- terra::unwrap(ocean_stack)
+dim(sst_stack)# 89 180 2120
 
 
 # =========
@@ -119,7 +122,7 @@ NOAA.Ocean.anomalies=tibble(dt.mnth=dt.mnth,
                             anoma.mean=sst.mean-mean(sst.mean,na.rm=T),
                             anoma.median=sst.median-mean(sst.median,na.rm=T))
 
-NOAA.Ocean.anomalies%>%ggplot(aes(x=dt.mnth))+
+plt.glob.mean=NOAA.Ocean.anomalies%>%ggplot(aes(x=dt.mnth))+
   geom_line(aes(y=anoma.mean),col="grey")+
   geom_point(aes(y=anoma.mean),size=0.2,col=2)+
   labs(x=NULL,y="anomaly mean [K]",
@@ -133,8 +136,9 @@ plt.anomaly_mean.median<-NOAA.Ocean.anomalies%>%ggplot(aes(x=dt.mnth))+
   geom_line(aes(y=anoma.mean ),col= 2)+
 
   labs(x="",y="anomaly K",title = "Ocean Temperature Anomalies",
-       subtitle="Global Ocean Mean(blue) and Median(red)",caption = "data: noaa.ersst.v5.nc ")
-
+       subtitle="Global Ocean Mean(blue); Median(red)",
+       caption = "data: noaa.ersst.v6.nc ")
+ggsave("figs/Global_Mean_Median.png")
 Ocean_NOAA.data=list(url.source="https://downloads.psl.noaa.gov/Datasets/noaa.ersst.v5/sst.mnmean.nc",
                      update=Sys.time(),
                      data.grid=wrap(sst_stack),
@@ -143,7 +147,8 @@ Ocean_NOAA.data=list(url.source="https://downloads.psl.noaa.gov/Datasets/noaa.er
 saveRDS(Ocean_NOAA.data,"data/NOAA.OCEAN.ANOMALIES.rds")
 # check saving
 library(terra)
-Ocean_NOAA.data=readRDS("data/NOAA.OCEAN.ANOMALIES.rds")
+Ocean_NOAA.data=readRDS(here("data","NOAA.OCEAN.ANOMALIES.rds"))
 NOAA.Ocean.anomalies=Ocean_NOAA.data$data
-sst_stack<-unwrap(Ocean_NOAA.data$data.grid)
+sst_stack<-terra::unwrap(Ocean_NOAA.data$data.grid)
+summary(Ocean_NOAA.data )
 
