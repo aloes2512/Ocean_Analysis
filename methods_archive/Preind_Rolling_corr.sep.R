@@ -43,6 +43,7 @@ fit_M.logistic%>%augment()%>%ggplot(aes(x=1:2121))+
   geom_line(aes(y=.fitted))
 tidy(fit_M.logistic)
 summary(fit_M.logistic)
+coef(fit_M.logistic)
 
 library(slider)
 richards_res <- Ocean_solar_anom$Anomaly - predict(fit_M.logistic)
