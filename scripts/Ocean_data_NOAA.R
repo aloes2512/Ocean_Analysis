@@ -9,14 +9,14 @@ library(tidyverse)
 #             method = "libcurl",
 #             mode = "wb")
 # download did overwrite sst.mnmean.nc
-sst_stack <- rast("~/Downloads/sst.mnmean-2.nc") # length 2069
-
+sst_stack <- rast("data/sst.mnmean-v6.nc") # length 2069
+dim(sst_stack) # 89 180 2120
 library(lubridate)
-date=time(sst_stack) # "1854-01-01" "2026-04-01"
+date=time(sst_stack) # "1854-01-01" "2026-08-01"
 
 dt.mnth=year(date)+(month(date)-1)/12
 
-length(dt.mnth) # 2068
+length(dt.mnth) # 2120
 
 berk_mask = terra::rast("data/Land_and_Ocean_1x1_SST_at_sea_ice.nc")$land_mask
 crs(berk_mask)=crs(sst_stack)
@@ -120,7 +120,7 @@ full_sst_matrix <- terra::values(sst_stack, mat = TRUE)# mat returns values as a
 # 5. Filter the matrix down to JUST your ocean cells
 # This matrix will now have exactly 2068 columns
 sst_matrix_clean <- full_sst_matrix[keep_idx, ]
-dim(sst_matrix_clean)
+dim(sst_matrix_clean) # 11306   2120
 
 
 # 2. Extract the corresponding weights
@@ -161,14 +161,12 @@ NOAA.Ocean.anomalies=tibble(dt.mnth=dt.mnth,
 summary(NOAA.Ocean.anomalies)
 NOAA.Ocean.anomalies%>%ggplot(aes(x=dt.mnth))+
   geom_line(aes(y=anoma.mean),col="grey")+
-  geom_point(aes(y=anoma.mean),size=0.2,col=2)
+  geom_point(aes(y=anoma.mean),size=0.2,col=2)+
+  labs(x="",y="aanomaly",title = "Global Ocean Anomaly",subtitle = "weighted cell means",
+       caption = "data source: NOAA.psl sst.mnmean-v6.nc")
+ggsave("figs/NOAA.Ocean_anomaly.png")
 #-----
-summary(NOAA.Ocean.anomalies)
-
-
-
-
-NOAA.Ocean.anomalies%>%ggplot(aes(x=dt.mnth))+
+plt.ocean.mean_median=NOAA.Ocean.anomalies%>%ggplot(aes(x=dt.mnth))+
   geom_line(aes(y=anoma.median ),col=4)+
   geom_line(aes(y=anoma.mean ),col= 2)+
 
@@ -176,7 +174,7 @@ NOAA.Ocean.anomalies%>%ggplot(aes(x=dt.mnth))+
        subtitle="Global Ocean Mean(blue) and Median(red)",caption = "data: noaa.ersst.v5.nc ")
 summary(NOAA.Ocean.anomalies)
 Ocean_NOAA.data=list(url.source="https://downloads.psl.noaa.gov/Datasets/noaa.ersst.v5/sst.mnmean.nc",
-                     update="2026-05-16",
+                     update="2026-09-26",
                      data.grid=sst_stack,
                      data=NOAA.Ocean.anomalies)
 #saveRDS(Ocean_NOAA.data,"data/NOAA.OCEAN.ANOMALIES.rds")

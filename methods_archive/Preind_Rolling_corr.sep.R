@@ -6,16 +6,16 @@ colnames(Ocean_solar_anom) # anoma.mean; Solar_Variation; trd3;res3;Clean_Baseli
 # 1975 defined as limit modern.trend
 
 modern.trend=subset(Ocean_solar_anom,dt.mnth>1975)%>%
-  pull(Clean_Baseline_Trend)
-Ocean_solar_anom%>%ggplot(aes(x=dt.mnth))+
-  geom_line(aes(y=Clean_Baseline_Trend))+
+  pull(trend.solar)
+plt.sol.lckd<-Ocean_solar_anom%>%ggplot(aes(x=dt.mnth))+
+  geom_line(aes(y=trend.solar))+
   labs(title = "Solar Locked Basline Trend")
 # Define your control parameters
 nls_control <- nls.control(maxiter = 1000) # Increase max iterations to 1000
 # estimate M
 M=1970#  1950 1970 1980 1990
 fit_logistic <- nls(
-  Clean_Baseline_Trend  ~ A0+K*(1+exp(-0.12*(dt.mnth-M)))^(-1/nu),
+  trend.solar  ~ A0+K*(1+exp(-0.12*(dt.mnth-M)))^(-1/nu),
   data = Ocean_solar_anom,
   start=list(A0=0.000,K=1.2,M= 1970,nu=1.6),
   control = nls_control
@@ -32,17 +32,18 @@ B= 0.12
 Rich.mdl=tibble(dt.mnth=Ocean_solar_anom$dt.mnth,
                   Rch_t= A0+K*(1+exp(-B*(dt.mnth-1995)))^(-1/nu))
 Ocean_solar_anom$Rch_t<-Rich.mdl$Rch_t
-Ocean_solar_anom%>%ggplot(aes(x=dt.mnth))+
+plt.1st.iteration<-Ocean_solar_anom%>%ggplot(aes(x=dt.mnth))+
   geom_line(aes(y=Rch_t))+
-  geom_line(aes(y=Clean_Baseline_Trend))
+  geom_line(aes(y=trend.solar))
 fit_M.logistic <- lm(
-  Clean_Baseline_Trend   ~ Rch_t,
+  trend.solar   ~ Rch_t,
   data = Ocean_solar_anom)
 library(broom)
 fit_M.logistic%>%augment()%>%ggplot(aes(x=1:2121))+
   geom_line(aes(y=.fitted))
 tidy(fit_M.logistic)
 summary(fit_M.logistic)
+coef(fit_M.logistic)
 
 library(slider)
 richards_res <- Ocean_solar_anom$Anomaly - predict(fit_M.logistic)

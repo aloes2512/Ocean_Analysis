@@ -4,11 +4,10 @@ library(tidyverse)
 DF<-readRDS("data/NOAA.OCEAN.ANOMALIES.rds")$data
 colnames(DF)
 global.ts<-DF%>%dplyr::select(dt.mnth,"Anomaly"=anoma.mean)
-N_global=NROW(global.ts) # 2116
+N_global=NROW(global.ts) # 2121
 dt.mnth=global.ts$dt.mnth
 N_base=which(dt.mnth==1958) #1297
 N_prewar=which(dt.mnth==1938) #1057
-dt.mnth[1058] # 1938.083
 library(itsmr)
 #eliminate season
 M.ssn=c("season",6,"season",12)
@@ -20,36 +19,48 @@ dt.prewar.limit<-1938
 global.ts  <- global.ts%>%mutate(anom.hr=hr(anomaly,N_global/1:20), # 9 yrs
                                  res.hr_anom=anomaly-anom.hr)
 
-library(itsmr)
-M.trd=c("trend",1)
-preind_global.ts<- subset(global.ts,dt.mnth<=dt.preind.limit)%>%
-  mutate(anomaly=Resid(Anomaly,M.trd))
-prewar_global.ts<-subset(global.ts,dt.mnth<=dt.prewar.limit)%>%
-  mutate(anomaly=Resid(Anomaly,M.trd))
+
+preind_global.ts<- subset(global.ts,dt.mnth<=dt.preind.limit)
+NROW(preind_global.ts) == N_base # TRUE
+prewar_global.ts<-subset(global.ts,dt.mnth<=dt.prewar.limit)
+NROW(prewar_global.ts) == N_prewar # TRUE
 prewar_global.ts%>%ggplot(aes(x=dt.mnth))+
   geom_line(aes(y=anomaly))
+
 global.ts%>%ggplot(aes(x=dt.mnth,y=anom.hr))+
-  geom_line(aes(y=res.hr_anom,col="res.hr_anom"))+
-  geom_line(aes(col="hr1_20"))+
+  geom_line(aes(y=res.hr_anom,col="residuals"))+
+  geom_line(aes(col="prd>9yr"))+
   labs(x="",title="Low.pass Filtrd Anomalies(red)",
-       subtitle = "residuals = diff(hr1_20,anomalies)")
+       subtitle = "residuals = anomalies-prd>9yr")
+library(gsignal)
+priods=diff(gsignal::findpeaks(global.ts$anom.hr,DoubleSided = T)$loc,2)
+priods%>% mean() %>% {./12} # 16 yrs
+priods%>% range() %>% {./12} # 8 31 yrs
 #-----------
-preind_global.ts%>%ggplot(aes(x=dt.mnth))+
+plt.preind_low=preind_global.ts%>%ggplot(aes(x=dt.mnth))+
   geom_line(aes(y=anomaly,col="preind.anomaly"))+
-  geom_line(aes(y=hr(anomaly,N_global/1:8),col="hr1_6"))+
+  geom_line(aes(y=hr(anomaly,N_global/1:8),col="prd>13yr"))+
   labs(title = "Normalized Preind.anomalies\n anomalies low-pass-filtered")
+NROW(preind_global.ts)/96 # 13.5 yrs
+priods.preind=diff(gsignal::findpeaks(preind_global.ts$anom.hr,DoubleSided = T)$loc,2)
+mean(priods.preind) / 12 # 21 yrs
+
 #--------------
 prewar_global.ts%>%ggplot(aes(x=dt.mnth))+
   geom_line(aes(y=anomaly,col="prewar.anomaly"))+
-  geom_line(aes(y=hr(anomaly,N_global/1:8),col="anoma.hr1_6"))+
+  geom_line(aes(y=hr(anomaly,N_global/1:20),col="prd>9yr"))+
+  geom_line(aes(y=hr(anomaly,N_global/1:8),col="prd>22yr"))+
   labs(title = "Normalized Prewar.anomalies\n anomalies low-pass-filtered")
+NROW(prewar_global.ts)/96 # 11 yrs
+priods.prewar=diff(gsignal::findpeaks(prewar_global.ts$anom.hr,DoubleSided = T)$loc,2)
+mean(priods.prewar) / 12 # 20.7 yrs
 
 # extend prewar.anomaly 1850 to N_global=2026; N_prewar = 1057
 circular_indices.1938 <- ((0:(N_global - 1)) %% N_prewar) + 1 #N_base= 1297; circular-length 2116
 Prewar.ext=tibble(dt.mnth=global.ts$dt.mnth,
        ext.prewar=prewar_global.ts$anomaly[circular_indices.1938])%>%
        mutate(ext.prewar=ext.prewar-mean(ext.prewar),anoma.hr1_6=hr(ext.prewar,N_global/1:6))
-Prewar.ext$ext.prewar%>%mean()#e-18
+#Prewar.ext$ext.prewar%>%mean()#e-18
 Prewar.ext%>%
   ggplot(aes(x=dt.mnth))+geom_line(aes(y=ext.prewar))+
   geom_line(aes(y=anoma.hr1_6,col="anoma.hr1_6"))+
@@ -61,7 +72,6 @@ circular_indices <- ((0:(N_global - 1)) %% N_base) + 1 #N_base= 1297; circular-l
 Preind.ext=tibble(dt.mnth=global.ts$dt.mnth,
                   ext.preind=preind_global.ts$anomaly[circular_indices])%>%
   mutate(ext.preind=ext.preind-mean(ext.preind),anoma.hr1_6=hr(ext.preind,N_global/1:6))
-Preind.ext$ext.preind%>%mean()#e-18
 Preind.ext%>%
   ggplot(aes(x=dt.mnth))+geom_line(aes(y=ext.preind))+
   geom_line(aes(y=anoma.hr1_6,col="anoma.hr1_6"))+
@@ -238,7 +248,7 @@ global_mdl%>%ggplot(aes(x=dt.mnth))+
   geom_line(aes(y=logistic.fit,col="trd.logistic"))+
   labs(x="",title = "Model: Global Observed Anomalies",
        subtitle = "trd:Generalized Logistic Fit;\npre-industr: 20 harmonics model")
-ggsave("figs/global.logist.20har.model.tiff")
+ggsave("figs/global.logist.20har.model.png")
 # end of pre-industrial?
 library(itsmr)
 observed_anomalies<-global.ts$Anomaly

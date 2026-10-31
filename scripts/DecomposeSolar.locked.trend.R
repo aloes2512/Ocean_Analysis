@@ -53,8 +53,9 @@ plt.sol.trend=Ocean_solar_anom%>%ggplot(aes(x=dt.mnth))+
   geom_line(aes(y=secular_baseline,col="secular"))+
   geom_line(aes(y=trd.solar,col="trd.sol.lckd"))+
   geom_line(aes(y=secular_baseline-trd.solar,col="periods.sol.lckd"))+
-  labs(x="",y="anomaly trend",title = "Solar Locked Trend",
-       subtitle = "secular trend separated periods")
+  labs(x="",y="anomaly trend",title = "Solar Locked- Secular-Trend",
+       subtitle = "difference  separates periods.sol.lckd")
+ggsave("figs/harm_sol_lckd.png")
 #---------
 plt.sol.periods=Ocean_solar_anom%>%
   ggplot(aes(x=dt.mnth))+
@@ -73,15 +74,18 @@ plt.decommp=Ocean_solar_anom%>%ggplot(aes(x=dt.mnth))+
 Ocean_solar_anom%>%ggplot(aes(x=dt.mnth))+
   geom_line(aes(y=trend.solar,col="trend.solar"))+
   geom_line(aes(y=secular_baseline,col="sec.base"))+
-  geom_line(aes(y=periodic.trnd,col="periodic.trnd"))
-Ocean_selcd.sol<-Ocean_solar_anom%>%dplyr::select(dt.mnth,Anomaly,secular_baseline)%>%
+  geom_line(aes(y=periodic.trnd,col="difference"))+
+  labs(x=NULL,title = "Solar Locked Trend",
+  subtitle = "compared with secular trend and harmonic difference")
+ggsave("figs/sec_sol_lckd.png")
+Ocean_solar_anom<-Ocean_solar_anom%>%dplyr::select(dt.mnth,Anomaly,secular_baseline)%>%
   mutate(total.resids=Anomaly-secular_baseline)
-Ocean_selcd.sol%>%ggplot(aes(x=dt.mnth))+geom_line(aes(y=total.resids))
+Ocean_solar_anom%>%ggplot(aes(x=dt.mnth))+geom_line(aes(y=total.resids))
 library(mgcv)
 library(itsmr)
 # GAM extend preWWII 1938
-full.resds=Ocean_selcd.sol%>%dplyr::select(dt.mnth,total.resids,Anomaly)
-train.resds=Ocean_selcd.sol[1:floor(N_global/2),]
+full.resds=Ocean_solar_anom%>%dplyr::select(dt.mnth,total.resids,Anomaly)
+train.resds=Ocean_solar_anom[1:floor(N_global/2),]
 # 2. GAM fit  cyclic  Splines (bs = "cc")
 gam_raw=gam(total.resids ~ s(dt.mnth,k=180,bs="cc"),data = full.resds)
 

@@ -6,19 +6,21 @@ library(here)
 
 Ocean_data_update <- readRDS(here("data", "Ocean_data_update.rds"))
 # Unwrap the raster object
-download.time<-ymd(Ocean_data_update$downld.time)
-source.url<-Ocean_data_update$raw_path
+download.time<-Ocean_data_update$downld.time # 2026-10-30 10:48:15
+Ocean_data_update$raw_path #"~/projects/Ocean_Analysis/data/sst.mnmean-v6.nc"
 # data source
 ocean_stack=Ocean_data_update$sst_stack
 sst_stack <- terra::unwrap(ocean_stack)
-dim(sst_stack)# 89 180 2120
-
-
+dim(sst_stack)# 89 180 2121 month
+source.url<-Ocean_data_update$origin_url #"https://downloads.psl.noaa.gov/Datasets/noaa.ersst.v6/"
+saveRDS(Ocean_data_update,"data/Ocean_data_update.rds")
 # =========
 #=============
 
 berk_mask = terra::rast("data/Land_and_Ocean_1x1_SST_at_sea_ice.nc")$land_mask
+dim(berk_mask) # [1] 180 360   1
 crs(sst_stack)=crs(berk_mask)
+
 # ocean cells to limit land included < 10%
 ocean_mask <- terra::mask(berk_mask, berk_mask < 0.1,maskvalues=F)
 ocean_frac <- 1 - berk_mask  # Ocean fraction [0,1]
@@ -27,9 +29,15 @@ weights_rel<- weights_abs / global(weights_abs, "max", na.rm=TRUE)[1,1]
 ocean_mask_fixed<- terra::resample(ocean_frac, sst_stack, method = "near")
 
 ocean_mask_na <- ocean_mask_fixed
-ocean_mask_na[ocean_mask_na==0]<-NA
+ocean_mask_na[ocean_mask_na==0]<-NA #89
 weighted_sst_stack<- sst_stack * ocean_mask_na*weights_rel
+
+# 1. Bake/materialize raster stack to disk
+writeRaster(weighted_sst_stack, "data/weighted_sst_stack.tif", overwrite = TRUE)
+
+
 active_weights <- mask(weights_rel, sst_stack[[1]])
+writeRaster(active_weights, "data/active_weights.tif", overwrite = TRUE)
 
 sum_of_ocean_weights <- global(active_weights, fun="sum", na.rm=TRUE)
 
@@ -37,6 +45,16 @@ sum_of_ocean_weights <- global(active_weights, fun="sum", na.rm=TRUE)
 ocean_mask_fixed <- terra::resample(ocean_frac, sst_stack, method = "near")
 ocean_mask_na <- ocean_mask_fixed
 ocean_mask_na[ocean_mask_na==0]<-NA
+# save ocean_stack
+library(terra)
+
+# 1. Bake/materialize your processed raster stack to disk
+writeRaster(weighted_sst_stack, "data/weighted_sst_stack.tif", overwrite = TRUE)
+
+# 2. In future sessions, instantly load it back as a fast disk-backed SpatRaster
+weighted_sst_stack <- rast("data/weighted_sst_stack.tif")
+
+
 # MEDIAN
 library(matrixStats)
 # Use the ORIGINAL sst_stack, not the multiplied one!
@@ -111,7 +129,7 @@ sst_matrix_zeroed[is.na(sst_matrix_zeroed)] <- 0
 
 # 2. Vectorized Weighted Mean using Matrix Multiplication (%*%)
 global_means <- as.vector((w_vals_clean %*% sst_matrix_zeroed) / sum(w_vals_clean))
-date=time(sst_stack) # 1850-01-01 2026-08-01
+date=time(sst_stack) # 1850-01-01 2026-09-01
 
 dt.mnth=year(date)+(month(date)-1)/12
 
@@ -145,6 +163,18 @@ Ocean_NOAA.data=list(url.source="https://downloads.psl.noaa.gov/Datasets/noaa.er
                      data=NOAA.Ocean.anomalies)
 
 saveRDS(Ocean_NOAA.data,"data/NOAA.OCEAN.ANOMALIES.rds")
+
+saveRDS(
+  list(
+    global_stack  = sst_stack, # unwrap(ocean_stack)
+    dates=time(sst_stack),
+    grid=wrap(sst_stack),
+    ocean_mask_weighted    = ocean_mask_weighted,
+    Ocean_NOAA.data = Ocean_NOAA.data    # list includes  url,
+                                         # date of download
+                                         # mean and median ts
+  ),"data/processed_global_inputs.rds"
+)
 # check saving
 library(terra)
 Ocean_NOAA.data=readRDS(here("data","NOAA.OCEAN.ANOMALIES.rds"))

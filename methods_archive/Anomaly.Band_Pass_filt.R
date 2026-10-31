@@ -2,7 +2,7 @@ library(tidyverse)
 library(minpack.lm)
 library(Rssa)
 library(itsmr)
-Ocean_solar_anomaly<-readRDS("data/Ocean_solar_anomaly.rds")[-c(1:4),]
+Ocean_solar_anomaly<-readRDS("data/Ocean_solar_anomaly.rds")
 N<-NROW(Ocean_solar_anomaly) # 2112
 L <- 132
 trd_solar<-Ocean_solar_anomaly$trend.solar

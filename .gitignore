@@ -4,9 +4,10 @@
 .Ruserdata
 data/
 deprecated_data/
+figs/
+scratch/
 .positai
 GAM_Filter.extrapol.new.R
-
 # render output and OS cruft
 .DS_Store
 **/.DS_Store
@@ -14,10 +15,14 @@ GAM_Filter.extrapol.new.R
 !Draft_Report_files/
 Draft_Report_files/*_files/
 _to_delete/
-
 # old embedded copy of the project (has its own .git)
 Ocean_Analysis.1/
-
 # not part of this project (other users of this Mac)
 Draft_Report_files/Comment*
 _git_backup/
+/Ocean_Analysis.pdf
+/Ocean_Analysis_cache/
+*.pdf
+*_cache/
+*_files/
+*.odt
