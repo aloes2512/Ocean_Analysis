@@ -1,12 +1,12 @@
 # copied from Solar_locked_anomaly.R
 library(tidyverse)
 library(itsmr)
-Ocean_solar_anomaly<-readRDS("data/Ocean_solar_anomaly.rds")
+Ocean_solar_anomaly<-readRDS("~/projects/Ocean_Analysis/data/Ocean_solar_anomaly.rds")
 my_df<-Ocean_solar_anomaly
 mytrend.sol<-my_df$trend.solar
 my_df<-my_df%>%mutate(sol.trd7=trend(trend.solar,7),
                       dif.sol.trd=trend.solar-sol.trd7)
-
+N<-NROW(my_df)
 dt.mnth=my_df$dt.mnth
 sol.trd.secular=loess(mytrend.sol~ dt.mnth,span = 0.5) %>% predict()
 # separate seasonal and semiseasonal
@@ -14,7 +14,7 @@ sol.trd.secular=loess(mytrend.sol~ dt.mnth,span = 0.5) %>% predict()
 M=c("season",12,"season",6)
 my_DF=tibble(dt.mnth=dt.mnth,sec.trd=sol.trd.secular,
              mytrend.sol=my_df$trend.solar,
-             anomaly=Resid(my_df$Anomaly,M))
+             anomaly=Resid(my_df$anomaly,M))
 my_DF=my_DF%>%mutate(difer=mytrend.sol-sol.trd.secular,
                      sol.residuals=anomaly-sol.trd.secular,
                      sol.res.hr= hr(sol.residuals,N/1:20))
@@ -39,7 +39,7 @@ rolling_corr.sol <- slide_index_dbl(
   .before = 132,   # Looks 131 steps backward + current step = 132 months
   .complete = TRUE # Automatically returns NA for incomplete windows at the start
 )
-RollingCor=tibble(Time=Ocean_solar_anom$dt.mnth,rolling_corr.sol=as.numeric(rolling_corr.sol))#
+RollingCor=tibble(Time=my_DF$dt.mnth,rolling_corr.sol=as.numeric(rolling_corr.sol))#
 RollingCor%>%ggplot(aes(x=Time))+
   geom_line(aes(y=rolling_corr.sol))+
   geom_vline(xintercept = 1997,linetype = 2)+

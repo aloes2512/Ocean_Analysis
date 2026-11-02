@@ -1,0 +1,749 @@
+% Options for packages loaded elsewhere
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+%
+\documentclass[
+  letterpaper,
+  DIV=11,
+  numbers=noendperiod]{scrartcl}
+\usepackage{xcolor}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+% Make \paragraph and \subparagraph free-standing
+\makeatletter
+\ifx\paragraph\undefined\else
+  \let\oldparagraph\paragraph
+  \renewcommand{\paragraph}{
+    \@ifstar
+      \xxxParagraphStar
+      \xxxParagraphNoStar
+  }
+  \newcommand{\xxxParagraphStar}[1]{\oldparagraph*{#1}\mbox{}}
+  \newcommand{\xxxParagraphNoStar}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+  \let\oldsubparagraph\subparagraph
+  \renewcommand{\subparagraph}{
+    \@ifstar
+      \xxxSubParagraphStar
+      \xxxSubParagraphNoStar
+  }
+  \newcommand{\xxxSubParagraphStar}[1]{\oldsubparagraph*{#1}\mbox{}}
+  \newcommand{\xxxSubParagraphNoStar}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+\makeatother
+
+
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+
+
+% definitions for citeproc citations
+\NewDocumentCommand\citeproctext{}{}
+\NewDocumentCommand\citeproc{mm}{%
+  \begingroup\def\citeproctext{#2}\cite{#1}\endgroup}
+\makeatletter
+ % allow citations to break across lines
+ \let\@cite@ofmt\@firstofone
+ % avoid brackets around text for \cite:
+ \def\@biblabel#1{}
+ \def\@cite#1#2{{#1\if@tempswa , #2\fi}}
+\makeatother
+\newlength{\cslhangindent}
+\setlength{\cslhangindent}{1.5em}
+\newlength{\csllabelwidth}
+\setlength{\csllabelwidth}{3em}
+\newenvironment{CSLReferences}[2] % #1 hanging-indent, #2 entry-spacing
+ {\begin{list}{}{%
+  \setlength{\itemindent}{0pt}
+  \setlength{\leftmargin}{0pt}
+  \setlength{\parsep}{0pt}
+  % turn on hanging indent if param 1 is 1
+  \ifodd #1
+   \setlength{\leftmargin}{\cslhangindent}
+   \setlength{\itemindent}{-1\cslhangindent}
+  \fi
+  % set entry spacing
+  \setlength{\itemsep}{#2\baselineskip}}}
+ {\end{list}}
+\usepackage{calc}
+\newcommand{\CSLBlock}[1]{\hfill\break\parbox[t]{\linewidth}{\strut\ignorespaces#1\strut}}
+\newcommand{\CSLLeftMargin}[1]{\parbox[t]{\csllabelwidth}{\strut#1\strut}}
+\newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth - \csllabelwidth}{\strut#1\strut}}
+\newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
+
+
+
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+
+
+
+
+
+\KOMAoption{captions}{tableheading}
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\AtBeginDocument{%
+\ifdefined\contentsname
+  \renewcommand*\contentsname{Table of contents}
+\else
+  \newcommand\contentsname{Table of contents}
+\fi
+\ifdefined\listfigurename
+  \renewcommand*\listfigurename{List of Figures}
+\else
+  \newcommand\listfigurename{List of Figures}
+\fi
+\ifdefined\listtablename
+  \renewcommand*\listtablename{List of Tables}
+\else
+  \newcommand\listtablename{List of Tables}
+\fi
+\ifdefined\figurename
+  \renewcommand*\figurename{Figure}
+\else
+  \newcommand\figurename{Figure}
+\fi
+\ifdefined\tablename
+  \renewcommand*\tablename{Table}
+\else
+  \newcommand\tablename{Table}
+\fi
+}
+\@ifpackageloaded{float}{}{\usepackage{float}}
+\floatstyle{ruled}
+\@ifundefined{c@chapter}{\newfloat{codelisting}{h}{lop}}{\newfloat{codelisting}{h}{lop}[chapter]}
+\floatname{codelisting}{Listing}
+\newcommand*\listoflistings{\listof{codelisting}{List of Listings}}
+\makeatother
+\makeatletter
+\makeatother
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\@ifpackageloaded{subcaption}{}{\usepackage{subcaption}}
+\makeatother
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Separating Anthropogenic Forcing from Solar-Locked Natural Variability in Global Ocean SST Anomalies (1850--2026)},
+  pdfauthor={Dr.~Alf Loeffler},
+  pdfkeywords={sea surface temperature, singular spectrum
+analysis, solar cycles, greenhouse gas forcing, coupled
+oscillators, Richards growth curve},
+  colorlinks=true,
+  linkcolor={blue},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={Blue},
+  pdfcreator={LaTeX via pandoc}}
+
+
+\title{Separating Anthropogenic Forcing from Solar-Locked Natural
+Variability in Global Ocean SST Anomalies (1850--2026)}
+\usepackage{etoolbox}
+\makeatletter
+\providecommand{\subtitle}[1]{% add subtitle to \maketitle
+  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
+}
+\makeatother
+\subtitle{A Non-Parametric Subspace, Coupled-Oscillator, and Sigmoidal
+Growth Framework}
+\author{Dr.~Alf Loeffler}
+\date{2026-11-05}
+\begin{document}
+\maketitle
+
+
+\textbf{Keywords:} Sea surface temperature; singular spectrum analysis;
+solar cycles; greenhouse gas forcing; coupled oscillators; Richards
+growth curve
+
+\subsection{Abstract}\label{abstract}
+
+Global ocean heat content accounts for the vast majority of Earth's
+surface thermal capacity. Anthropogenic greenhouse gas emissions disturb
+the equilibrium of incoming solar and outgoing longwave radiation; while
+both components are attenuated, the retention of outgoing thermal
+radiation dominates, driving persistent heat content growth.
+
+Mathematically, ocean thermal dynamics can be modeled as a system of
+coupled oscillators driven by multi-decadal solar irradiance cycles.
+Observed sea surface temperature (SST) anomalies integrate these
+long-term dynamics alongside short-term seasonal and meteorological
+``noise'', necessitating a clear separation of secular trends from
+internal periodic variations.
+
+Using NOAA ERSSTv6 global area-weighted sea surface temperature (SST)
+anomalies (1850--2026), we extract background secular trends using three
+complementary approaches: (1) solar-cycle phase locking using splines,
+(2) non-parametric Singular Spectrum Analysis (SSA), and (3) non-linear
+logistic growth modeling. Rolling-correlation analysis reveals distinct
+structural breaks matching the early acceleration phase of the modern
+times rise of the SST. These breaks mark a mid-century transition regime
+where anthropogenic warming begins to obscure natural periodic
+variability.
+
+Our findings demonstrate that historical multi-decadal
+hiatuses---specifically around \textasciitilde1910 and between 1940 and
+1970---are driven by destructive phase alignments of natural cycles
+rather than shifts in external forcing Medhaug et al. (2017). While
+sigmoidal growth curves successfully isolate the monotonic anthropogenic
+trajectory, post-inflection data through 2026 remain insufficient to
+establish a hard physical upper asymptote for ocean heat uptake.
+
+To evaluate the human contribution, long-term natural periodic
+variability is separated from the underlying anthropogenic trend.
+
+\subsection{Introduction}\label{introduction}
+
+The global ocean acts as a massive thermal reservoir absorbing the solar
+forced heating. Thermodynamic laws are the principal forces trying to
+obtain equilibrium between the various ocean basins. Huge atmospheric
+and oceanic currents transport the heat and are observed as
+oscillations. Some of these are stable for centuries others change with
+seasonal or daily periods.
+
+Mathematically, large-scale oceanic thermal adjustments can be
+conceptualized through coupled-oscillator frameworks. Analogous to the
+`recharge oscillator' mechanics developed for equatorial ocean dynamics
+by Burgers, Jin, and Oldenborgh (2005) , global sea surface temperature
+anomalies integrate delayed subsurface and boundary feedback responses,
+which manifest as prominent multi-decadal periods when stripped of
+secular trends.
+
+This physical system can be conceptualized through three main dynamics:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \emph{Coupled Solar Driving:} The ocean behaves as a set of non-linear
+  coupled oscillators driven by periodic variations in solar irradiance
+  across Schwabe (\textasciitilde11-year), Hale
+  (\textasciitilde22-year), and Gleissberg (\textasciitilde88-year)
+  cycles.
+\item
+  \emph{Radiative Imbalance:} Anthropogenic emissions of long-lived
+  greenhouse gases alter the planetary energy balance primarily by
+  retarding outgoing longwave thermal radiation emitted primary in the
+  northern hemisphere but distribute with a time lag of
+  \textasciitilde{} 2 years across the full global surface
+  (\(4\pi R^2\)). While local atmospheric processes also affect incoming
+  solar irradiance, the net global energetic disturbance is
+  overwhelmingly dominated by the retention of outgoing thermal
+  radiation over the total ocean area.
+\item
+  \emph{Signal Disentanglement:} Isolating the anthropogenic warming
+  trend requires separating the underlying secular trajectory from
+  natural, multi-decadal oscillatory modes.
+\end{enumerate}
+
+Traditional Fourier-based spectral filtering and linear detrending needs
+to be combined with a separation of the dominant periods
+(\emph{principal component analysis}) to understand the effect of the
+periodical varying solar input.
+
+In this study, we apply splines to lock the anomaly to solar irradiance,
+paired with non-parametric Singular Spectrum Analysis (SSA) and
+sigmoidal growth curve modeling to isolate natural cyclical variations
+from anthropogenic warming without enforcing artificial linearity or
+spectral symmetry.
+
+\subsection{Data and Pre-Processing}\label{data-and-pre-processing}
+
+\subsubsection{NOAA ERSSTv6 Global Ocean
+Anomalies}\label{noaa-ersstv6-global-ocean-anomalies}
+
+Global monthly sea surface temperature (SST) fields are obtained from
+the NOAA Extended Reconstructed Sea Surface Temperature version 6
+(ERSSTv6) covering January 1850 through 2026 (Huang et al. 2025).
+Spatial operations on the \(180 \times 90\) global grid
+(\(2^\circ \times 2^\circ\) resolution) were executed using the
+\texttt{terra\ package} (Hijmans et al. 2026). Global ocean mean
+anomalies were generated using an area-weighted ocean mask based on
+Berkeley Earth grid boundaries (Rohde and Hausfather 2020). Annual and
+semi-annual seasonal signals were removed using the
+\texttt{itsmr\ package} (Weigt 2025).
+
+To account for high-frequency vortex and weather noise, both mean and
+median anomaly metrics were extracted across the time series. As shown
+with Figure~\ref{fig-Global-SST-Anomaly} the median anomaly series
+exhibits a lower overall slope and a narrower dynamic range. Beyond
+2000, the lower bound of the median series approaches that of the mean
+anomaly, reflecting the physical lower limit of seawater freezing points
+versus nearly unconstrained upper atmospheric warming spikes. For
+primary modeling, we prioritize the area-weighted mean SST anomaly, as
+it strictly conserves enthalpy and total thermal energy, while using the
+median to verify against localized polar amplification artifacts.
+Although we attempt to analyze the change of the global ocean heat
+content, we take SST as a proxy because of the available data processed
+and published by NOAA Huang et al. (2025)
+
+\begin{figure}
+
+\centering{
+
+\includegraphics[width=0.85\linewidth,height=\textheight,keepaspectratio]{Figs_Ocean/Fig1_Mean_Median.png}
+
+}
+
+\caption{\label{fig-Global-SST-Anomaly}Global Temperature Anomaly (Mean
+vs Median)}
+
+\end{figure}%
+
+\subsubsection{Solar Irradiance Proxy
+(1749--2026)}\label{solar-irradiance-proxy-17492026}
+
+A very extensive analysis of the solar irradiation is published by (Lean
+2018) covering paleontologic times until today. We use a simplification
+of the method as input data for our analysis covering the time from 1850
+to 2026. The model evaluates long-term solar activity using daily
+sunspot numbers from WDC SILSO v2.0 (Clette and Lefèvre 2015). From the
+smoothed time series irradiance variations are calculated using
+satellite-calibrated quadratic polynomial transformations (Ambelu et al.
+2011).
+
+\begin{figure}
+
+\centering{
+
+\includegraphics[width=0.85\linewidth,height=\textheight,keepaspectratio]{Figs_Ocean/Fig2_Solar_trend.png}
+
+}
+
+\caption{\label{fig-sol-power}Solar Power Periodicity}
+
+\end{figure}%
+
+The solar power series is decomposed using SSA to map long-term
+modulation envelopes, including the Gleissberg - (\textasciitilde88
+years), Hale cycle (\textasciitilde20 years) and Schwabe cycle.The
+Schwabe cycle's \textasciitilde11-year period is transformed into
+\textasciitilde22 years as power is approximated by a 2nd-degree
+polynomial. The irradiation variance calculated from the Schwabe cycle
+shown as the blue line and Hale cycle as red line periods.
+
+\subsection{Physical Framework \& Signal
+Decomposition}\label{physical-framework-signal-decomposition}
+
+The Figure~\ref{fig-Global-SST-Anomaly} of the global ocean anomaly
+suggests a strong upwards trend around \textasciitilde{} 1950. A
+standard methods to calculate this decomposition is an approximation
+with polynomials or repeated differentiation Brockwell and Davis (2016).
+Both methods gave questionable results with the ocean anomaly time
+series: Polynomials need to made a decision on the degree used for
+fitting and the result depends on this. Differentiation produces high
+frequencies with the data complicating further analysis. In addition
+extended polynomials violate the physical boundaries of ocean anomalies.
+
+Locking the SST anomaly to the periodic changing solar irradiation gives
+physical correct model. The second method \emph{Singular Spectrum
+Analysis} Golyandina, Nekrutkin, and Zhigljavsky (2001) includes the
+extraction of the dominant harmonic periods by principal component
+analysis (PCA).
+
+Both methods include no physical derived criterion or method to separate
+the effect of greenhouse gases from the natural periodic changes of the
+anomaly.This is achieved by regression to a mathematical model that
+respects the physical constraints of SST. A lower limit ( the freezing
+point of seawater) and an upper limit caused by increased evaporation
+and as consequence cloud formation. Such a limit of\(\approx 35\,^\circ\text{C}\)we
+observe in some partial ocean areas.
+
+\subsubsection{Solar-Locked Baseline and Natural Periodic
+Changes}\label{solar-locked-baseline-and-natural-periodic-changes}
+
+By connecting the observed SST to the solar cycle minima, a
+\textbf{solar-locked baseline} is established. Subtracting this baseline
+yields a stationary residual vector containing multi-decadal periodic
+variability without monotonic secular trends.
+
+A LOESS smoothing fit (\(\text{span} = 0.25\), \(\approx 44\) years)
+(Cleveland and Devlin 1988) isolates the background trajectory
+(sec.base;green line). The difference between the solar-locked trend and
+the secular baseline highlights a primary \textasciitilde22-year
+oscillation corresponding to the Schwabe power cycle and the
+\textasciitilde20-year Hale cycle.
+
+\begin{figure}
+
+\centering{
+
+\includegraphics[width=0.85\linewidth,height=\textheight,keepaspectratio]{Figs_Ocean/Fig3_sec_sol.png}
+
+}
+
+\caption{\label{fig-sol-lckd-trend}Solar-Locked / Secular Trend}
+
+\end{figure}%
+
+\subsubsection{Singular Spectrum Analysis
+(SSA)}\label{singular-spectrum-analysis-ssa}
+
+The dominant periods, are extracted from the observed SST anomalies
+using Rssa package (Golyandina and Korobeynikov 2014). An embedding
+window of \(L = 703\) months (\(\approx 58.6\) years, or
+\(\approx N/3\)) was selected to cleanly resolve multi-decadal modes
+without distorting boundary values.
+
+\begin{figure}
+
+\centering{
+
+\includegraphics[width=0.85\linewidth,height=\textheight,keepaspectratio]{Figs_Ocean/Fig4_SSA_sol.png}
+
+}
+
+\caption{\label{fig-ssa-decomp}SSA Decomposition of Solar-Locked
+Components}
+
+\end{figure}%
+
+The ssa.trend consists of the first two components, the harmonics
+represent the components 3 to 20 . Comparing Figure~\ref{fig-ssa-decomp}
+with the Figure~\ref{fig-sol-lckd-trend} shows that the main harmonics
+calculated with SSA look very similar to the difference of the solar
+locked trend and the secular reference. The intuitive solar locked
+method gives very similar results to the mathematical derived
+decomposition. The SSA method can be applied also to the residuals of
+the anomaly providing a consistent method for ocean analysis.
+
+\subsection{Anthropogenic Trend \& Growth
+Modeling}\label{anthropogenic-trend-growth-modeling}
+
+\subsubsection{Logistic and Richards Growth Curve
+Fitting}\label{logistic-and-richards-growth-curve-fitting}
+
+Assuming limits on SST the secular anthropogenic component is modeled
+using sigmoidal growth functions. The initial effect of the irradiation
+unbalance on the SST is observed as an upward trend expanding the
+historical stable range of the anomaly. A mathematical model must also
+respect an upper limit asymptotical. An upper limit is clearly observed
+with the ``West Pacific Warm Pool'' a partial basins of the global
+ocean. A sigmoidal function can map both. Hence as a very simplified
+model we fit a standard symmetric logistic curve:
+
+\begin{equation}\phantomsection\label{eq-logistic}{
+y(t) = b + \frac{L}{1 + e^{-k(t - t_0)}}
+}\end{equation}
+
+An asymmetric Generalized Logistic (Richards) growth curve could
+conceptually capture the upper and lower limit different. However,
+fitting the Richards curve failed due to matrix singularities during
+optimization. This numerical failure points to a deeper physical cause:
+the global anomaly time series aggregates vast spatial areas, thereby
+diluting the sharp regional feedback mechanisms---such as the regional
+recharge/discharge limits observed in smaller sub-basins---that are
+required to mathematically constrain an additional asymmetry parameter.
+
+\begin{equation}\phantomsection\label{eq-richards}{
+y(t) = L_r + \frac{\Delta}{\left(1 + e^{-k(t - t_{0r})}\right)^{1/\nu}}
+}\end{equation}
+
+where \(t_0\) represents the inflection point, \(k\) is the growth rate,
+and \(L\) denotes the upper asymptotic limit.
+
+\begin{figure}
+
+\centering{
+
+\includegraphics[width=0.85\linewidth,height=\textheight,keepaspectratio]{Figs_Ocean/Fig5_Industr_separated.png}
+
+}
+
+\caption{\label{fig-sigmoid-ssa-low}Sigmoidal Growth Fitting to Low-Pass
+SSA Reconstruction}
+
+\end{figure}%
+
+Figure~\ref{fig-sigmoid-ssa-low} shows the lowpass filtered series
+(observed,green line); the ``industrial trend'' (red line); the
+inflection point of the sigmoid: dot at \(t_0 \approx 2018\); and the
+residuals (pre-ind, blue-line)
+
+With data extending to 2026, post-inflection observations (\(\sim 8\)
+years) provide initial curvature constraints but are insufficient to
+establish the exact physical asymptote (\(L\)). In this context, the
+fitted limit reflects short-term mixed-layer heat capacity and thermal
+inertia rather than a final ceiling on global climate change.
+
+\subsubsection{Structural Break \& Natural Residual
+Analysis}\label{structural-break-natural-residual-analysis}
+
+Subtracting the sigmoid growth model Figure~\ref{fig-sigmoid-ssa-low}
+(industr) from the total anomaly (observed) yields the
+\textbf{pre-industrial natural residual} (pre-ind). An 11-year rolling
+correlation between the observed anomaly and natural reconstruction
+shows high correlation until brk1 \(\sim 1950\), where a clear
+structural break indicates the transition into an
+anthropogenic-dominated climate regime.
+
+\begin{figure}
+
+\centering{
+
+\includegraphics[width=0.85\linewidth,height=\textheight,keepaspectratio]{Figs_Ocean/Fig6_roll_cor.png}
+
+}
+
+\caption{\label{fig-rolling-cor}Rolling Correlation showing the
+Mid-Century Structural Break}
+
+\end{figure}%
+
+The two vertical lines Figure~\ref{fig-rolling-cor} (brk1 and brk2
+breaks of the correlation) mark the transition period and are also shown
+in Figure~\ref{fig-sigmoid-ssa-low}.
+
+\subsection{Discussion \& Results}\label{discussion-results}
+
+\subsubsection{Logistic Inflection 2009 Phase Anchor, and Asymptotic
+Constraints}\label{logistic-inflection-2009-phase-anchor-and-asymptotic-constraints}
+
+A critical question in interpreting the non-linear trajectory is the
+timing of the logistic curve's inflection point. While unconstrained
+logistic regression places the symmetry point near 2018 , the natural
+harmonic minimum is firmly anchored near 2009 Figure~\ref{fig-nat-har}.
+By restricting the logistic regression through the 2009 phase minimum
+and verifying that recalculated natural residuals remain virtually
+identical, we confirm an iterative, physically consistent correction
+robust against circular logic. Correcting the turning point to 2009
+naturally lowers the model's fitted upper asymptote (\(L\)).
+Nevertheless, this adjusted asymptote reflects short-term mixed-layer
+heat capacity rather than a definitive physical ceiling on global
+warming. A full accounting of upper thermal bounds requires integrating
+regional regime-shift dynamics and boundary-layer feedbacks highlighted
+by structural break analysis.
+
+\begin{figure}
+
+\centering{
+
+\includegraphics[width=0.85\linewidth,height=\textheight,keepaspectratio]{Figs_Ocean/Fig7_nat_decomposed.png}
+
+}
+
+\caption{\label{fig-natrl-ssa-decmp}Natural Harmonics Decomposed}
+
+\end{figure}%
+
+\subsubsection{Key Findings}\label{key-findings}
+
+By strictly separating solar-locked natural cycles from the secular
+warming trend, this analysis provides a physical baseline for ocean heat
+uptake that avoids polynomial overfitting and empirical distortion.
+
+\begin{figure}
+
+\centering{
+
+\includegraphics[width=0.85\linewidth,height=\textheight,keepaspectratio]{Figs_Ocean/Fig8_nat_summary.png}
+
+}
+
+\caption{\label{fig-nat-har}Natural Harmonics Discussion}
+
+\end{figure}%
+
+\subsubsection{Structural Breaks and the 1940--1970
+Hiatus}\label{structural-breaks-and-the-19401970-hiatus}
+
+During the 1940--1970 hiatus, accelerating greenhouse warming was
+temporarily offset by the downward phase of natural multi-decadal
+harmonics, masking underlying secular acceleration.
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Hiatus Dynamics:} The mid-20th-century warming slowdown
+  (1950--1970) is primarily explained by destructive phase interference
+  between natural solar harmonics (notably the \textasciitilde22-year
+  Hale cycle) and ocean thermal lag, rather than purely external aerosol
+  forcing.
+\item
+  \textbf{Secular Trajectory:} Isolating the anthropogenic mode via SSA
+  demonstrates a continuous, monotonic warming trajectory that aligns
+  with cumulative planetary energy imbalance and thermodynamic enthalpy
+  conservation.
+\item
+  \textbf{Regime Stability:} Structural break testing confirms that
+  multi-decadal oscillations act as superposed periodic variations
+  around a single, evolving non-linear warming baseline.
+\end{itemize}
+
+\subsubsection{Future Work}\label{future-work}
+
+This diagnostic framework will be extended to basin-specific regional
+SST anomalies (Atlantic Multidecadal Oscillation and Pacific Decadal
+Oscillation dynamics) to evaluate local resonance effects and regional
+thermal inertia differences.
+
+\subsubsection{Statements and
+Declarations}\label{statements-and-declarations}
+
+Funding: The author declares that no funds, grants, or other support
+were received during the preparation of this manuscript.
+
+Competing Interests: The author has no competing interests to declare
+that are relevant to the content of this article.
+
+Data Availability: Global monthly sea surface temperature anomaly fields
+are publicly available from the NOAA Extended Reconstructed Sea Surface
+Temperature version 6 (ERSSTv6) repository at https://www.ncei.noaa.gov.
+Daily sunspot numbers are available from WDC SILSO v2.0 at
+https://sidc.be/silso/.
+
+Code Availability: The complete analysis pipeline, Quarto source
+documents, and R scripts supporting the findings of this study are
+openly archived in the public GitHub repository
+https://github.com/aloes2512/Ocean\_Analysis.
+
+Corresponding author: alf.loeffler@icloud.com
+
+\subsubsection{Acknowledgments}\label{acknowledgments}
+
+Artificial Intelligence assistance (Google Gemini) was utilized strictly
+as an auxiliary tool for verifying R processing scripts, optimizing
+Quarto syntax formatting, and refining text grammar. The mathematical
+conceptualization, thermal dynamics framework, data analysis, and
+scientific conclusions were developed independently by the author.
+
+\phantomsection\label{refs}
+\begin{CSLReferences}{1}{0}
+\bibitem[\citeproctext]{ref-ambelu2011estimation}
+Ambelu, T., E. O. Falayi, E. O. Elemo, and O. Oladosu. 2011.
+{``Estimation of Total Solar Irradiance from Sunspot Number.''}
+\emph{Latin-American Journal of Physics Education} 5 (2): 374--81.
+
+\bibitem[\citeproctext]{ref-brockwell2016introduction}
+Brockwell, Peter J., and Richard A. Davis. 2016. \emph{Introduction to
+Time Series and Forecasting}. 3rd ed. New York: Springer.
+\url{https://doi.org/10.1007/978-3-319-29854-2}.
+
+\bibitem[\citeproctext]{ref-burgers2005simplest}
+Burgers, Geert, Fei-Fei Jin, and Geert Jan van Oldenborgh. 2005. {``The
+Simplest ENSO Recharge Oscillator.''} \emph{Geophysical Research
+Letters} 32 (13): L13706. \url{https://doi.org/10.1029/2005GL022951}.
+
+\bibitem[\citeproctext]{ref-SILSOSunspotCounts2015}
+Clette, F., and L. Lefèvre. 2015. {``{SILSO Sunspot Number V2.0}.''}
+https://doi.org/10.24414/qnza-ac80.
+\url{https://doi.org/10.24414/qnza-ac80}.
+
+\bibitem[\citeproctext]{ref-cleveland1988}
+Cleveland, William S., and Susan J. Devlin. 1988. {``Locally Weighted
+Regression: An Approach to Regression Analysis by Local Fitting.''}
+\emph{Journal of the American Statistical Association} 83 (403):
+596--610. \url{https://doi.org/10.1080/01621459.1988.10478639}.
+
+\bibitem[\citeproctext]{ref-golyandina2014rssa}
+Golyandina, Nina, and Anton Korobeynikov. 2014. {``Basic Singular
+Spectrum Analysis and Forecasting with r: {Rssa}.''} \emph{Journal of
+Statistical Software} 60 (9): 1--25.
+\url{https://doi.org/10.18637/jss.v060.i09}.
+
+\bibitem[\citeproctext]{ref-golyandina2001}
+Golyandina, Nina, Vladimir Nekrutkin, and Anatoly Zhigljavsky. 2001.
+\emph{Analysis of Time Series Structure: SSA and Related Techniques}.
+Boca Raton, FL: Chapman; Hall/CRC.
+
+\bibitem[\citeproctext]{ref-Hijmans2026}
+Hijmans, Robert J., Andrew Brown, A. Márcia Barbosa, Emanuele Cordano,
+and Krzysztof Dyba. 2026. \emph{Terra: Spatial Data Analysis}.
+\url{https://github.com/rspatial/terra}.
+
+\bibitem[\citeproctext]{ref-huang2025ersstv6}
+Huang, Boyin, Chunying Liu, Viva Banzon, Eric Freeman, Richard Graham,
+Bill Hankins, Thomas M. Smith, and Huai-Min Zhang. 2025. {``Extended
+Reconstructed Sea Surface Temperature, Version 6 (ERSSTv6): Upgraded
+Reconstruction and QC Methods.''} \emph{Journal of Climate} 38 (4):
+1125--43. \url{https://doi.org/10.1175/JCLI-D-24-0123.1}.
+
+\bibitem[\citeproctext]{ref-lean2018estimating}
+Lean, J. L. 2018. {``Estimating Solar Irradiance Since 850 {CE}.''}
+\emph{Earth and Space Science} 5 (4): 133--49.
+\url{https://doi.org/10.1002/2017EA000357}.
+
+\bibitem[\citeproctext]{ref-medhaug2017reconciling}
+Medhaug, Iselin, Martin B. Stolpe, Erich M. Fischer, and Reto Knutti.
+2017. {``Reconciling Controversies about the 'Global Warming Hiatus'.''}
+\emph{Nature} 545 (7652): 41--47.
+\url{https://doi.org/10.1038/nature22315}.
+
+\bibitem[\citeproctext]{ref-rohde2020berkeley}
+Rohde, Robert A., and Zeke Hausfather. 2020. {``The Berkeley Earth
+Land/Ocean Temperature Record.''} \emph{Earth System Science Data} 12
+(10): 3469--79. \url{https://doi.org/10.5194/essd-12-3469-2020}.
+
+\bibitem[\citeproctext]{ref-Weigt2025}
+Weigt, George. 2025. \emph{Itsmr: Time Series Analysis Using the
+Innovations Algorithm}.
+\url{https://doi.org/10.32614/CRAN.package.itsmr}.
+
+\end{CSLReferences}
+
+
+
+
+\end{document}

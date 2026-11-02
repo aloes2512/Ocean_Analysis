@@ -1,32 +1,32 @@
 ---
-title: "Separating Anthropogenic Forcing from Solar-Locked Natural Variability in Global Ocean SST Anomalies (1850–2026)"
-subtitle: "A Non-Parametric Subspace, Coupled-Oscillator, and Sigmoidal Growth Framework"
-author: "Alf Loeffler"
-affiliation: "Independent Researcher"
+title: "Modelling Solar-Locked Natural Variability in Global Ocean SST Anomalies (1850–2026)"
+subtitle: "Singular Spectrum Analysis applied to separate Trend and Harmonic Components"
+author: "Dr. Alf Loeffler"
 date: today
 bibliography: oceanreferences.bib
 keywords: ["sea surface temperature", "singular spectrum analysis", "solar cycles", "greenhouse gas forcing", "coupled oscillators", "Richards growth curve"]
 format:
-  html:
-    html-math-method: katex
-    toc: true
-    embed-resources: true
-    toc-depth: 3
-    number-sections: true
-    fig-cap-location: bottom
-    code-fold: true
-    code-summary: "Show code"
   pdf:
-    toc: true
-      
-editor: visual
+    number-sections: true
+    include-before-body:
+      text: |
+        \begin{center}
+        \textit{Independent Researcher, Markgröningen, Germany}\\
+        \vspace{0.4em}
+        \textbf{Corresponding author:} alf.loeffler@icloud.com
+        \end{center}
+        \vspace{1em}
+    include-in-header:
+      text: |
+        \usepackage{lineno}
+        \linenumbers
 execute:
   echo: false
   warning: false
   message: false
-  cache: true
- 
 ---
+
+\textbf{Keywords:} Sea surface temperature; singular spectrum analysis; solar cycles; greenhouse gas forcing; coupled oscillators; Richards growth curve
 
 ```{r setup}
 library(tidyverse)
@@ -43,15 +43,16 @@ library(terra)
 M.ssn <- c("season", 12, "season", 6)
 ```
 
+
 ## Abstract
 
 Global ocean heat content accounts for the vast majority of Earth’s surface thermal capacity. Anthropogenic greenhouse gas emissions disturb the equilibrium of incoming solar and outgoing longwave radiation; while both components are attenuated, the retention of outgoing thermal radiation dominates, driving persistent heat content growth.
 
-Mathematically, ocean thermal dynamics can be modeled as a system of coupled oscillators driven by multi-decadal solar irradiance cycles. Observed sea surface temperature (SST) anomalies integrate these long-term dynamics alongside short-term seasonal and meteorological "noise", necessitating a clear separation of secular trends from internal periodic variations.
+Physically, ocean thermal dynamics can be understood as a system of coupled oscillators driven by multi-decadal solar irradiance cycles. Observed sea surface temperature (SST) anomalies integrate these long-term dynamics alongside short-term seasonal and meteorological "noise", necessitating a clear separation of secular trends from internal periodic variations.
 
 Using NOAA ERSSTv6 global area-weighted sea surface temperature (SST) anomalies (1850–2026), we extract background secular trends using three complementary approaches: (1) solar-cycle phase locking using splines, (2) non-parametric Singular Spectrum Analysis (SSA), and (3) non-linear logistic growth modeling. Rolling-correlation analysis reveals distinct structural breaks matching the early acceleration phase of the modern times rise of the SST. These breaks mark a mid-century transition regime where anthropogenic warming begins to obscure natural periodic variability.
 
-Our findings demonstrate that historical multi-decadal hiatuses—specifically around \~1910 and between 1940 and 1970—are driven by destructive phase alignments of natural cycles rather than shifts in external forcing @medhaug2017reconciling. While sigmoidal growth curves successfully isolate the monotonic anthropogenic trajectory, post-inflection data through 2026 remain insufficient to establish a hard physical upper asymptote for ocean heat uptake.
+Our findings demonstrate that historical multi-decadal hiatuses—specifically around \~1910 and between 1940 and 1970—are driven by destructive phase alignments of natural cycles rather than shifts in external forcing [@medhaug2017reconciling] . While sigmoidal growth curves successfully isolate the monotonic anthropogenic trajectory, post-inflection data through 2026 remain insufficient to establish a hard physical upper asymptote for ocean heat uptake.
 
 To evaluate the human contribution, long-term natural periodic variability is separated from the underlying anthropogenic trend.
 
@@ -59,12 +60,14 @@ To evaluate the human contribution, long-term natural periodic variability is se
 
 The global ocean acts as a massive thermal reservoir absorbing the solar forced heating. Thermodynamic laws are the principal forces trying to obtain equilibrium between the various ocean basins. Huge atmospheric and oceanic currents transport the heat and are observed as oscillations. Some of these are stable for centuries others change with seasonal or daily periods.
 
-Mathematically, large-scale oceanic thermal adjustments can be conceptualized through coupled-oscillator frameworks. Analogous to the ‘recharge oscillator’ mechanics developed for equatorial ocean dynamics by @burgers2005simplest , global sea surface temperature anomalies integrate delayed subsurface and boundary feedback responses, which manifest as prominent multi-decadal periods when stripped of secular trends.
+Physically, ocean thermal dynamics can be understood as a system of coupled oscillators driven by multi-decadal solar irradiance cycles.
+
+Analogous to the ‘recharge oscillator’ mechanics developed for equatorial ocean dynamics by [@burgers2005simplest], global sea surface temperature anomalies integrate delayed subsurface and boundary feedback responses, which manifest as prominent multi-decadal periods when stripped of secular trends.
 
 This physical system can be conceptualized through three main dynamics:
 
 1.  *Coupled Solar Driving:* The ocean behaves as a set of non-linear coupled oscillators driven by periodic variations in solar irradiance across Schwabe (\~11-year), Hale (\~22-year), and Gleissberg (\~88-year) cycles.
-2.  *Radiative Imbalance:* Anthropogenic emissions of long-lived greenhouse gases alter the planetary energy balance primarily by retarding outgoing longwave thermal radiation emitted primary in the northern hemisphere but distribute with a time lag of \~ 2 years across the full global surface ($4\pi R^2$). While local atmospheric processes also affect incoming solar irradiance, the net global energetic disturbance is overwhelmingly dominated by the retention of outgoing thermal radiation over the total ocean area.
+2.  *Radiative Imbalance:* Anthropogenic emissions of long-lived greenhouse gases alter the planetary energy balance primarily by retarding outgoing longwave thermal radiation emitted primarily in the Northern Hemisphere and distribute with a time lag of $\sim 2\text{ years}$ across the full global surface   $4\pi R^2$. While local atmospheric processes also affect incoming solar irradiance, the net global energetic disturbance is overwhelmingly dominated by the retention of outgoing thermal radiation over the total ocean area.
 3.  *Signal Disentanglement:* Isolating the anthropogenic warming trend requires separating the underlying secular trajectory from natural, multi-decadal oscillatory modes.
 
 Traditional Fourier-based spectral filtering and linear detrending needs to be combined with a separation of the dominant periods (*principal component analysis*) to understand the effect of the periodical varying solar input.
@@ -75,9 +78,11 @@ In this study, we apply splines to lock the anomaly to solar irradiance, paired 
 
 ### NOAA ERSSTv6 Global Ocean Anomalies
 
+While total ocean heat content integrates three-dimensional subsurface thermal capacity down to depth, global mean SST anomalies are analyzed here strictly as an empirical surface-layer proxy for thermal adjustments at the air–sea interface.
+
 Global monthly sea surface temperature (SST) fields are obtained from the NOAA Extended Reconstructed Sea Surface Temperature version 6 (ERSSTv6) covering January 1850 through 2026 [@huang2025ersstv6]. Spatial operations on the $180 \times 90$ global grid ($2^\circ \times 2^\circ$ resolution) were executed using the `terra package` [@Hijmans2026]. Global ocean mean anomalies were generated using an area-weighted ocean mask based on Berkeley Earth grid boundaries [@rohde2020berkeley]. Annual and semi-annual seasonal signals were removed using the `itsmr package` [@Weigt2025].
 
-To account for high-frequency vortex and weather noise, both mean and median anomaly metrics were extracted across the time series. As shown with @fig-Global-SST-Anomaly the median anomaly series exhibits a lower overall slope and a narrower dynamic range. Beyond 2000, the lower bound of the median series approaches that of the mean anomaly, reflecting the physical lower limit of seawater freezing points versus nearly unconstrained upper atmospheric warming spikes. For primary modeling, we prioritize the area-weighted mean SST anomaly, as it strictly conserves enthalpy and total thermal energy, while using the median to verify against localized polar amplification artifacts. Although we attempt to analyze the change of the global ocean heat content, we take SST as a proxy because of the available data processed and published by NOAA @huang2025ersstv6
+To account for high-frequency vortex and weather noise, both mean and median anomaly metrics were extracted across the time series. As shown in @fig-Global-SST-Anomaly the median anomaly series exhibits a lower overall slope and a narrower dynamic range. Beyond 2000, the lower bound of the median series approaches that of the mean anomaly, reflecting the physical lower limit of seawater freezing points versus nearly unconstrained upper atmospheric warming spikes. For primary modeling, we prioritize the area-weighted mean SST anomaly, as it strictly conserves enthalpy and total thermal energy, while using the median to verify against localized polar amplification artifacts.
 
 ```{r glob mean median}
 #| include: false
@@ -87,11 +92,11 @@ source("scripts/Ocean_mean.median_ts.R")
 
 ```
 
-![Global Temperature Anomaly (Mean vs Median)](figs/Fig1_Mean_Median.png){#fig-Global-SST-Anomaly fig-align="center" width="85%"}
+![Global Temperature Anomaly (Mean vs Median)](Figs_Ocean/Fig1_Mean_Median.png){#fig-Global-SST-Anomaly fig-align="center" width="85%"}
 
 ### Solar Irradiance Proxy (1749–2026)
 
-A very extensive analysis of the solar irradiation is published by [@lean2018estimating] covering paleontologic times until today. We use a simplification of the method as input data for our analysis covering the time from 1850 to 2026. The model evaluates long-term solar activity using daily sunspot numbers from WDC SILSO v2.0 [@SILSOSunspotCounts2015]. From the smoothed time series irradiance variations are calculated using satellite-calibrated quadratic polynomial transformations [@ambelu2011estimation].
+A very extensive analysis of the solar irradiation is published by [@lean2018estimating] covering medieval times until today. We use a simplification of the method as input data for our analysis covering the time from 1850 to 2026. The model evaluates long-term solar activity using daily sunspot numbers from WDC SILSO v2.0 [@SILSOSunspotCounts2015]. From the smoothed time series irradiance variations are calculated using satellite-calibrated quadratic polynomial transformations [@ambelu2011estimation] (an updated evaluation published by [@solanki1999reconstruction]).
 
 ```{r solar irrad ext}
 #| include: false
@@ -100,17 +105,17 @@ source("scripts/Solar_irrad_extended.R")
 
 ```
 
-![Solar Power Periodicity](figs/Fig2_Solar_trend.png){#fig-sol-power fig-align="center" width="85%"}
+![Solar Power Periodicity](Figs_Ocean/Fig2_Solar_trend.png){#fig-sol-power fig-align="center" width="85%"}
 
-The solar power series is decomposed using SSA to map long-term modulation envelopes, including the Gleissberg - (\~88 years), Hale cycle (\~20 years) and Schwabe cycle.The Schwabe cycle's \~11-year period is transformed into \~22 years as power is approximated by a 2nd-degree polynomial. The irradiation variance calculated from the Schwabe cycle shown as the blue line and Hale cycle as red line periods.
+The solar power series is decomposed using SSA to map long-term modulation envelopes, including the Gleissberg - (\~88 years), Hale cycle (\~20 years) and Schwabe cycle. The Schwabe cycle's \~11-year period is transformed into \~22 years as power is approximated by a 2nd-degree polynomial. The irradiation variance calculated from the Schwabe cycle shown as the blue line and Hale cycle as red line periods.
 
 ## Physical Framework & Signal Decomposition
 
-The @fig-Global-SST-Anomaly of the global ocean anomaly suggests a strong upwards trend around \~ 1950. A standard methods to calculate this decomposition is an approximation with polynomials or repeated differentiation @brockwell2016introduction. Both methods gave questionable results with the ocean anomaly time series: Polynomials need to made a decision on the degree used for fitting and the result depends on this. Differentiation produces high frequencies with the data complicating further analysis. In addition extended polynomials violate the physical boundaries of ocean anomalies.
+@fig-Global-SST-Anomaly of the global ocean anomaly suggests a strong upwards trend around \~ 1950. A standard method to calculate this decomposition is an approximation with polynomials or repeated differentiation [@brockwell2016introduction]. Both methods gave questionable results with the ocean anomaly time series:  Polynomials require choosing the degree used for fitting and the result depends on this. Differentiation produces high frequencies with the data complicating further analysis. In addition extended polynomials violate the physical boundaries of ocean anomalies.
 
-Locking the SST anomaly to the periodic changing solar irradiation gives physical correct model. The second method *Singular Spectrum Analysis* @golyandina2001 includes the extraction of the dominant harmonic periods by principal component analysis (PCA).
+The second method, Singular Spectrum Analysis (SSA)—originally formulated for nonlinear climate dynamics by [@vautard1989singular] and [@ghil2002advanced], and formalized mathematically by [@golyandina2001]—decomposes delay-coordinate trajectory matrices via singular value decomposition to separate trend and oscillatory components without assuming a parametric basis. Implemented in R via Rssa (@golyandina2014rssa), SSA extracts data-adaptive modes, but neither it nor standard statistical smoothing provides a physics-based criterion to separate greenhouse-gas-driven secular warming from natural periodic variability.
 
-Both methods include no physical derived criterion or method to separate the effect of greenhouse gases from the natural periodic changes of the anomaly.This is achieved by regression to a mathematical model that respects the physical constraints of SST. A lower limit ( the freezing point of seawater) and an upper limit caused by increased evaporation and as consequence cloud formation. Such a limit of $\approx 35°C$ we observe in some partial ocean areas.
+To achieve that separation, we fit a bounded Richards growth model that respects the physical bounds of sea surface temperature (SST): a lower bound set by the freezing point of seawater and an upper bound governed by increased evaporation and convective cloud feedback, observed locally near $\approx 35\,^\circ\text{C}$ in warm ocean regions. While quantifying the temperature response to a defined $\text{CO}_2$ increase remains actively debated (e.g., @Sherwood2020climate), a bounded secular curve offers a phenomenological approximation of how long-term warming approaches saturation. However, the present record does not yet constrain the upper asymptote and shape parameter ($\nu$) of the Richards curve tightly, so these estimates should be read as a first approximation that may be refined by analyzing smaller, more homogeneous ocean basins.
 
 ### Solar-Locked Baseline and Natural Periodic Changes
 
@@ -125,7 +130,7 @@ source( here::here("scripts","Solar_locked.trend.R"))
 
 A LOESS smoothing fit ($\text{span} = 0.25$, $\approx 44$ years) [@cleveland1988] isolates the background trajectory (sec.base;green line). The difference between the solar-locked trend and the secular baseline highlights a primary \~22-year oscillation corresponding to the Schwabe power cycle and the \~20-year Hale cycle.
 
-![Solar-Locked / Secular Trend](figs/Fig3_sec_sol.png){#fig-sol-lckd-trend fig-align="center" width="85%"}
+![Solar-Locked / Secular Trend](Figs_Ocean/Fig3_sec_sol.png){#fig-sol-lckd-trend fig-align="center" width="85%"}
 
 ### Singular Spectrum Analysis (SSA)
 
@@ -139,29 +144,31 @@ source(here::here("scripts","SSA_decomp_logistic.R"))
 
 ```
 
-![SSA Decomposition of Solar-Locked Components](figs/Fig4_SSA_sol.png){#fig-ssa-decomp fig-align="center" width="85%"}
+![SSA Decomposition of Solar-Locked Components](Figs_Ocean/Fig4_SSA_sol.png){#fig-ssa-decomp fig-align="center" width="85%"}
 
 The ssa.trend consists of the first two components, the harmonics represent the components 3 to 20 . Comparing @fig-ssa-decomp with the @fig-sol-lckd-trend shows that the main harmonics calculated with SSA look very similar to the difference of the solar locked trend and the secular reference. The intuitive solar locked method gives very similar results to the mathematical derived decomposition. The SSA method can be applied also to the residuals of the anomaly providing a consistent method for ocean analysis.
 
-## Anthropogenic Trend & Growth Modeling
+## Modelling the Secular Anthropogenic Trajectory
 
-### Logistic and Richards Growth Curve Fitting
+Isolating the long-term warming trend requires a functional form that avoids the well-documented pitfalls of standard alternatives: unconstrained polynomials produce severe boundary divergence and arbitrary curvature choices, while linear trends fail to capture the non-linear acceleration of radiative forcing. To represent the secular trajectory without imposing artificial periodicity or boundary artifacts, we employ a sigmoidal (logistic) growth function as a phenomenological baseline. Physically, the net radiative imbalance @Sherwood2020climate drives a non-linear thermal response across the global ocean mixed layer. While global mean SST does not possess a rigid pre-determined thermal ceiling over centennial timescales, localized physical feedbacks—such as strong evaporative damping, cloud albedo feedbacks, and convective heat-loss limits observed in tropical warm pools—exhibit bounded, saturating response characteristics. Consequently, the sigmoidal model is not invoked as a strict thermodynamic law predicting a global temperature asymptote, but rather as a robust, monotonic transition function. It provides a stable mathematical backbone to separate the smooth secular warming trend from overlying multi-decadal natural oscillations, ensuring that high-frequency or boundary distortions are not inadvertently aliased into the harmonic residuals.
 
-Assuming limits on SST the secular anthropogenic component is modeled using sigmoidal growth functions. The initial effect of the irradiation unbalance on the SST is observed as an upward trend expanding the historical stable range of the anomaly. A mathematical model must also respect an upper limit asymptotical. An upper limit is clearly observed with the "West Pacific Warm Pool" a partial basins of the global ocean. A sigmoidal function can map both. Hence as a very simplified model we fit a standard symmetric logistic curve:
+The initial effect of the irradiation unbalance on the SST is observed as an upward trend expanding the historical stable range of the anomaly. A sigmoidal function can map both. Hence as a very simplified model we fit a standard symmetric logistic curve @eq-logistic
 
 $$
 y(t) = b + \frac{L}{1 + e^{-k(t - t_0)}}
 $$ {#eq-logistic}
 
-An asymmetric Generalized Logistic (Richards) growth curve could conceptually capture the upper and lower limit different. However, fitting the Richards curve failed due to matrix singularities during optimization. This numerical failure points to a deeper physical cause: the global anomaly time series aggregates vast spatial areas, thereby diluting the sharp regional feedback mechanisms—such as the regional recharge/discharge limits observed in smaller sub-basins—that are required to mathematically constrain an additional asymmetry parameter.
+A mathematical model must also respect an upper limit asymptotical. An upper limit is clearly observed with the "West Pacific Warm Pool" a partial basin of the global ocean. The physical processes determining the initial effect of the imbalance are quite different from the upper limiting effects. Hence the very simple logistic model is extended to map an asymmetric upper asymptote using  @eq-richards . Because fitting the  Richards model encountered numerical singularities on the global series, we use the symmetric logistic curve (Eq. 1) as a stable baseline, noting that post-inflection observations through 2026 do not yet tightly constrain the upper asymptote.
+
+This numerical failure points to a deeper physical cause: the global anomaly time series aggregates vast spatial areas, thereby diluting the sharp regional feedback mechanisms—such as the regional recharge/discharge limits observed in smaller sub-basins—that are required to mathematically constrain an additional asymmetry parameter.
 
 $$
-y(t) = L_r + \frac{\Delta}{\left(1 + e^{-k(t - t_{0r})}\right)^{1/\nu}}
+y(t) = b + \frac{L}{\left(1 + e^{-k(t - t_0)}\right)^{1/\nu}}
 $$ {#eq-richards}
 
 where $t_0$ represents the inflection point, $k$ is the growth rate, and $L$ denotes the upper asymptotic limit.
 
-![Sigmoidal Growth Fitting to Low-Pass SSA Reconstruction](figs/Fig5_Industr_separated.png){#fig-sigmoid-ssa-low fig-align="center" width="85%"}
+![Sigmoidal Growth Fitting to Low-Pass SSA Reconstruction](Figs_Ocean/Fig5_Industr_separated.png){#fig-sigmoid-ssa-low fig-align="center" width="85%"}
 
 @fig-sigmoid-ssa-low shows the lowpass filtered series (observed,green line); the "industrial trend" (red line); the inflection point of the sigmoid: dot at $t_0 \approx 2018$; and the residuals (pre-ind, blue-line)
 
@@ -179,7 +186,7 @@ source(here::here("scripts","Rolling.cor_anomaly_ssa.R"))
 
 Subtracting the sigmoid growth model @fig-sigmoid-ssa-low (industr) from the total anomaly (observed) yields the **pre-industrial natural residual** (pre-ind). An 11-year rolling correlation between the observed anomaly and natural reconstruction shows high correlation until brk1 $\sim 1950$, where a clear structural break indicates the transition into an anthropogenic-dominated climate regime.
 
-![Rolling Correlation showing the Mid-Century Structural Break](figs/Fig6_roll_cor.png){#fig-rolling-cor fig-align="center" width="85%"}
+![Rolling Correlation showing the Mid-Century Structural Break](Figs_Ocean/Fig6_roll_cor.png){#fig-rolling-cor fig-align="center" width="85%"}
 
 The two vertical lines @fig-rolling-cor (brk1 and brk2 breaks of the correlation) mark the transition period and are also shown in @fig-sigmoid-ssa-low.
 
@@ -187,22 +194,22 @@ The two vertical lines @fig-rolling-cor (brk1 and brk2 breaks of the correlation
 
 ### Logistic Inflection 2009 Phase Anchor, and Asymptotic Constraints
 
-A critical question in interpreting the non-linear trajectory is the timing of the logistic curve's inflection point. While unconstrained logistic regression places the symmetry point near 2018 , the natural harmonic minimum is firmly anchored near 2009 @fig-nat-har. By restricting the logistic regression through the 2009 phase minimum and verifying that recalculated natural residuals remain virtually identical, we confirm an iterative, physically consistent correction robust against circular logic. Correcting the turning point to 2009 naturally lowers the model's fitted upper asymptote ($L$). Nevertheless, this adjusted asymptote reflects short-term mixed-layer heat capacity rather than a definitive physical ceiling on global warming. A full accounting of upper thermal bounds requires integrating regional regime-shift dynamics and boundary-layer feedbacks highlighted by structural break analysis.
+A critical question in interpreting the non-linear trajectory is the timing of the logistic curve's inflection point. While unconstrained logistic regression places the symmetry point near 2018, the natural harmonic minimum is firmly anchored near 2009 @fig-nat-har. By restricting the logistic regression through the 2009 phase minimum and verifying that recalculated natural residuals remain virtually identical, we confirm an iterative, physically consistent correction robust against circular logic. Correcting the turning point to 2009 naturally lowers the model's fitted upper asymptote ($L$). Nevertheless, this adjusted asymptote reflects short-term mixed-layer heat capacity rather than a definitive physical ceiling on global warming. A full accounting of upper thermal bounds requires integrating regional regime-shift dynamics and boundary-layer feedbacks highlighted by structural break analysis.
 
-![Natural Harmonics Decomposed](figs/Fig7_nat_decomposed.png){#fig-natrl-ssa-decmp fig-align="center" width="85%"}
+![Natural Harmonics Decomposed](Figs_Ocean/Fig7_nat_decomposed.png){#fig-natrl-ssa-decmp fig-align="center" width="85%"}
 
 ### Key Findings
 
 By strictly separating solar-locked natural cycles from the secular warming trend, this analysis provides a physical baseline for ocean heat uptake that avoids polynomial overfitting and empirical distortion.
 
-![Natural Harmonics Discussion](figs/Fig8_nat_summary.png){#fig-nat-har fig-align="center" width="85%"}
+![Natural Harmonics Discussion](Figs_Ocean/Fig8_nat_summary.png){#fig-nat-har fig-align="center" width="85%"}
 
-### Structural Breaks and the 1940–1970 Hiatus
+### Structural Breaks and the 1950–1970 Hiatus
 
-During the 1940–1970 hiatus, accelerating greenhouse warming was temporarily offset by the downward phase of natural multi-decadal harmonics, masking underlying secular acceleration.
+During the 1950–1970 hiatus, accelerating greenhouse warming was temporarily offset by the downward phase of natural multi-decadal harmonics, masking underlying secular acceleration.
 
 - **Hiatus Dynamics:** The mid-20th-century warming slowdown (1950–1970) is primarily explained by destructive phase interference between natural solar harmonics (notably the \~22-year Hale cycle) and ocean thermal lag, rather than purely external aerosol forcing.
-- **Secular Trajectory:** Isolating the anthropogenic mode via SSA demonstrates a continuous, monotonic warming trajectory that aligns with cumulative planetary energy imbalance and thermodynamic enthalpy conservation.
+- **Secular Trajectory:** Isolating the non-periodic mode via SSA demonstrates a continuous, monotonic warming trajectory consistent with sustained surface-layer heat accumulation under a positive planetary radiative imbalance.
 - **Regime Stability:** Structural break testing confirms that multi-decadal oscillations act as superposed periodic variations around a single, evolving non-linear warming baseline.
 
 ### Future Work
@@ -219,17 +226,7 @@ Data Availability: Global monthly sea surface temperature anomaly fields are pub
 
 Code Availability: The complete analysis pipeline, Quarto source documents, and R scripts supporting the findings of this study are openly archived in the public GitHub repository https://github.com/aloes2512/Ocean_Analysis.
 
+
 ### Acknowledgments
 
 Artificial Intelligence assistance (Google Gemini) was utilized strictly as an auxiliary tool for verifying R processing scripts, optimizing Quarto syntax formatting, and refining text grammar. The mathematical conceptualization, thermal dynamics framework, data analysis, and scientific conclusions were developed independently by the author.
-```{r}
-
-#| echo: false
-#| include: false
-if (file.exists("Ocean_Analysis.pdf")) {
-  file.copy("Ocean_Analysis.pdf", "Draft_Report_files/Ocean_Analysis.pdf", overwrite = TRUE)
-  file.remove("Ocean_Analysis.pdf")
-}
-
-```
-
