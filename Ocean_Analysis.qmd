@@ -17,15 +17,15 @@ format:
     code-fold: true
     code-summary: "Show code"
   pdf:
-    include-in-header:
-      text: |
-        \usepackage[version=4]{mhchem}    
+    toc: true
+      
 editor: visual
 execute:
   echo: false
   warning: false
   message: false
   cache: true
+ 
 ---
 
 ```{r setup}
@@ -222,3 +222,14 @@ Code Availability: The complete analysis pipeline, Quarto source documents, and 
 ### Acknowledgments
 
 Artificial Intelligence assistance (Google Gemini) was utilized strictly as an auxiliary tool for verifying R processing scripts, optimizing Quarto syntax formatting, and refining text grammar. The mathematical conceptualization, thermal dynamics framework, data analysis, and scientific conclusions were developed independently by the author.
+```{r}
+
+#| echo: false
+#| include: false
+if (file.exists("Ocean_Analysis.pdf")) {
+  file.copy("Ocean_Analysis.pdf", "Draft_Report_files/Ocean_Analysis.pdf", overwrite = TRUE)
+  file.remove("Ocean_Analysis.pdf")
+}
+
+```
+
