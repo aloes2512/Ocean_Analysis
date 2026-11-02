@@ -12,7 +12,6 @@ GAM_Filter.extrapol.new.R
 .DS_Store
 **/.DS_Store
 *_files/
-!Draft_Report_files/
 Draft_Report_files/*_files/
 _to_delete/
 # old embedded copy of the project (has its own .git)
@@ -22,7 +21,10 @@ Draft_Report_files/Comment*
 _git_backup/
 /Ocean_Analysis.pdf
 /Ocean_Analysis_cache/
+
 *.pdf
 *_cache/
 *_files/
 *.odt
+
+

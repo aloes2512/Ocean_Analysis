@@ -219,7 +219,6 @@ Data Availability: Global monthly sea surface temperature anomaly fields are pub
 
 Code Availability: The complete analysis pipeline, Quarto source documents, and R scripts supporting the findings of this study are openly archived in the public GitHub repository https://github.com/aloes2512/Ocean_Analysis.
 
-
 ### Acknowledgments
 
 Artificial Intelligence assistance (Google Gemini) was utilized strictly as an auxiliary tool for verifying R processing scripts, optimizing Quarto syntax formatting, and refining text grammar. The mathematical conceptualization, thermal dynamics framework, data analysis, and scientific conclusions were developed independently by the author.
