@@ -223,13 +223,29 @@ Code Availability: The complete analysis pipeline, Quarto source documents, and 
 
 Artificial Intelligence assistance (Google Gemini) was utilized strictly as an auxiliary tool for verifying R processing scripts, optimizing Quarto syntax formatting, and refining text grammar. The mathematical conceptualization, thermal dynamics framework, data analysis, and scientific conclusions were developed independently by the author.
 ```{r}
-
 #| echo: false
 #| include: false
-if (file.exists("Ocean_Analysis.pdf")) {
-  file.copy("Ocean_Analysis.pdf", "Draft_Report_files/Ocean_Analysis.pdf", overwrite = TRUE)
-  file.remove("Ocean_Analysis.pdf")
-}
+#| message: false
+#| warning: false
 
+library(here)
+
+pdf_filename <- "Ocean_Analysis.pdf"
+source_file <- here(pdf_filename)
+dest_dir <- here("Draft_Report_files")
+dest_file <- file.path(dest_dir, pdf_filename)
+
+if (file.exists(source_file)) {
+  if (!dir.exists(dest_dir)) {
+    dir.create(dest_dir, recursive = TRUE)
+  }
+  
+  # Copy to destination subfolder
+  file.copy(source_file, dest_file, overwrite = TRUE)
+  
+  # Brief pause to ensure the PDF process releases the file handle, then remove
+  Sys.sleep(0.5)
+  unlink(source_file)
+}
 ```
 
