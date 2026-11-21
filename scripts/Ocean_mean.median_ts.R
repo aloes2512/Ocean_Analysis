@@ -1,184 +1,128 @@
-# load the data
+# 1. Load packages and data
 library(tidyverse)
 library(lubridate)
 library(terra)
 library(here)
+library(matrixStats)
 
 Ocean_data_update <- readRDS(here("data", "Ocean_data_update.rds"))
-# Unwrap the raster object
-download.time<-Ocean_data_update$downld.time # 2026-10-30 10:48:15
-Ocean_data_update$raw_path #"~/projects/Ocean_Analysis/data/sst.mnmean-v6.nc"
-# data source
-ocean_stack=Ocean_data_update$sst_stack
-sst_stack <- terra::unwrap(ocean_stack)
-dim(sst_stack)# 89 180 2121 month
-source.url<-Ocean_data_update$origin_url #"https://downloads.psl.noaa.gov/Datasets/noaa.ersst.v6/"
-saveRDS(Ocean_data_update,"data/Ocean_data_update.rds")
-# =========
-#=============
 
-berk_mask = terra::rast("data/Land_and_Ocean_1x1_SST_at_sea_ice.nc")$land_mask
-dim(berk_mask) # [1] 180 360   1
-crs(sst_stack)=crs(berk_mask)
+download.time <- Ocean_data_update$downld.time
+raw_path <- Ocean_data_update$raw_path
+source.url <- Ocean_data_update$origin_url
 
-# ocean cells to limit land included < 10%
-ocean_mask <- terra::mask(berk_mask, berk_mask < 0.1,maskvalues=F)
-ocean_frac <- 1 - berk_mask  # Ocean fraction [0,1]
-weights_abs<- cellSize(sst_stack[[1]], unit="km")
-weights_rel<- weights_abs / global(weights_abs, "max", na.rm=TRUE)[1,1]
-ocean_mask_fixed<- terra::resample(ocean_frac, sst_stack, method = "near")
+sst_stack <- terra::unwrap(Ocean_data_update$sst_stack)
+dim(sst_stack)
 
-ocean_mask_na <- ocean_mask_fixed
-ocean_mask_na[ocean_mask_na==0]<-NA #89
-weighted_sst_stack<- sst_stack * ocean_mask_na*weights_rel
+saveRDS(Ocean_data_update, here("data", "Ocean_data_update.rds"))
 
-# 1. Bake/materialize raster stack to disk
-writeRaster(weighted_sst_stack, "data/weighted_sst_stack.tif", overwrite = TRUE)
+# 2. Build ocean fraction and area weight rasters
+berk_mask <- terra::rast(here("data", "Land_and_Ocean_1x1_SST_at_sea_ice.nc"))$land_mask
+dim(berk_mask)
+crs(sst_stack) <- crs(berk_mask)
 
-
-active_weights <- mask(weights_rel, sst_stack[[1]])
-writeRaster(active_weights, "data/active_weights.tif", overwrite = TRUE)
-
-sum_of_ocean_weights <- global(active_weights, fun="sum", na.rm=TRUE)
-
-
+ocean_frac <- 1 - berk_mask
 ocean_mask_fixed <- terra::resample(ocean_frac, sst_stack, method = "near")
+
 ocean_mask_na <- ocean_mask_fixed
-ocean_mask_na[ocean_mask_na==0]<-NA
-# save ocean_stack
-library(terra)
+ocean_mask_na[ocean_mask_na == 0] <- NA
 
-# 1. Bake/materialize your processed raster stack to disk
-writeRaster(weighted_sst_stack, "data/weighted_sst_stack.tif", overwrite = TRUE)
+weights_abs <- terra::cellSize(sst_stack[[1]], unit = "km")
+weights_rel <- weights_abs / terra::global(weights_abs, "max", na.rm = TRUE)[1, 1]
+active_weights <- terra::mask(weights_rel, sst_stack[[1]])
+total_weights <- ocean_mask_na * active_weights
+ocean_mask_weighted <- total_weights
 
-# 2. In future sessions, instantly load it back as a fast disk-backed SpatRaster
-weighted_sst_stack <- rast("data/weighted_sst_stack.tif")
+weighted_sst_stack <- sst_stack * total_weights
+terra::writeRaster(weighted_sst_stack, here("data", "weighted_sst_stack.tif"), overwrite = TRUE)
+terra::writeRaster(active_weights, here("data", "active_weights.tif"), overwrite = TRUE)
 
+# 3. Weighted sum and weighted mean via terra::global()
+sst.wsum <- terra::global(sst_stack, "sum", weights = total_weights, na.rm = TRUE)[, 1]
+active_weight_sums <- terra::global(!is.na(sst_stack), "sum", weights = total_weights, na.rm = TRUE)[, 1]
+sst.mean <- sst.wsum / active_weight_sums
 
-# MEDIAN
-library(matrixStats)
-# Use the ORIGINAL sst_stack, not the multiplied one!
-# 1. Combine ocean fraction and relative grid area into a single weight map
-total_weights <- ocean_mask_na* active_weights
-# 2. Extract the weights as a simple 1D vector
+# 4. Weighted median across time (columns)
 w_vals <- terra::values(total_weights)[, 1]
-# 3. Identify exactly which grid cells to keep (valid ocean cells)
-# This will have a length of exactly 1658 based on your error message
 keep_idx <- which(!is.na(w_vals) & w_vals > 0)
 w_vals_clean <- w_vals[keep_idx]
-sst_vals <- values(sst_stack, na.rm = FALSE)
+
 full_sst_matrix <- terra::values(sst_stack, mat = TRUE)
-# 5. Filter the matrix down to JUST your ocean cells
-# This matrix will now have exactly 2068 rows
-sst_matrix_clean <- full_sst_matrix[keep_idx, ]
-# 6. Calculate the weighted median across time (columns)
-# apply(..., 2) loops through each month. 'month_column' will have a length of 2068,
-# perfectly matching 'w_vals_clean'.
+sst_matrix_clean <- full_sst_matrix[keep_idx, , drop = FALSE]
+
 global_medians <- apply(sst_matrix_clean, 2, function(month_column) {
   clean_idx <- !is.na(month_column)
-
-  # If a month is entirely missing data (highly unlikely), return NA
-  if (!any(clean_idx)) return(NA)
-
+  if (!any(clean_idx)) return(NA_real_)
   matrixStats::weightedMedian(
     x = month_column[clean_idx],
     w = w_vals_clean[clean_idx]
   )
 })
 
+# 5. Assemble anomalies tibble
+date <- terra::time(sst_stack)
+dt.mnth <- year(date) + (month(date) - 1) / 12
 
-# 3. Extract the weights (ocean fraction)
-ocean_mask_weighted=ocean_mask_na*total_weights
-# We flatten this to a single vector
-# 2. Extract the weights as a simple 1D vector
-w_vals <- terra::values(weights_rel)[, 1]
+NOAA.Ocean.anomalies <- tibble(
+  dt.mnth = dt.mnth,
+  date = date,
+  sst.wsum = sst.wsum,
+  sst.mean = sst.mean,
+  sst.median = global_medians,
+  anoma.mean = sst.mean - mean(sst.mean, na.rm = TRUE),
+  anoma.median = sst.median - mean(sst.median, na.rm = TRUE)
+)
 
+# 6. Plots
+dir.create(here("figs"), showWarnings = FALSE, recursive = TRUE)
 
-is.na(w_vals)%>%sum() # 0
-which(!is.na(w_vals)) %>%length()# length 16020
-which(w_vals>0)%>%unlist()%>%length() # 16020
-# 3. Identify exactly which grid cells to keep (valid ocean cells)
-# This will have a length of exactly 1658 based on your error message
-keep_idx <- which(!is.na(w_vals) & w_vals > 0)
-
-w_vals_clean <- w_vals[keep_idx]
-length(w_vals_clean) # 16020
-library(matrixStats)
-# 4. Extract the entire SST stack into a standard R matrix
-full_sst_matrix <- terra::values(sst_stack, mat = TRUE)# mat returns values as a matrix
-# 5. Filter the matrix down to JUST your ocean cells
-sst_matrix_clean <- full_sst_matrix[keep_idx, ]
-dim(sst_matrix_clean) # 16020 2120
-# 2. Extract the corresponding weights
-w_vector <- w_vals[keep_idx]
-length(w_vector) # 16020
-# 6. Calculate the weighted median across time (columns)
-global_medians <- apply(sst_matrix_clean, 2, function(month_column) {
-  clean_idx <- !is.na(month_column)
-  # If a month is entirely missing data (highly unlikely), return NA
-  if (!any(clean_idx)) return(NA)
- matrixStats::weightedMedian(
-    x = month_column[clean_idx],
-    w = w_vals_clean[clean_idx]
+plt.glob.mean <- NOAA.Ocean.anomalies %>%
+  ggplot(aes(x = dt.mnth)) +
+  geom_line(aes(y = anoma.mean), col = "grey") +
+  geom_point(aes(y = anoma.mean), size = 0.2, col = 2) +
+  labs(
+    x = NULL,
+    y = "anomaly mean [K]",
+    title = "Global Ocean Anomaly",
+    caption = "psl.noaa.gov/Datasets/noaa.ersst.v6"
   )
-})
-global_medians%>%length() #2120
-# CALCULATE GLOBAL MEANS
-sst_matrix_zeroed <- sst_matrix_clean
-sst_matrix_zeroed[is.na(sst_matrix_zeroed)] <- 0
+ggsave(here("figs", "Global_Ocean_Anomaly.png"), plot = plt.glob.mean)
 
-# 2. Vectorized Weighted Mean using Matrix Multiplication (%*%)
-global_means <- as.vector((w_vals_clean %*% sst_matrix_zeroed) / sum(w_vals_clean))
-date=time(sst_stack) # 1850-01-01 2026-09-01
+plt.anomaly_mean.median <- NOAA.Ocean.anomalies %>%
+  ggplot(aes(x = dt.mnth)) +
+  geom_line(aes(y = anoma.median), col = 4) +
+  geom_line(aes(y = anoma.mean), col = 2) +
+  labs(
+    x = "",
+    y = "anomaly K",
+    title = "Ocean Temperature Anomalies",
+    subtitle = "Global Ocean Mean (blue); Median (red)",
+    caption = "data: noaa.ersst.v6.nc"
+  )
+ggsave(here("figs", "Global_Mean_Median.png"), plot = plt.anomaly_mean.median)
 
-dt.mnth=year(date)+(month(date)-1)/12
+# 7. Save outputs and verify
+Ocean_NOAA.data <- list(
+  url.source = source.url,
+  update = Sys.time(),
+  data.grid = terra::wrap(sst_stack),
+  data = NOAA.Ocean.anomalies
+)
 
-NOAA.Ocean.anomalies=tibble(dt.mnth=dt.mnth,
-                            date=time(sst_stack),
-                            sst.mean=global_means,
-                            sst.median=global_medians,
-                            anoma.mean=sst.mean-mean(sst.mean,na.rm=T),
-                            anoma.median=sst.median-mean(sst.median,na.rm=T))
-
-plt.glob.mean=NOAA.Ocean.anomalies%>%ggplot(aes(x=dt.mnth))+
-  geom_line(aes(y=anoma.mean),col="grey")+
-  geom_point(aes(y=anoma.mean),size=0.2,col=2)+
-  labs(x=NULL,y="anomaly mean [K]",
-       title = "Global Ocean Anomaly",
-       caption = "psl.noaa.gov/Datasets/noaa.ersst.v5")
-ggsave("figs/Global_Ocean_Anomaly.png")
-#-----
-
-plt.anomaly_mean.median<-NOAA.Ocean.anomalies%>%ggplot(aes(x=dt.mnth))+
-  geom_line(aes(y=anoma.median ),col=4)+
-  geom_line(aes(y=anoma.mean ),col= 2)+
-
-  labs(x="",y="anomaly K",title = "Ocean Temperature Anomalies",
-       subtitle="Global Ocean Mean(blue); Median(red)",
-       caption = "data: noaa.ersst.v6.nc ")
-ggsave("figs/Global_Mean_Median.png")
-Ocean_NOAA.data=list(url.source="https://downloads.psl.noaa.gov/Datasets/noaa.ersst.v5/sst.mnmean.nc",
-                     update=Sys.time(),
-                     data.grid=wrap(sst_stack),
-                     data=NOAA.Ocean.anomalies)
-
-saveRDS(Ocean_NOAA.data,"data/NOAA.OCEAN.ANOMALIES.rds")
+saveRDS(Ocean_NOAA.data, here("data", "NOAA.OCEAN.ANOMALIES.rds"))
 
 saveRDS(
   list(
-    global_stack  = sst_stack, # unwrap(ocean_stack)
-    dates=time(sst_stack),
-    grid=wrap(sst_stack),
-    ocean_mask_weighted    = ocean_mask_weighted,
-    Ocean_NOAA.data = Ocean_NOAA.data    # list includes  url,
-                                         # date of download
-                                         # mean and median ts
-  ),"data/processed_global_inputs.rds"
+    global_stack = sst_stack,
+    dates = date,
+    grid = terra::wrap(sst_stack),
+    ocean_mask_weighted = ocean_mask_weighted,
+    Ocean_NOAA.data = Ocean_NOAA.data
+  ),
+  here("data", "processed_global_inputs.rds")
 )
-# check saving
-library(terra)
-Ocean_NOAA.data=readRDS(here("data","NOAA.OCEAN.ANOMALIES.rds"))
-NOAA.Ocean.anomalies=Ocean_NOAA.data$data
-sst_stack<-terra::unwrap(Ocean_NOAA.data$data.grid)
-summary(Ocean_NOAA.data )
 
+Ocean_NOAA.data_check <- readRDS(here("data", "NOAA.OCEAN.ANOMALIES.rds"))
+NOAA.Ocean.anomalies_check <- Ocean_NOAA.data_check$data
+sst_stack_check <- terra::unwrap(Ocean_NOAA.data_check$data.grid)
+summary(Ocean_NOAA.data_check)
