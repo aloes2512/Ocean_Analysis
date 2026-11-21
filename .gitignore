@@ -20,9 +20,10 @@ Ocean_Analysis.1/
 Draft_Report_files/Comment*
 _git_backup/
 /Loeffler_NPG_submission/
-/Loeffler_NPG_submission.zip/
+/Loeffler_NPG_submission.zip
 /Ocean_Analysis.pdf
 /Ocean_Analysis_cache/
+/copernicus_upload/
 /Figs_Ocean/
 *.pdf
 *_cache/
