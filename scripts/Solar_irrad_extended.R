@@ -17,8 +17,8 @@ sn_month <- sn_month %>%
   dplyr::select(1,2,4)%>%mutate(dt.mnth=Year+(mth-1)/12)
 #browseURL("http://www.lajpe.org/dec11/LAJPE_576_Ambelu_Tebabal_prreprint_corr.pdf")
 a= 1365.66 # W/m^2
-b= 0.0136  # W/(SP*m^2)
-c=-0.0000076 # W/(SP*m)^2
+b= 0.0136  # W/(SP*m^2) # 1.61e-2
+c=-0.0000076 # W/(SP*m)^2 # -5.5e-5
 #TSI= a+ b*SP+c*SP^2
 S_power_ext=sn_month%>%mutate(TSI=a+b*SP_N+c*SP_N^2,TSI=1000*TSI/a)%>%
   dplyr::select(dt.mnth,TSI)%>%
