@@ -19,9 +19,11 @@ Ocean_Analysis.1/
 # not part of this project (other users of this Mac)
 Draft_Report_files/Comment*
 _git_backup/
+/Loeffler_NPG_submission/
+/Loeffler_NPG_submission.zip/
 /Ocean_Analysis.pdf
 /Ocean_Analysis_cache/
-
+/Figs_Ocean/
 *.pdf
 *_cache/
 *_files/
