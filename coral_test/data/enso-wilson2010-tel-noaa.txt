@@ -1,0 +1,590 @@
+# Nino3.4 SST 460 Year Reconstructions
+#----------------------------------------------------------------------- 
+#               World Data Service for Paleoclimatology, Boulder 
+#                                  and 
+#                     NOAA Paleoclimatology Program 
+#----------------------------------------------------------------------- 
+# Template Version 4.0
+# Encoding: UTF-8
+# NOTE: Please cite original publication, NOAA Landing Page URL, dataset and publication DOIs (where available),
+# and date accessed when using these downloaded data. If there is no publication information, please cite investigator, study title, NOAA Landing Page URL, and date accessed.
+#
+# NOAA_Landing_Page: https://www.ncei.noaa.gov/access/paleo-search/study/11749
+#   Landing_Page_Description: NOAA Landing Page of this file's parent study, which includes all study metadata.
+#
+# Study_Level_JSON_Metadata: https://www.ncei.noaa.gov/pub/data/metadata/published/paleo/json/noaa-recon-11749.json
+#   Study_Level_JSON_Description: JSON metadata of this file's parent study, which includes all study metadata.
+#
+# Data_Type: Climate Reconstructions
+#
+# Dataset_DOI: 10.25921/17jb-fg08
+#
+# Science_Keywords: ENSO
+#-------------------
+# Resource_Links
+#
+# Data_Download_Resource: https://www.ncei.noaa.gov/pub/data/paleo/treering/reconstructions/enso-wilson2010-tel-noaa.txt
+#   Data_Download_Description: NOAA Template File; Teleconnected Proxy Data
+#
+#-------------------
+# Contribution_Date
+#    Date: 2011-06-29
+#-------------------
+# File_Last_Modified_Date
+#    Date: 2025-06-16
+#-------------------
+# Title
+#   Study_Name: Nino3.4 SST 460 Year Reconstructions
+#-------------------
+# Investigators
+#   Investigators: Wilson, R.J.S.; Cook, E.R.(https://orcid.org/0000-0001-7478-4176); D'Arrigo, R.D.; Riedwyl, N.; Evans, M.N.; Tudhope, A.W.; Allan, R.J.
+#-------------------
+# Description_Notes_and_Keywords
+#   Description: Nino3.4 SST reconstructions based on a variety of proxy data, utilizing 3 reconstruction methodologies, for the core ENSO region in the central and eastern tropical Pacific, and for other tropical regions displaying teleconnected ENSO responses. The first region is labeled the 'centre of action' (COA), located in the central and eastern Pacific, where SSTs are positively correlated with NINO3.4 SSTs. The second region is the 'teleconnection' (TEL) region covering all other tropical areas where SSTs are either inversely (e.g. Indonesia to Tonga) or positively (e.g. Indian Ocean) correlated with NINO3.4 SSTs. Independent reconstructions of annual NINO3.4 SSTs were developed for the COA and TEL regions, using three approaches: (1) composite plus regression, (2) principal component regression, and (3) regularised expectation maximisation. 
+#-------------------
+# Publication
+#   Authors: Wilson, R., E. Cook, R. D'Arrigo, N. Riedwyl, M.N. Evans, A. Tudhope, and R. Allan
+#   Journal_Name: Journal of Quaternary Science
+#   Published_Title: Reconstructing ENSO: the influence of method, proxy data, climate forcing and teleconnections
+#   Published_Date_or_Year: 2009-12-04
+#   Volume: 25
+#   Issue: 1
+#   Pages: 62-78
+#   Report_Number: 
+#   DOI: 10.1002/jqs.1297
+#   Full_Citation: Wilson, R., E. Cook, R. D'Arrigo, N. Riedwyl, M.N. Evans, A. Tudhope, and R. Allan. 2010. Reconstructing ENSO: the influence of method, proxy data, climate forcing and teleconnections. Journal of Quaternary Science, Vol. 25, Issue 1, pp. 62–78, January 2010. DOI: 10.1002/jqs.1297, ISSN 0267-8179. 
+#   Abstract: In this study we compare three newly developed independent NINO3.4 sea surface temperature (SST) reconstructions using data from (1) the central Pacific (corals), (2) the TexMex region of the USA (tree rings) and (3) other regions in the Tropics (corals and an ice core) which are teleconnected with central Pacific SSTs in the 20th century. Although these three reconstructions are strongly calibrated and well verified, inter-proxy comparison shows a significant weakening in interproxy coherence in the 19th century. This breakdown in common signal could be related to insufficient data, dating errors in some of the proxy records or a breakdown in El Nino–Southern Oscillation's (ENSO's) influence on other regions.  However, spectral analysis indicates that each reconstruction portrays ENSO-like spectral properties. Superposed epoch analysis also shows that each reconstruction shows a generally consistent 'El Nino-like' response to major volcanic events in the following year, while during years T+4 to T+7 'La Nina-like' conditions prevail. These results suggest that each of the series expresses ENSO-like 'behaviour', but this 'behaviour' does not appear to be spatially or temporally consistent. This result may reflect published observations that there appear to be distinct 'types' of ENSO variability depending on location within the tropical Pacific. Future work must address potential dating issues within some proxies (i.e. sampling of multiple coral heads for one location) as well as assessing the time stability of local climate relationships with central Pacific SSTs. More emphasis is needed on sampling new and extending old coral proxy records from the crucial central and eastern tropical 
+#-------------------
+# Funding_Agency
+#   Funding_Agency_Name: European Commission MILLENNIUM Integrated Project
+#   Grant_Number: 017008-2 MILLENNIUM
+#-------------------
+# Funding_Agency
+#   Funding_Agency_Name: US National Science Foundation
+#   Grant_Number: OCE 04-02474, ATM 03-49356
+#-------------------
+# Funding_Agency
+#   Funding_Agency_Name: UK Natural Environment Research Council (NERC)
+#   Grant_Number: NER/GR3/ 12021
+#-------------------
+# Funding_Agency
+#   Funding_Agency_Name: Queensland Climate Change Centre of Excellence
+#   Grant_Number: 
+#-------------------
+# Funding_Agency
+#   Funding_Agency_Name: Met Office Hadley Centre's Integrated Climate Programme
+#   Grant_Number: 
+#-------------------
+# Funding_Agency
+#   Funding_Agency_Name: UK Department for Environment, Food and Rural Affairs (DEFRA)
+#   Grant_Number: GA01101
+#-------------------
+# Funding_Agency
+#   Funding_Agency_Name: UK Ministry of Defence (MoD)
+#   Grant_Number: CBC/2B/0417_AnnexC5
+#-------------------
+# Site_Information
+#   Site_Name: Nino3.4
+#   Location: Eastern Pacific Ocean
+#   Northernmost_Latitude: 5
+#   Southernmost_Latitude: -5
+#   Easternmost_Longitude: -120
+#   Westernmost_Longitude: -170
+#   Elevation_m: 
+#-------------------
+# Data_Collection
+#   Collection_Name: sst_tel_wilson2010
+#   First_Year: 1540
+#   Last_Year: 2007
+#   Time_Unit: CE
+#   Core_Length_m: 
+#   Parameter_Keywords: sea surface temperature,atmospheric circulation
+#   Notes: 
+#-------------------
+# Chronology_Information
+#   Chronology:
+#-------------------
+# Variables 
+#
+# PaST_Thesaurus_Download_Resource: https://www.ncei.noaa.gov/access/paleo-search/skos/past-thesaurus.rdf
+#   PaST_Thesaurus_Download_Description: Paleoenvironmental Standard Terms (PaST) Thesaurus terms, definitions, and relationships in SKOS format.
+#
+# Variables format: shortname <tab> what,material,error,units,seasonality,data_type,detail,method, C(har) or N(umeric) data,additional information
+#
+## age	age,,,year Common Era,,climate reconstructions;corals and sclerosponges,,,N,
+## nino3.4	Niño 3.4 sea surface temperature index,,,degree Celsius,annual,instrumental,,,N,
+## cprtel	Niño 3.4 sea surface temperature index,multiple proxies,,degree Celsius,annual,climate reconstructions,anomalized,composite plus regression,N,teleconnected proxies; anomalized wrt 1961-1990AD
+## pcrtel	Niño 3.4 sea surface temperature index,multiple proxies,,degree Celsius,annual,climate reconstructions,anomalized,regression analysis,N,teleconnected proxies; anomalized wrt 1961-1990AD; principal components regression
+## regemtel	Niño 3.4 sea surface temperature index,multiple proxies,,degree Celsius,annual,climate reconstructions,anomalized,regression analysis,N,teleconnected proxies; anomalized wrt 1961-1990AD; regularized expectation maximization
+#-------------------------------
+# Data: 
+# Missing_Values: NA
+age	nino3.4	cprtel	pcrtel	regemtel
+1540	NA	0.535	0.5596	0.718
+1541	NA	-0.5271	-0.5437	0.2108
+1542	NA	0.2404	0.2536	0.19
+1543	NA	-0.1184	-0.1192	0.3299
+1544	NA	0.1429	0.1523	1.46E-03
+1545	NA	-0.6412	-0.6622	0.1811
+1546	NA	0.5412	0.566	0.7557
+1547	NA	-2.14E-04	3.64E-03	0.3656
+1548	NA	-0.8113	-0.8389	-1.7334
+1549	NA	-0.5603	-0.5781	0.2049
+1550	NA	0.0226	0.0274	-0.1871
+1551	NA	0.6636	0.6932	0.556
+1552	NA	0.033	0.0381	-0.1871
+1553	NA	-0.8196	-0.8475	0.1275
+1554	NA	-0.0313	-0.0287	-0.3003
+1555	NA	0.2093	0.2213	0.4251
+1556	NA	-0.0272	-0.0244	-0.3003
+1557	NA	0.4105	0.4303	0.4787
+1558	NA	-0.1807	-0.1838	-0.5642
+1559	NA	-0.0624	-0.061	0.3477
+1560	NA	-0.4815	-0.4963	-1.1299
+1561	NA	0.0641	0.0704	0.3834
+1562	NA	-0.5914	-0.6105	-1.3185
+1563	NA	1.86E-03	5.80E-03	0.3656
+1564	NA	0.4147	0.4346	0.5294
+1565	NA	0.2778	0.2924	0.443
+1566	NA	1.3523	1.4086	2.2265
+1567	NA	-0.2989	-0.3066	0.2763
+1568	NA	-0.7262	-0.7505	-1.5448
+1569	NA	-0.2968	-0.3045	0.2763
+1570	NA	0.5433	0.5682	0.7557
+1571	NA	-0.8528	-0.882	0.1156
+1572	NA	-0.4628	-0.4769	-1.0922
+1573	NA	0.2383	0.2514	0.431
+1574	NA	-0.2201	-0.2248	-0.6397
+1575	NA	-0.4586	-0.4726	0.2287
+1576	NA	-0.3902	-0.4014	-0.9414
+1577	NA	-1.0664	-1.1039	0.0561
+1578	NA	-0.5271	-0.5437	-1.2054
+1579	NA	0.0351	0.0403	0.3715
+1580	NA	-0.2574	-0.2635	-0.7151
+1581	NA	0.0579	0.064	0.3775
+1582	NA	0.1782	0.189	0.0769
+1583	NA	0.7196	0.7513	0.5679
+1584	NA	0.7715	0.8052	1.1706
+1585	NA	-0.5147	-0.5307	0.2168
+1586	NA	0.0268	0.0317	-0.1871
+1587	NA	-0.5001	-0.5156	0.2168
+1588	NA	-0.2201	-0.2248	-0.6397
+1589	NA	-0.0126	-9.27E-03	0.3596
+1590	NA	-0.023	-0.02	-0.3003
+1591	NA	0.1056	0.1135	0.3953
+1592	NA	0.3918	0.4109	0.454
+1593	NA	0.2674	0.2816	0.437
+1594	NA	0.6449	0.6738	0.9443
+1595	NA	0.6138	0.6415	0.5382
+1596	NA	0.1574	0.1674	0.0392
+1597	NA	0.2819	0.2967	0.443
+1598	NA	-0.0189	-0.0158	-0.2625
+1599	NA	8.08E-03	0.0123	0.3656
+1600	NA	-0.8134	-0.841	-1.7334
+1601	NA	-0.8673	-0.897	0.1156
+1602	NA	-0.4981	-0.5135	-1.1299
+1603	NA	-0.1599	-0.1623	0.318
+1604	NA	-0.4981	-0.5135	-1.1299
+1605	NA	-0.2263	-0.2312	0.3001
+1606	NA	0.4084	0.4281	0.4917
+1607	NA	0.2321	0.245	0.431
+1608	NA	0.3213	0.3376	0.3409
+1609	NA	0.4976	0.5208	0.5084
+1610	NA	0.5308	0.5553	0.718
+1611	NA	-0.4503	-0.4639	0.2346
+1612	NA	0.0454	0.051	-0.1494
+1613	NA	-0.5582	-0.576	0.2049
+1614	NA	-0.0334	-0.0308	-0.3003
+1615	NA	-0.189	-0.1924	0.3061
+1616	NA	0.0392	0.0446	-0.1871
+1617	NA	0.062	0.0683	0.3834
+1618	NA	0.4064	0.426	0.4917
+1619	NA	0.2861	0.301	0.443
+1620	NA	0.2674	0.2816	0.2277
+1621	NA	-0.0521	-0.0502	0.3477
+1622	NA	-0.5914	-0.6105	-1.3185
+1623	NA	0.3835	0.4023	0.4727
+1624	NA	0.3234	0.3398	0.3409
+1625	NA	-0.5271	-0.5437	0.2108
+1626	NA	-0.2699	-0.2765	-0.7151
+1627	NA	-0.5188	-0.535	0.2168
+1628	NA	-0.6101	-0.6299	-1.3562
+1629	NA	-0.2557	-0.2618	-0.3537
+1630	NA	-0.4821	-0.4969	-0.8436
+1631	NA	0.0107	0.015	-0.0845
+1632	NA	0.0272	0.0322	0.344
+1633	NA	0.4145	0.4344	0.5878
+1634	NA	0.5767	0.6029	1.2221
+1635	NA	0.612	0.6396	1.695
+1636	NA	-0.403	-0.4147	-0.2097
+1637	NA	-0.1803	-0.1834	-0.1715
+1638	NA	-0.2533	-0.2593	-0.7401
+1639	NA	0.256	0.2698	0.4732
+1640	NA	-0.6671	-0.6891	-0.8208
+1641	NA	-0.3099	-0.3181	-0.9034
+1642	NA	-0.1425	-0.1442	-0.0805
+1643	NA	-0.3854	-0.3965	-1.0434
+1644	NA	0.2749	0.2894	0.4943
+1645	NA	0.1051	0.113	0.0976
+1646	NA	0.4711	0.4932	0.7489
+1647	NA	-0.1577	-0.16	0.3412
+1648	NA	0.0673	0.0738	0.0276
+1649	NA	0.3579	0.3756	0.4922
+1650	NA	-0.4195	-0.4319	-0.645
+1651	NA	0.3314	0.3482	0.6576
+1652	NA	-0.1554	-0.1575	-0.0383
+1653	NA	-0.3705	-0.381	-0.2952
+1654	NA	-0.027	-0.0242	-0.208
+1655	NA	0.3692	0.3874	0.702
+1656	NA	0.6144	0.6421	1.3086
+1657	NA	0.5088	0.5324	0.8166
+1658	NA	0.3827	0.4014	0.7357
+1659	NA	-0.0438	-0.0416	0.2037
+1660	NA	-0.2935	-0.301	-0.1398
+1661	NA	-0.1356	-0.137	-0.7983
+1662	NA	-0.6965	-0.7196	-0.7437
+1663	NA	-0.1484	-0.1502	0.0561
+1664	NA	-0.3069	-0.3149	0.0963
+1665	NA	0.17	0.1805	0.3644
+1666	NA	-0.0495	-0.0476	0.0505
+1667	NA	-0.1979	-0.2017	0.0966
+1668	NA	-0.0856	-0.085	-0.1707
+1669	NA	-0.232	-0.2371	-0.2032
+1670	NA	0.1496	0.1592	0.1645
+1671	NA	-0.0338	-0.0312	0.1636
+1672	NA	-0.1209	-0.1218	0.1472
+1673	NA	0.2951	0.3104	0.67
+1674	NA	-0.2062	-0.2103	-0.1769
+1675	NA	-0.5061	-0.5219	-0.4526
+1676	NA	-0.1944	-0.1981	-0.3418
+1677	NA	-0.099	-0.099	0.0595
+1678	NA	-0.151	-0.153	0.1448
+1679	NA	-0.2659	-0.2724	0.024
+1680	NA	0.3043	0.3199	0.5351
+1681	NA	0.1969	0.2084	0.2615
+1682	NA	-1.25E-03	2.57E-03	0.3328
+1683	NA	-0.2403	-0.2458	-0.6932
+1684	NA	-0.4949	-0.5102	-0.8391
+1685	NA	-0.2789	-0.2859	-0.3325
+1686	NA	-0.293	-0.3005	-0.0192
+1687	NA	0.0829	0.09	0.0274
+1688	NA	0.3974	0.4166	0.5723
+1689	NA	-2.60E-03	1.17E-03	0.2885
+1690	NA	-0.1971	-0.2009	0.279
+1691	NA	0.4367	0.4575	0.4703
+1692	NA	-0.5416	-0.5587	-0.6261
+1693	NA	0.1374	0.1466	0.2256
+1694	NA	0.5775	0.6038	0.6877
+1695	NA	-0.0597	-0.0582	-0.1209
+1696	NA	0.1978	0.2094	0.3705
+1697	NA	0.0382	0.0435	0.4502
+1698	NA	-0.4814	-0.4962	-0.4728
+1699	NA	0.403	0.4225	1.0446
+1700	NA	0.3872	0.4061	0.8062
+1701	NA	0.116	0.1244	0.7539
+1702	NA	-0.0439	-0.0418	0.0384
+1703	NA	4.35E-03	8.39E-03	0.127
+1704	NA	-0.4349	-0.4479	-0.4024
+1705	NA	-0.0777	-0.0769	0.1907
+1706	NA	-0.6993	-0.7225	-0.6756
+1707	NA	-0.1972	-0.2009	-0.3596
+1708	NA	-0.4695	-0.4838	-0.461
+1709	NA	-0.3666	-0.377	-1.0605
+1710	NA	-0.2453	-0.2509	-0.337
+1711	NA	0.1023	0.1102	0.043
+1712	NA	9.00E-03	0.0132	0.1132
+1713	NA	0.3288	0.3455	-0.0513
+1714	NA	0.0583	0.0644	0.1395
+1715	NA	-0.026	-0.0231	0.0864
+1716	NA	-1.40E-03	2.41E-03	0.418
+1717	NA	0.0939	0.1014	0.5288
+1718	NA	-9.38E-03	-5.88E-03	0.4477
+1719	NA	0.4016	0.421	0.718
+1720	NA	0.3016	0.3171	0.3944
+1721	NA	0.3946	0.4138	0.73
+1722	NA	0.2964	0.3118	0.1694
+1723	NA	0.3532	0.3708	0.2471
+1724	NA	0.4125	0.4323	0.1615
+1725	NA	-0.6634	-0.6853	-0.2988
+1726	NA	0.0929	0.1004	0.6689
+1727	NA	0.0849	0.1727	0.2365
+1728	NA	0.4832	0.497	0.6769
+1729	NA	-0.0374	-0.3238	-0.357
+1730	NA	0.0833	0.2161	0.3009
+1731	NA	0.1911	0.4031	0.5488
+1732	NA	-0.3935	-0.1109	-0.1592
+1733	NA	0.2202	0.3768	0.4954
+1734	NA	-0.1114	0.0983	0.1208
+1735	NA	0.2919	0.3151	0.4497
+1736	NA	0.5318	0.7184	0.928
+1737	NA	-0.2173	-0.2036	-0.2261
+1738	NA	0.2018	0.0517	0.0978
+1739	NA	0.1389	3.34E-03	0.0261
+1740	NA	-0.032	-0.1701	-0.1929
+1741	NA	0.0115	-0.2066	-0.2418
+1742	NA	-0.3212	-0.3422	-0.4285
+1743	NA	-0.4041	-0.2845	-0.3711
+1744	NA	-0.2692	-0.0997	-0.1536
+1745	NA	-4.57E-03	-0.078	-0.0798
+1746	NA	-0.14	0.0232	1.26E-03
+1747	NA	-0.3147	-0.2496	-0.3016
+1748	NA	0.3298	0.0183	0.09
+1749	NA	0.3489	0.1256	0.1902
+1750	NA	4.66E-03	-0.0841	-0.0872
+1751	NA	-0.2641	-0.4577	-0.5595
+1752	NA	-0.4663	-0.467	-0.5876
+1753	NA	-0.3854	-0.3498	-0.4316
+1754	NA	-0.4688	-0.4579	-0.5755
+1755	NA	-0.4206	-0.5149	-0.6608
+1756	NA	-0.2598	-0.3768	-0.4527
+1757	NA	-0.5275	-0.3966	-0.5186
+1758	NA	-0.1747	0.0953	0.0907
+1759	NA	-0.4153	-0.3121	-0.3687
+1760	NA	0.3103	0.2633	0.3682
+1761	NA	0.1153	0.2415	0.3194
+1762	NA	0.0946	0.2696	0.3641
+1763	NA	0.0825	0.056	0.1091
+1764	NA	0.0993	0.0302	0.0555
+1765	NA	0.178	0.1571	0.2074
+1766	NA	0.0932	0.1225	0.1609
+1767	NA	0.0851	-0.0556	-0.0281
+1768	NA	0.1302	0.3761	0.4498
+1769	NA	4.89E-03	0.188	0.2311
+1770	NA	0.1429	0.1443	0.1832
+1771	NA	-0.2419	-0.455	-0.561
+1772	NA	0.1745	0.1168	0.1491
+1773	NA	0.3103	0.3002	0.391
+1774	NA	0.021	-0.1132	-0.106
+1775	NA	-0.1327	-0.0181	-0.0385
+1776	NA	0.1299	0.0594	0.358
+1777	NA	0.1776	0.1404	0.3196
+1778	NA	0.2614	0.277	0.3112
+1779	NA	-0.0474	-0.1569	0.0315
+1780	NA	-0.4029	-0.4015	-0.4154
+1781	NA	0.1005	0.1331	0.0633
+1782	NA	0.0944	0.095	0.1133
+1783	NA	-0.3636	-0.3994	-0.444
+1784	NA	0.0933	-0.1582	-8.86E-03
+1785	NA	-0.0524	-0.0339	-6.17E-03
+1786	NA	-0.3799	-0.3495	-0.3939
+1787	NA	-0.17	-0.1385	-0.1731
+1788	NA	-0.2886	-0.3868	-0.4074
+1789	NA	-0.155	-0.1195	-0.1494
+1790	NA	-0.0819	-6.60E-04	-0.0297
+1791	NA	-0.1455	-0.1891	-0.2184
+1792	NA	0.2241	0.1148	0.1965
+1793	NA	-0.107	-0.2718	-0.1852
+1794	NA	-0.0682	-0.2542	-0.1635
+1795	NA	-0.2331	-0.3218	-0.3114
+1796	NA	-0.1229	-0.2626	-0.2394
+1797	NA	-0.3879	-0.3245	-0.4351
+1798	NA	-0.2073	-0.1793	-0.2261
+1799	NA	-0.3797	-0.3287	-0.3968
+1800	NA	0.1149	0.0119	0.0966
+1801	NA	-0.2697	-0.2691	-0.3046
+1802	NA	-0.258	-0.16	-0.2259
+1803	NA	-0.1201	-0.1086	-0.1577
+1804	NA	-0.0388	-0.1297	-0.073
+1805	NA	0.2448	0.0745	0.2079
+1806	NA	-0.5113	-0.4777	-0.6603
+1807	NA	-0.4309	-0.4326	-0.5127
+1808	NA	6.57E-03	-0.014	4.00E-03
+1809	NA	-0.0652	-0.0913	8.69E-03
+1810	NA	-1.05E-04	-0.0353	0.1001
+1811	NA	0.0973	0.0775	0.279
+1812	NA	0.2127	0.1588	0.2544
+1813	NA	-0.1253	-0.1331	-0.0578
+1814	NA	0.3232	0.2895	0.4606
+1815	NA	-0.0996	-0.1228	-1.73E-03
+1816	NA	0.3593	0.3312	0.5218
+1817	NA	0.1479	0.1055	0.317
+1818	NA	0.1973	0.1927	0.3666
+1819	NA	0.061	0.0961	0.154
+1820	NA	-0.2052	-0.1944	-0.1458
+1821	NA	0.5283	0.5416	0.6217
+1822	NA	0.2172	0.2527	0.3051
+1823	NA	-1.25E-03	0.0445	0.031
+1824	NA	-0.286	-0.277	-0.2082
+1825	NA	0.0713	0.168	0.2082
+1826	NA	0.0162	0.0367	-9.76E-03
+1827	NA	-0.1167	-0.0913	-0.1804
+1828	NA	-0.2467	-0.2111	-0.316
+1829	NA	-0.4854	-0.4468	-0.6152
+1830	NA	-0.3413	-0.302	-0.4832
+1831	NA	-0.2535	-0.2265	-0.2936
+1832	NA	-0.1283	-0.1142	-0.1485
+1833	NA	0.0199	0.0619	-0.0273
+1834	NA	0.2723	0.2059	0.2613
+1835	NA	-0.2783	-0.2792	-0.3116
+1836	NA	0.3949	0.3366	0.4284
+1837	NA	0.3414	0.2863	0.3607
+1838	NA	0.113	0.1221	0.1667
+1839	NA	0.4374	0.3884	0.4779
+1840	NA	0.1398	0.1985	0.1374
+1841	NA	0.1127	0.1374	0.1262
+1842	NA	0.0813	7.96E-03	0.0608
+1843	NA	-0.092	-0.1618	-0.0426
+1844	NA	0.2588	0.4078	0.2426
+1845	NA	-0.0499	0.0823	-0.0486
+1846	NA	-0.1175	-0.0392	-0.1785
+1847	NA	-0.1289	-0.1437	-0.2218
+1848	NA	0.0298	-0.0319	-0.1225
+1849	NA	-0.1132	-0.0767	-0.1788
+1850	NA	0.1927	0.2981	0.2446
+1851	NA	0.1502	0.2006	0.0936
+1852	NA	0.1599	0.1976	0.143
+1853	NA	0.1177	0.1732	0.1112
+1854	NA	0.2168	0.2166	0.1807
+1855	NA	0.0736	0.0864	0.0384
+1856	NA	0.2691	0.1895	0.2213
+1857	NA	-0.3334	-0.3605	-0.4363
+1858	NA	-0.0967	-0.0935	-0.1126
+1859	NA	0.0597	0.0737	0.0105
+1860	NA	0.0487	0.022	-0.045
+1861	NA	-0.3867	-0.3935	-0.5528
+1862	NA	-8.89E-03	0.0331	-0.0174
+1863	NA	-0.0193	8.79E-03	-0.0619
+1864	NA	-0.0791	-0.051	-0.1247
+1865	NA	0.1651	0.2005	0.1887
+1866	NA	0.1616	0.1595	0.1976
+1867	NA	-0.1158	-0.1037	-0.1543
+1868	NA	-0.0919	-0.0372	-0.0884
+1869	NA	0.0245	-0.0118	3.13E-03
+1870	NA	-0.5426	-0.5813	-0.663
+1871	-0.37	-0.4867	-0.5468	-0.6601
+1872	-0.59	-0.1587	-0.1992	-0.2716
+1873	-0.61	-0.0845	-0.0983	-0.18
+1874	-0.94	-0.1337	-0.145	-0.1961
+1875	-0.7	-0.367	-0.4015	-0.5007
+1876	-0.49	-0.0888	-0.0379	-0.0682
+1877	1.15	0.4024	0.5014	0.5417
+1878	0.92	0.362	0.3804	0.4395
+1879	-0.57	-0.5604	-0.5325	-0.6274
+1880	-0.37	-0.411	-0.3853	-0.4727
+1881	0.1	-0.0941	-0.0872	-0.1177
+1882	-0.34	-0.5582	-0.5639	-0.6539
+1883	-0.22	0.0353	0.0426	0.0359
+1884	0.22	0.3885	0.4725	0.5753
+1885	0.42	0.6309	0.6567	0.7321
+1886	-0.48	-0.2636	-0.2417	-0.329
+1887	-0.64	-0.3701	-0.3446	-0.42
+1888	0.78	0.1472	0.1262	0.187
+1889	0.25	-0.2456	-0.2832	-0.2639
+1890	-1.23	-0.4386	-0.4453	-0.4904
+1891	0.03	-0.1617	-0.1901	-0.1916
+1892	-0.64	-0.6629	-0.7555	-0.7598
+1893	-1.16	-0.7963	-0.9101	-0.9348
+1894	-0.86	-0.7148	-0.8485	-0.8406
+1895	0	-0.1786	-0.1924	-0.2088
+1896	0.58	0.2768	0.3028	0.3433
+1897	0.33	-0.22	-0.2139	-0.2056
+1898	-0.43	-0.5251	-0.5047	-0.6113
+1899	0.12	-0.1547	-0.1856	-0.2459
+1900	0.92	0.1688	0.2001	0.1575
+1901	0.05	-0.1808	-0.1028	-0.1895
+1902	0.69	0.4367	0.4343	0.5014
+1903	0.3	0.1195	0.1001	0.1357
+1904	-0.07	-0.0442	0.0216	0.0157
+1905	0.97	0.6991	0.751	0.8168
+1906	0.2	0.1029	0.2185	0.2187
+1907	-0.32	0.1703	0.2466	0.2173
+1908	-0.33	-0.751	-0.7518	-0.8241
+1909	-0.79	-0.6723	-0.7064	-0.734
+1910	-0.87	-0.3983	-0.4193	-0.4782
+1911	-0.29	-0.137	-0.1877	-0.1603
+1912	0.43	0.4298	0.4387	0.4823
+1913	0.02	0.1983	0.2479	0.267
+1914	0.61	0.5611	0.5666	0.6646
+1915	0.53	0.3967	0.4172	0.4451
+1916	-0.72	-0.626	-0.5714	-0.6856
+1917	-0.4	-0.5135	-0.5567	-0.6182
+1918	0.01	-0.0977	-0.1522	-0.161
+1919	0.79	0.177	0.1554	0.1773
+1920	0.35	-0.3433	-0.2735	-0.3772
+1921	-0.31	-0.3935	-0.3802	-0.4738
+1922	-0.24	-0.2853	-0.2672	-0.3783
+1923	-0.01	0.2256	0.2901	0.2538
+1924	-0.17	-0.0336	0.011	-0.0477
+1925	0.1	0.2346	0.2216	NA
+1926	0.78	0.3535	0.4676	NA
+1927	-0.02	-0.0967	0.0403	NA
+1928	0.05	-0.0622	0.0454	NA
+1929	0.13	-0.0142	0.0802	NA
+1930	0.75	0.4424	0.4941	NA
+1931	0.69	0.5083	0.6319	NA
+1932	0.11	-0.2263	-0.149	NA
+1933	-0.46	-0.5119	-0.4436	NA
+1934	-0.47	0.0437	0.1253	NA
+1935	-0.09	0.1075	0.1464	NA
+1936	0.15	0.4952	0.505	NA
+1937	0.14	0.5235	0.5179	NA
+1938	-0.28	0.2912	0.3025	NA
+1939	-0.17	-0.2348	-0.225	NA
+1940	0.72	0.6662	0.619	NA
+1941	1.22	1.0881	1.0793	NA
+1942	-0.15	0.1794	0.2827	NA
+1943	-0.49	-0.5702	-0.4619	NA
+1944	-0.03	-0.4789	-0.4783	NA
+1945	-0.51	-0.4856	-0.4905	NA
+1946	-0.17	-0.0941	-0.1446	NA
+1947	-0.18	-0.0363	-0.0875	NA
+1948	0.16	-0.0117	-0.0716	NA
+1949	-0.27	-0.2871	-0.3135	NA
+1950	-0.98	-0.3003	-0.4063	NA
+1951	0.08	0.0182	-0.1045	NA
+1952	0.01	0.0912	0.0407	NA
+1953	0.35	0.2189	0.1574	NA
+1954	-0.41	-0.318	-0.3994	NA
+1955	-1.03	-0.34	-0.4863	NA
+1956	-0.84	-0.2764	-0.4341	NA
+1957	0.42	0.2701	0.1832	NA
+1958	0.59	0.2747	0.2612	NA
+1959	0.11	0.0409	0.0644	NA
+1960	0.01	-0.4566	-0.3972	NA
+1961	-0.06	-0.2259	-0.211	NA
+1962	-0.22	-0.3221	-0.3041	NA
+1963	0.33	0.1752	0.1214	NA
+1964	-0.27	0.2138	0.212	NA
+1965	0.49	0.6084	0.6124	NA
+1966	0.47	0.68	0.6882	NA
+1967	-0.28	-0.1343	-0.0744	NA
+1968	-0.02	-0.2779	-0.2861	NA
+1969	0.66	0.1751	0.226	NA
+1970	-0.12	-0.4165	-0.3604	NA
+1971	-0.86	-0.9007	-0.8733	NA
+1972	0.61	0.1927	0.1196	NA
+1973	-0.19	-0.1068	-0.2058	NA
+1974	-0.96	-0.6625	-0.6795	NA
+1975	-0.89	-0.7505	-0.7806	NA
+1976	-0.18	-5.98E-03	-0.0726	NA
+1977	0.56	0.0948	-4.55E-03	NA
+1978	0	1.01E-03	0.1024	NA
+1979	0.23	-0.0642	-0.0824	NA
+1980	0.26	0.0569	0.0438	NA
+1981	-0.07	-0.2723	-0.2477	NA
+1982	0.83	0.4132	0.4484	NA
+1983	0.83	0.5636	0.7249	NA
+1984	-0.57	-0.2459	-0.1381	NA
+1985	-0.71	-0.4224	-0.3444	NA
+1986	0.06	-0.0769	-0.0826	NA
+1987	1.32	0.6185	0.652	NA
+1988	-0.67	-0.4504	-0.6205	NA
+1989	-0.84	-0.9534	-1.0921	NA
+1990	0.23	-0.0935	-0.1691	NA
+1991	0.58	0.0267	0.0794	NA
+1992	0.85	0.2828	0.2742	NA
+1993	0.52	0.2339	0.2148	NA
+1994	0.39	0.3296	0.2632	NA
+1995	0.23	-0.266	-0.1169	NA
+1996	-0.3	-0.4032	-0.4472	NA
+1997	1.07	0.5962	0.4991	NA
+1998	0.5	0.4536	0.3861	NA
+1999	-0.99	NA	NA	NA
+2000	-0.83	NA	NA	NA
+2001	-0.28	NA	NA	NA
+2002	0.52	NA	NA	NA
+2003	0.42	NA	NA	NA
+2004	0.43	NA	NA	NA
+2005	0.25	NA	NA	NA
+2006	0.03	NA	NA	NA
+2007	-0.24	NA	NA	NA
