@@ -1,0 +1,223 @@
+# Dry Tortugas National Park Coral Sr/Ca data for 1734 to 2008
+#----------------------------------------------------
+#                World Data Service for Paleoclimatology, Boulder
+#                                  and
+#                     NOAA Paleoclimatology Program
+#             National Centers for Environmental Information (NCEI)
+#----------------------------------------------------
+# Template Version 4.0
+# Encoding: UTF-8
+# NOTE: Please cite original publication, NOAA Landing Page URL, dataset and publication DOIs (where available), and date accessed when using downloaded data. If there is no publication information, please cite investigator, study title, NOAA Landing Page URL, and date accessed.
+#
+# Description/Documentation lines begin with #
+# Data lines have no #
+#
+# NOAA_Landing_Page: https://www.ncei.noaa.gov/access/paleo-search/study/16217
+#   Landing_Page_Description: NOAA Landing Page of this file's parent study, which includes all study metadata.
+#
+# Study_Level_JSON_Metadata: https://www.ncei.noaa.gov/pub/data/metadata/published/paleo/json/noaa-coral-16217.json
+#   Study_Level_JSON_Description: JSON metadata of this data file's parent study, which includes all study metadata.
+#
+# Data_Type: Corals and Sclerosponges
+#
+# Dataset_DOI: 10.25921/g86a-rg88
+#
+# Science_Keywords: 
+#--------------------
+# Resource_Links
+#
+# Data_Download_Resource:  https://www.ncei.noaa.gov/pub/data/paleo/coral/atlantic/delong2014/delong2014-drto-sst-noaa.txt
+#   Data_Download_Description: NOAA Template File; Buoy SST Data
+#
+# Related_Online_Resource: https://www.ncei.noaa.gov/pub/data/paleo/coral/atlantic/delong2014/delong2014-supp.txt
+#   Related_Online_Description: Supplemental File; Extended Description of Methods
+#
+#--------------------
+# Contribution_Date
+#   Date: 2014-04-02
+#--------------------
+# File_Last_Modified_Date
+#   Date: 2025-08-22
+#--------------------
+# Title
+#   Study_Name: Dry Tortugas National Park Coral Sr/Ca data for 1734 to 2008
+#--------------------
+# Investigators
+#   Investigators: DeLong, K.L.(https://orcid.org/0000-0001-6320-421X); Flannery, J.A.(https://orcid.org/0000-0002-1692-2662); Poore, R.Z.; Quinn, T.M.(https://orcid.org/0000-0003-0323-9175); Maupin, C.R.(https://orcid.org/0000-0001-5249-8398); Lin, K.(https://orcid.org/0000-0003-3675-9054); Shen, C.-C.(https://orcid.org/0000-0003-2833-2771)
+#--------------------
+# Description_Notes_and_Keywords
+#   Description: The data set contains the ratio of strontium-to-calcium (Sr/Ca) for three Atlantic coral colonies (Siderastrea siderea) from the Dry Tortugas National Park (centered on 24.7°N, 82.8°W) in the Gulf of Mexico that were cross-dated into one continuous chronology. Two cores (08PS-A2 and 08PS-F1) had dead tops thus unknown ages and these cores were uranium-thorium (U-Th) dated. This coral Sr/Ca record updates the previous NOAA contribution, https://www.ncei.noaa.gov/access/paleo-search/study/11935, for cores 08PS-F1 and 08PS-A1.
+#--------------------
+# Publication
+#   Authors: DeLong, K.L., J. Flannery, R.Z. Poore, T.M. Quinn, C.R. Maupin, K. Lin, and C.-C. Shen
+#   Journal_Name: Paleoceanography
+#   Published_Title: A reconstruction of sea surface temperature variability in the southeastern Gulf of Mexico from 1734-2008 CE using cross-dated Sr/Ca records from the coral Siderastrea siderea
+#   Published_Date_or_Year: 2014
+#   Volume: 29
+#   Issue: 5
+#   Pages: 403-422
+#   Report_Number: 
+#   DOI: 10.1002/2013PA002524
+#   Full_Citation:
+#   Abstract: This study uses skeletal variations in coral Sr/Ca from three Siderastrea siderea coral colonies within the Dry Tortugas National Park in the southeastern Gulf of Mexico (24°42′N, 82°48′W) to reconstruct monthly sea surface temperature (SST) variations from 1734 to 2008 Common Era (C.E.). Calibration and verification of the replicated coral Sr/Ca-SST reconstruction with local, regional, and historical temperature records reveals that this proxy-temperature relationship is stable back to 1879 C.E. The coral SST reconstruction contains robust interannual (~2.0°C) and multidecadal variability (~1.5°C) for the past 274 years, the latter of which does not covary with the Atlantic Multidecadal Oscillation. Winter SST extremes are more variable than summer SST extremes (±2.2°C versus ±1.6°C, 2σ) suggesting that Loop Current transport in the winter dominates variability on interannual and longer time scales. Summer SST maxima are increasing (+1.0°C for 274 years, σMC = ±0.5°C, 2σ), whereas winter SST minima contain no significant trend. Colder decades (~1.5°C) during the Little Ice Age (LIA) do not coincide with decades of sunspot minima. The coral SST reconstruction contains similar variability to temperature reconstructions from the northern Gulf of Mexico (planktic foraminifer Mg/Ca) and the Caribbean Sea (coral Sr/Ca) suggesting areal reductions in the Western Hemisphere Warm Pool during the LIA. Mean summer coral SST extremes post-1985 C.E. (29.9°C) exceeds the long-term summer average (29.2°C for 1734–2008 C.E.), yet the warming trend after 1985 C.E. (0.04°C for 24 years, σMC = ±0.5, 2σ) is not significant, whereas Caribbean coral Sr/Ca studies contain a warming trend for this interval.
+#--------------------
+# Funding_Agency
+#   Funding_Agency_Name: US National Science Foundation
+#   Grant:
+#--------------------
+# Funding_Agency
+#   Funding_Agency_Name: Ministry of Science and Technology (MOST), Taiwan
+#   Grant: 100-2116-M-002-009, 101-2116-M-002-016, and 101R7625
+#--------------------
+# Site_Information
+#   Site_Name: Buoys DRYF1 and PLSF1, Dry Tortugas National Park
+#   Location: Florida
+#   Northernmost_Latitude: 24.693
+#   Southernmost_Latitude: 24.638
+#   Easternmost_Longitude: -82.773
+#   Westernmost_Longitude: -82.862
+#   Elevation_m: 
+#--------------------
+# Data_Collection
+#   Collection_Name: DRYF1 and PLSF1 SST D14
+#   First_Year: 1992
+#   Last_Year: 2008
+#   Time_Unit: CE
+#   Core_Length_m:
+#   Parameter_Keywords: physical properties
+#   Notes: Monthly mean SST from NDBC www.ndbc.noaa.gov. Buoys: DRYF1 24.638 N 82.862 W and PLSF1 24.693N 82.773W
+#--------------------
+# Chronology_Information
+# Chronology:
+#--------------------
+# Variables
+# PaST_Thesaurus_Download_Resource: https://www.ncei.noaa.gov/access/paleo-search/skos/past-thesaurus.rdf
+#   PaST_Thesaurus_Download_Description: Paleoenvironmental Standard Terms (PaST) Thesaurus terms, definitions, and relationships in SKOS format.
+#
+# Data variables follow that are preceded by '##' in columns one and two.
+# Variables list, one per line, shortname-tab-var components: what, material, error, units, seasonality, data type, detail, method, C or N for Character or Numeric data)
+#
+## age_CE	age,,,year Common Era,,instrumental,,,N,
+## sst-mon	sea surface temperature,,,degree Celsius,,instrumental,,,N,
+## sst-mon_err	sea surface temperature,,one standard deviation,degree Celsius,,instrumental,,,N,
+#--------------------
+# Data:
+# Data lines follow (have no #)
+# Data line format - tab-delimited text, variable short name as header
+# Missing_Values:
+age_CE	sst-mon	sst-mon_err
+2008.63	30.19	0.010
+2008.54	29.55	0.011
+2008.46	28.54	0.023
+2008.38	26.64	0.026
+2008.29	24.91	0.020
+2008.21	22.72	0.029
+2005.71	29.31	0.009
+2004.63	30.01	0.011
+2004.54	30.12	0.014
+2004.46	28.25	0.041
+2004.38	25.27	0.022
+2004.29	23.55	0.027
+2004.21	23.24	0.019
+2004.13	22.97	0.021
+2004.04	22.94	0.026
+2003.96	22.22	0.035
+2003.88	25.52	0.030
+2003.79	28.06	0.029
+2003.71	29.62	0.008
+2003.63	30.21	0.013
+2003.54	29.37	0.023
+2003.46	28.88	0.018
+2003.38	27.66	0.036
+2003.29	24.35	0.029
+2003.21	24.51	0.036
+2003.13	19.25	0.029
+2002.38	26.73	0.026
+2002.29	25.69	0.034
+2002.21	21.65	0.024
+2002.13	22.41	0.026
+2002.04	22.25	0.024
+2001.96	24.30	0.030
+2001.88	25.49	0.011
+2001.79	27.50	0.023
+2001.71	28.93	0.024
+2001.63	29.55	0.017
+2001.54	29.39	0.014
+2001.46	28.61	0.027
+2001.38	25.45	0.032
+2001.29	24.67	0.053
+2001.21	22.26	0.032
+2001.13	21.98	0.045
+2001.04	20.87	0.019
+2000.96	23.68	0.030
+2000.88	25.51	0.022
+2000.79	27.65	0.045
+2000.71	29.92	0.014
+2000.63	30.11	0.010
+2000.54	30.35	0.022
+2000.46	28.62	0.019
+2000.38	26.48	0.048
+2000.29	24.36	0.025
+2000.21	24.49	0.023
+2000.13	21.74	0.027
+2000.04	22.75	0.032
+1999.96	24.31	0.022
+1999.88	25.24	0.026
+1999.79	27.38	0.033
+1999.71	30.08	0.023
+1999.63	30.29	0.012
+1999.54	29.76	0.021
+1999.46	28.81	0.019
+1999.38	26.66	0.042
+1999.29	25.17	0.026
+1999.21	22.38	0.019
+1999.13	23.22	0.023
+1999.04	22.54	0.023
+1998.96	24.31	0.016
+1998.88	25.14	0.009
+1998.79	27.34	0.030
+1998.71	29.58	0.030
+1998.63	30.79	0.010
+1998.54	30.37	0.020
+1998.46	28.84	0.048
+1998.38	24.16	0.059
+1998.29	23.04	0.032
+1998.21	20.26	0.034
+1998.13	21.21	0.028
+1998.04	21.89	0.025
+1997.96	23.09	0.031
+1997.88	25.17	0.023
+1997.79	27.57	0.036
+1997.71	29.75	0.017
+1997.63	31.09	0.025
+1997.54	30.06	0.014
+1997.46	28.98	0.017
+1997.38	28.22	0.017
+1996.21	21.40	0.072
+1996.13	20.99	0.036
+1996.04	22.05	0.048
+1995.96	23.91	0.032
+1995.88	26.03	0.050
+1995.79	28.82	0.014
+1995.71	30.08	0.014
+1995.63	29.66	0.031
+1995.54	29.83	0.017
+1995.46	28.72	0.015
+1995.38	28.08	0.024
+1995.29	25.73	0.020
+1995.21	22.72	0.041
+1995.13	21.05	0.019
+1995.04	22.32	0.034
+1994.96	24.96	0.048
+1994.88	26.73	0.026
+1994.79	28.33	0.025
+1993.71	30.28	0.023
+1993.63	30.19	0.010
+1993.54	29.97	0.019
+1993.46	27.71	0.035
+1993.38	24.41	0.022
+1993.29	22.91	0.013
+1993.21	22.05	0.028
+1993.13	22.58	0.010
+1993.04	24.45	0.030
+1992.96	24.10	0.014

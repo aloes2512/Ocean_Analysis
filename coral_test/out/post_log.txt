@@ -1,0 +1,192 @@
+IDPO vs Fiji_AB corr of band-passed: -0.73 
+           record start  end peak_P pct_AR1_point p_band p_band_filtfit
+       HonTre_SST  1600 2010   21.1          96.5  0.455          0.136
+       HonTre_wet  1600 2010   21.1          97.0  0.448          0.102
+     Fiji_AB_d18O  1617 2001   22.0          46.7  1.000          0.997
+     Fiji_1F_d18O  1781 1996   18.4          55.0  0.992          0.866
+ Fiji_1F_SrCa_SST  1781 1996   21.1          98.1  0.139          0.020
+   FijiTonga_IDPO  1650 2004   16.0          87.0  0.977          0.737
+      Amedee_SrCa  1649 1999   19.0          94.3  0.541          0.196
+   Rarotonga_SrCa  1727 1996   24.0          66.2  0.964          0.622
+   Rarotonga_d18O  1727 1996   18.3          62.5  0.991          0.929
+  DryTortugas_SST  1734 2008   17.5          66.1  0.986          0.908
+       Ryukyu_SST  1579 2008   17.9          94.6  0.666          0.261
+ Wilson_N34_coral  1607 1998   19.6          78.0  0.971          0.952
+   Wilson_N34_tel  1540 1998   20.6          96.3  0.530          0.410
+       Freund_NCT  1617 2007   20.1          70.8  0.990          0.991
+     Tierney_WPac  1617 2006   20.0          81.3  0.930          0.546
+     Tierney_EPac  1607 1997   23.0          80.0  0.958          0.798
+              CET  1659 2025   24.1          99.0  0.153          0.001
+     PAGES2k_GMST  1000 2000   24.0          96.9  0.371          0.020
+   ERSSTv6_global  1850 2025   20.7          93.4  0.335          0.095
+ winP_median winP_sd winP_sd_surr_median p_stable
+        20.8    2.92                2.77    0.580
+        21.1    2.68                2.76    0.470
+        23.7    2.81                2.78    0.511
+        18.7    2.89                2.10    0.740
+        20.5    1.22                2.11    0.244
+        20.9    3.77                2.78    0.917
+        18.4    1.57                2.69    0.086
+        16.9    4.51                2.53    0.991
+        19.6    2.57                2.45    0.536
+        17.2    3.91                2.48    0.928
+        18.0    2.40                2.76    0.300
+        19.1    2.42                2.78    0.338
+        21.4    2.55                2.79    0.358
+        20.6    2.83                2.72    0.564
+        19.7    2.55                2.78    0.388
+        20.5    3.96                2.76    0.964
+        22.5    3.99                2.72    0.971
+        21.3    2.94                3.08    0.361
+        21.1    0.77                1.31    0.276
+           record   RN  p_RN   RS  p_RS   RH  p_RH maxr lag_maxr p_maxr
+       HonTre_SST 0.32 0.722 0.19 0.891 0.35 0.852 0.17        5  0.769
+       HonTre_wet 0.37 0.639 0.18 0.907 0.28 0.888 0.17        5  0.767
+     Fiji_AB_d18O 0.47 0.533 0.48 0.489 0.96 0.067 0.49        5  0.105
+     Fiji_1F_d18O 0.99 0.021 0.91 0.285 0.95 0.165 0.12        0  0.896
+ Fiji_1F_SrCa_SST 0.94 0.186 0.92 0.262 0.81 0.476 0.31        0  0.506
+   FijiTonga_IDPO 0.18 0.922 0.55 0.456 0.96 0.051 0.51        0  0.107
+      Amedee_SrCa 0.72 0.203 0.69 0.257 0.92 0.118 0.28        2  0.516
+   Rarotonga_SrCa 0.65 0.486 0.52 0.645 0.30 0.905 0.30        3  0.458
+   Rarotonga_d18O 0.76 0.335 0.96 0.050 0.91 0.156 0.16        0  0.828
+  DryTortugas_SST 0.43 0.743 0.52 0.641 0.25 0.942 0.06        4  0.966
+       Ryukyu_SST 0.38 0.604 0.27 0.789 0.76 0.363 0.39        0  0.239
+ Wilson_N34_coral 0.27 0.801 0.68 0.235 0.46 0.765 0.38        0  0.273
+   Wilson_N34_tel 0.19 0.869 0.42 0.528 0.80 0.358 0.12        5  0.878
+       Freund_NCT 0.52 0.411 0.19 0.901 0.32 0.860 0.10        5  0.906
+     Tierney_WPac 0.68 0.203 0.44 0.540 0.62 0.557 0.22        0  0.638
+     Tierney_EPac 0.40 0.627 0.48 0.481 0.76 0.380 0.50        0  0.092
+              CET 0.26 0.819 0.47 0.533 0.78 0.297 0.47        0  0.092
+     PAGES2k_GMST 0.12 0.872 0.09 0.936 0.92 0.130 0.58        1  0.047
+   ERSSTv6_global 0.84 0.597 0.98 0.178 1.00 0.030 0.63        3  0.093
+
+Independent-site records: n = 6 
+p<0.05 (band): 0  (point pct>=95): 1  RN: 0  RS: 0  RH: 0  maxr: 0 
+p<0.05 across all 19 records: band 0  RN 1  RS 0  RH 1 
+           record indep deg_N deg_S deg_H
+       HonTre_SST  TRUE    -5   164    78
+       HonTre_wet FALSE    15    67    88
+     Fiji_AB_d18O  TRUE    24    -5   -55
+     Fiji_1F_d18O FALSE     0    40   -37
+ Fiji_1F_SrCa_SST FALSE    26    43   -26
+   FijiTonga_IDPO FALSE    62    24   313
+      Amedee_SrCa  TRUE    64    39    22
+   Rarotonga_SrCa  TRUE    63   -94  -131
+   Rarotonga_d18O FALSE   157   100     9
+  DryTortugas_SST  TRUE    83   -57   -20
+       Ryukyu_SST  TRUE   -96   -82   -22
+ Wilson_N34_coral FALSE  -127   -21   -12
+   Wilson_N34_tel FALSE  -168   115    96
+       Freund_NCT FALSE   -69  -160   102
+     Tierney_WPac FALSE    51    32   -30
+     Tierney_EPac FALSE  -105   -28    -8
+              CET FALSE  -105   -42   -26
+     PAGES2k_GMST FALSE    28    70    18
+   ERSSTv6_global FALSE   179   109    47
+
+Rayleigh, independent sites (full record):
+       n Rbar mean_deg     p
+nodal  6 0.58       37 0.128
+sine22 6 0.41      -55 0.381
+hale   6 0.51      -18 0.213
+Rayleigh, Pacific independent only:
+       n Rbar mean_deg     p
+nodal  5 0.58       22 0.188
+sine22 5 0.29      -53 0.674
+hale   5 0.42      -17 0.443
+Rayleigh, all coral/proxy records (dependent!):
+        n Rbar mean_deg     p
+nodal  16 0.30       24 0.244
+sine22 16 0.36       19 0.133
+hale   16 0.55       -3 0.006
+
+Common period 1750-1996 phases (deg):
+                   N    S    H
+HonTre_SST       152  158   80
+Fiji_AB_d18O      85   -9  -55
+Amedee_SrCa       84   67   18
+Rarotonga_SrCa    60 -105 -132
+DryTortugas_SST   86    4  -23
+Ryukyu_SST      -124   13  -16
+Rayleigh common period:
+       Rbar     p
+nodal  0.59 0.121
+sine22 0.37 0.456
+hale   0.51 0.216
+surrogate-based cross-site Rbar null (independent sites, 1000 draws):
+N obs Rbar 0.58  p(surrogate) = 0.115 
+S obs Rbar 0.41  p(surrogate) = 0.384 
+H obs Rbar 0.51  p(surrogate) = 0.207 
+
+Dating-error table
+           record RN_obs RN_dated_med RN_thr95 frac_RN_above_thr RS_obs
+       HonTre_SST   0.32         0.31     0.85              0.00   0.19
+       HonTre_wet   0.37         0.36     0.82              0.00   0.18
+     Fiji_AB_d18O   0.47         0.45     0.86              0.00   0.48
+     Fiji_1F_d18O   0.99         0.99     0.98              0.76   0.91
+ Fiji_1F_SrCa_SST   0.94         0.94     0.98              0.00   0.92
+   FijiTonga_IDPO   0.18         0.20     0.90              0.00   0.55
+      Amedee_SrCa   0.72         0.70     0.88              0.00   0.69
+   Rarotonga_SrCa   0.65         0.66     0.95              0.00   0.52
+   Rarotonga_d18O   0.76         0.75     0.95              0.00   0.96
+  DryTortugas_SST   0.43         0.43     0.94              0.00   0.52
+       Ryukyu_SST   0.38         0.36     0.80              0.00   0.27
+ Wilson_N34_coral   0.27         0.28     0.85              0.00   0.68
+   Wilson_N34_tel   0.19         0.17     0.80              0.00   0.42
+       Freund_NCT   0.52         0.54     0.87              0.00   0.19
+     Tierney_WPac   0.68         0.68     0.85              0.00   0.44
+     Tierney_EPac   0.40         0.41     0.87              0.00   0.48
+              CET   0.26         0.30     0.87              0.00   0.47
+     PAGES2k_GMST   0.12         0.15     0.53              0.00   0.09
+   ERSSTv6_global   0.84         0.84     0.99              0.00   0.98
+ RS_dated_med RS_thr95 frac_RS_above RH_obs RH_dated_med RH_thr95 frac_RH_above
+         0.20     0.83          0.00   0.35         0.36     0.96          0.00
+         0.18     0.86          0.00   0.28         0.28     0.95          0.00
+         0.47     0.86          0.00   0.96         0.97     0.97          0.44
+         0.91     0.98          0.01   0.95         0.94     0.98          0.04
+         0.92     0.99          0.00   0.81         0.81     0.98          0.00
+         0.55     0.89          0.00   0.96         0.96     0.96          0.37
+         0.68     0.87          0.00   0.92         0.93     0.96          0.16
+         0.53     0.95          0.00   0.30         0.33     0.97          0.00
+         0.95     0.95          0.40   0.91         0.92     0.97          0.01
+         0.53     0.95          0.00   0.25         0.26     0.96          0.00
+         0.26     0.84          0.00   0.76         0.74     0.96          0.00
+         0.68     0.85          0.00   0.46         0.46     0.96          0.00
+         0.41     0.82          0.00   0.80         0.79     0.96          0.00
+         0.21     0.86          0.00   0.32         0.33     0.96          0.00
+         0.48     0.83          0.00   0.62         0.63     0.97          0.00
+         0.47     0.85          0.00   0.76         0.76     0.97          0.00
+         0.45     0.88          0.00   0.78         0.78     0.95          0.00
+         0.10     0.53          0.00   0.92         0.92     0.96          0.01
+         0.98     1.00          0.01   1.00         1.00     1.00          0.79
+ fullphaseN_circR fullphaseS_circR amp_ratio_N bp_sd_ratio
+             0.66             0.48        1.13        1.10
+             0.55             0.55        1.49        1.15
+             0.84             0.97        1.10        1.13
+             0.95             0.93        1.10        1.11
+             0.96             0.95        1.07        1.08
+             0.94             0.97        1.09        1.02
+             0.88             0.94        1.07        1.09
+             0.98             0.94        1.11        1.11
+             0.93             0.94        1.08        1.08
+             0.87             0.74        1.13        1.12
+             0.96             0.63        1.08        1.10
+             0.96             0.90        1.15        1.14
+             0.84             0.90        1.44        1.14
+             0.93             0.86        1.17        1.16
+             0.93             0.91        1.08        1.09
+             0.62             0.70        1.79        1.15
+             0.84             0.94        1.18        1.17
+             0.61             0.83        1.54        1.08
+             0.97             0.97        1.04        1.07
+phN cross-site Rayleigh under dating errors: median Rbar 0.52  median p 0.203  share p<0.05: 0.025 
+phS cross-site Rayleigh under dating errors: median Rbar 0.44  median p 0.329  share p<0.05: 0.025 
+null device 
+          1 
+null device 
+          1 
+null device 
+          1 
+null device 
+          1 
+done

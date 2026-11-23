@@ -1,0 +1,487 @@
+# Linsley et al. 2008 Fiji-Tonga Interdecadal-Decadal Pacific Oscillation Index
+#----------------------------------------------------
+#                World Data Service for Paleoclimatology, Boulder
+#                                  and
+#                     NOAA Paleoclimatology Program
+#             National Centers for Environmental Information (NCEI)
+#----------------------------------------------------
+# Template Version 4.0
+# Encoding: UTF-8
+# NOTE: Please cite original publication, NOAA Landing Page URL, dataset and publication DOIs (where available), and date accessed when using downloaded data. If there is no publication information, please cite investigator, study title, NOAA Landing Page URL, and date accessed.
+#
+# Description/Documentation lines begin with #
+# Data lines have no #
+#
+# NOAA_Landing_Page: https://www.ncei.noaa.gov/access/paleo-search/study/6216
+#   Landing_Page_Description: NOAA Landing Page of this file's parent study, which includes all study metadata.
+#
+# Study_Level_JSON_Metadata: https://www.ncei.noaa.gov/pub/data/metadata/published/paleo/json/noaa-recon-6216.json
+#   Study_Level_JSON_Description: JSON metadata of this data file's parent study, which includes all study metadata.
+#
+# Data_Type: Climate Reconstructions
+#
+# Dataset_DOI: 10.25921/hw08-pz75
+#
+# Science_Keywords: Atmospheric and Oceanic Circulation Patterns Reconstruction
+#--------------------
+# Resource_Links
+#
+# Data_Download_Resource:  https://www.ncei.noaa.gov/pub/data/paleo/coral/west_pacific/fiji-tonga-idpo2008-noaa.txt
+#   Data_Download_Description: NOAA Template File; Composite Reconstruction of Interdecadal-Decadal Pacific Oscillation Index
+#
+#--------------------
+# Contribution_Date
+#   Date: 2008-10-01
+#--------------------
+# File_Last_Modified_Date
+#   Date: 2025-07-08
+#--------------------
+# Title
+#   Study_Name: Linsley et al. 2008 Fiji-Tonga Interdecadal-Decadal Pacific Oscillation Index
+#--------------------
+# Investigators
+#   Investigators: Linsley, B.K.(https://orcid.org/0000-0003-2085-0662); Zhang, P.; Kaplan, A.(https://orcid.org/0000-0002-3384-8185); Howe, S.S.; Wellington, G.M.
+#--------------------
+# Description_Notes_and_Keywords
+#   Description: Fiji-Tonga Interdecadal-Decadal Pacific Oscillation Index (F-T IDPO), based on average oxygen isotope (d18O) time series from five coral cores collected from Fiji and Tonga.  Three Porites lutea coral colonies were drilled at Tonga on the islands of Ha’afera, Malinoa, and Nomuka Iki. Two Fiji Porites lutea cores (Fiji 1F and Fiji AB) were used in this study. Update October 2008: Tonga core TM1 exhibits fungal pigments and resulting slower growth rate (due to fungal infestation), and the authors believe this should preclude the use of data from this core in the index. Therefore they have recalculated the index with just four corals (Fiji 1F, Fiji AB, Tonga TH1, and Tonga TNI2). The new 4-coral index is almost identical to the 5 coral version. Please see Linsley et al., 2008 for discussion of the problems with coral TM1.
+#--------------------
+# Publication
+#   Authors: Linsley, B.K., Zhang, P., Kaplan, A., Howe, S.S., and Wellington, G.M.
+#   Journal_Name: Paleoceanography
+#   Published_Title: Interdecadal-decadal climate variability from multicoral oxygen isotope records in the South Pacific Convergence Zone region since 1650 AD
+#   Published_Date_or_Year: 2008
+#   Volume: 23
+#   Issue: 2
+#   Pages: 
+#   Report_Number: 
+#   DOI: 10.1029/2007PA001539
+#   Full_Citation:
+#   Abstract: In the South Pacific, interdecadal-decadal oceanic and atmospheric variability, referred to as the Interdecadal Pacific Oscillation (IPO), is most pronounced in the South Pacific Convergence Zone (SPCZ) salinity front region. Here we have used annual average oxygen isotope (d18O) time series from five coral cores collected from Fiji and Tonga in this region to construct a Fiji-Tonga Interdecadal-Decadal Pacific Oscillation (F-T IDPO) index of low-frequency (>9 and <55 years) climate variability back to 1650 A.D. We first demonstrate the consistency between this F-T IDPO index and a mean sea level (MSL) pressure-based SPCZ position index (SPI) (1891–2000), thus verifying the ability of coral d18O to record past interdecadal-decadal climatic variations in this region back to 1891. The F-T IDPO index is then shown to be synchronous with the IPO index (1856–2000), suggesting that this coral-based index effectively represents the interdecadal-decadal scale climate variance back to 1650. The regularity of the F-T IDPO index indicates that interdecadal-decadal variability in the SPCZ region has been relatively constant over the past 350 years with a mean frequency of ~20 years (variance peaks near 11 and 35 years). There is a consistent antiphase correlation of the F-T IDPO index and the interdecadal-decadal components in equatorial Pacific coral d18O series from Maiana and Palmyra. This observation indicates that the eastward expansion (westward contraction) of the eastern salinity front of the Western Pacific Warm Pool (WPWP) occurs simultaneously (±<1 year) with the westward (eastward) shift of the SPCZ salinity front during positive IPO (negative IPO) phases. This is the same relationship observed during the phases of the El Niño Southern Oscillation.
+#--------------------
+#   Authors: Linsley, B.K.; Wellington, G.M.; Schrag, D.P.; Ren, L.; Salinger, M.J.; Tudhope, A.W.
+#   Journal_Name: Climate Dynamics
+#   Published_Title: Geochemical evidence from corals for changes in the amplitude and spatial pattern of South Pacific interdecadal climate variability over the last 300 years.
+#   Published_Date_or_Year: 2004
+#   Volume: 22
+#   Issue: 
+#   Pages: 1-11
+#   Report_Number: 
+#   DOI: 10.1007/s00382-003-0364-y
+#   Full_Citation:
+#   Abstract: In the Pacific Ocean, the coherent pattern of interdecadal variations in sea surface temperature (SST) over the last ∼100 years has been termed the Interdecadal Pacific Oscillation (IPO). To examine past variations in the IPO we have generated time series of Sr/Ca and oxygen isotopes (δ18O) from South Pacific Porites coral colonies growing at Rarotonga (1997 to 1726) and Fiji (1997 to 1780). At both sites skeletal Sr/Ca is highly correlated with instrumental SST at least back to ∼1970 and δ18O appears to reflect both SST and South Pacific Convergence Zone (SPCZ) effects on seawater δ18O. Comparison of our results to a New Caledonia coral δ18O record and to indices of interdecadal Pacific climate variability demonstrates that these South Pacific corals have accurately recorded twentieth century variations in the IPO and SPCZ. The coral records also indicate that higher amplitude and more spatially coherent IPO-related variability existed from 1880 to 1950 with notably poor between-site correlations in the mid-1800s. These observations suggest that the spatial IPO pattern in South Pacific SST was significantly more complex and/or poorly defined in the mid-1800s compared to that observed in the twentieth century. Comparison with North Pacific IPO indices also indicates that the degree of cross-hemispheric symmetry of interdecadal oceanographic variability has changed over time with a lower correlation between the North and South Pacific in the mid-1800s. This evidence suggests that the spatial pattern of the IPO at least in the South Pacific has varied over the last 300 years, with a major reorganization occurring after ~1880 A.D.
+#--------------------
+#   Authors: Linsley, B.K., A. Kaplan, Y. Gouriou, J. Salinger, P.B. deMenocal, G.M. Wellington, and S.S. Howe
+#   Journal_Name: Geochemistry, Geophysics, Geosystems
+#   Published_Title: Tracking the extent of the South Pacific Convergence Zone since the early 1600s
+#   Published_Date_or_Year: 2006
+#   Volume: 7
+#   Issue: 
+#   Pages: 
+#   Report_Number: Q05003
+#   DOI: 10.1029/2005GC001115
+#   Full_Citation:
+#   Abstract: The South Pacific Convergence Zone (SPCZ) is the largest and most persistent spur of the Intertropical Convergence Zone. At the southeastern edge of the SPCZ near 170W and 15 20S a surface ocean salinity frontal zone exists that separates fresher Western Pacific Warm Pool water from saltier and cooler waters in the east. This salinity front is known to shift east and west with the phase of the El NinËœo Southern Oscillation. We have generated subannually resolved and replicated coral oxygen isotopic time series from Fiji (17S, 179E) and Rarotonga (21.5S, 160W) that have recorded interannual displacements of the salinity front over the last 380 years and also indicate that at lower frequencies the decadal mean position of the salinity front, and eastern extent of the SPCZ, has shifted east-west through 10 to 20 of longitude three times during this interval. The most recent and largest shift began in the mid 1800s as the salinity front progressively moved eastward and salinity decreased at both sites. Our results suggest that sea surface salinity at these sites is now at the lowest levels recorded and is evidence for an unprecedented expansion of the SPCZ since the mid 1800s. The expansion of the SPCZ implies a gradual change in the South Pacific to more La Nina-like long-term mean conditions. This observation is consistent with the ocean thermostat mechanism for the Pacific coupled ocean-atmosphere system, whereby exogenous heating of the atmosphere would result in greater warming in the western Pacific and a greater east-west surface temperature gradient.
+#--------------------
+# Funding_Agency
+#   Funding_Agency_Name: US National Science Foundation
+#   Grant: OCE-0318296, ATM-9619035, OCE-0318296, OCE-0317941
+#--------------------
+# Funding_Agency
+#   Funding_Agency_Name: US National Oceanic and Atmospheric Administration (NOAA)
+#   Grant: NA96GP0406, NA96GP0470
+#--------------------
+# Site_Information
+#   Site_Name: Tonga and Fiji
+#   Location: Pacific Ocean
+#   Northernmost_Latitude: -16.82
+#   Southernmost_Latitude: -21.03
+#   Easternmost_Longitude: -174.72
+#   Westernmost_Longitude: 179.23
+#   Elevation_m: 
+#--------------------
+# Data_Collection
+#   Collection_Name: Linsley2008
+#   First_Year: 1650
+#   Last_Year: 2004
+#   Time_Unit: CE
+#   Core_Length_m:
+#   Parameter_Keywords: reconstructions
+#   Notes: 
+#--------------------
+# Chronology_Information
+# Chronology:
+#--------------------
+# Variables
+# PaST_Thesaurus_Download_Resource: https://www.ncei.noaa.gov/access/paleo-search/skos/past-thesaurus.rdf
+#   PaST_Thesaurus_Download_Description: Paleoenvironmental Standard Terms (PaST) Thesaurus terms, definitions, and relationships in SKOS format.
+#
+# Data variables follow that are preceded by '##' in columns one and two.
+# Variables list, one per line, shortname-tab-var components: what, material, error, units, seasonality, data type, detail, method, C or N for Character or Numeric data)
+#
+## age_CE	age,,,year Common Era,,climate reconstructions;corals and sclerosponges,,,N,
+## 5-core	Interdecadal Pacific Oscillation Index,delta 18O,,dimensionless,,climate reconstructions;corals and sclerosponges,averaged,,N,5-coral averaged IDPO
+## num_cores	number of samples,,,count,,climate reconstructions;corals and sclerosponges,,,N,number of corals in 5 core average
+## 5-core-1s	Interdecadal Pacific Oscillation Index,delta 18O,one standard deviation,dimensionless,,climate reconstructions;corals and sclerosponges,averaged,,N,1 SIGMA unbiased for 5-core average (ave=0.022)
+## 4-core	Interdecadal Pacific Oscillation Index,delta 18O,,dimensionless,,climate reconstructions;corals and sclerosponges,averaged,,N,4-coral averaged IDPO (added 10/2/2008)
+## 4-core-1s	Interdecadal Pacific Oscillation Index,delta 18O,one standard deviation,dimensionless,,climate reconstructions;corals and sclerosponges,averaged,,N,1 SIGMA unbiased for 4-core average
+#--------------------
+# Data:
+# Data lines follow (have no #)
+# Data line format - tab-delimited text, variable short name as header
+# Missing_Values:
+age_CE	5-core	num_cores	5-core-1s	4-core	4-core-1s
+2004	-0.062	3	0.017	-0.068	0.027
+2003	-0.083	3	0.017	-0.076	0.027
+2002	-0.094	3	0.023	-0.075	0.021
+2001	-0.087	4	0.023	-0.065	0.005
+2000	-0.089	4	0.027	-0.066	0.019
+1999	-0.075	4	0.030	-0.050	0.024
+1998	-0.049	4	0.030	-0.021	0.015
+1997	-0.024	4	0.029	0.004	0.006
+1996	-0.012	5	0.020	0.006	0.011
+1995	-0.003	5	0.017	0.012	0.011
+1994	0.005	5	0.014	0.017	0.010
+1993	0.006	5	0.012	0.015	0.010
+1992	-0.003	5	0.009	0.003	0.008
+1991	-0.019	5	0.005	-0.016	0.005
+1990	-0.031	5	0.003	-0.031	0.004
+1989	-0.027	5	0.004	-0.029	0.005
+1988	-0.007	5	0.008	-0.010	0.010
+1987	0.016	5	0.011	0.014	0.014
+1986	0.032	5	0.010	0.027	0.012
+1985	0.040	5	0.012	0.031	0.010
+1984	0.045	5	0.016	0.031	0.011
+1983	0.046	5	0.020	0.028	0.010
+1982	0.036	5	0.021	0.017	0.009
+1981	0.020	5	0.019	0.004	0.012
+1980	0.009	5	0.014	-0.001	0.013
+1979	0.008	5	0.006	0.008	0.008
+1978	0.014	5	0.011	0.024	0.007
+1977	0.014	5	0.018	0.031	0.006
+1976	0.002	5	0.020	0.021	0.006
+1975	-0.015	5	0.019	0.001	0.014
+1974	-0.027	5	0.014	-0.019	0.015
+1973	-0.030	5	0.009	-0.033	0.011
+1972	-0.028	5	0.016	-0.043	0.008
+1971	-0.019	5	0.025	-0.044	0.005
+1970	-0.002	5	0.031	-0.032	0.004
+1969	0.022	5	0.034	-0.010	0.014
+1968	0.043	5	0.034	0.013	0.021
+1967	0.055	5	0.030	0.030	0.021
+1966	0.055	5	0.022	0.035	0.014
+1965	0.042	5	0.016	0.028	0.008
+1964	0.022	5	0.011	0.013	0.009
+1963	-0.001	5	0.008	-0.003	0.011
+1962	-0.021	5	0.011	-0.016	0.012
+1961	-0.033	5	0.014	-0.023	0.012
+1960	-0.036	5	0.016	-0.021	0.009
+1959	-0.033	5	0.019	-0.014	0.005
+1958	-0.036	5	0.021	-0.015	0.005
+1957	-0.048	5	0.022	-0.027	0.004
+1956	-0.060	5	0.021	-0.040	0.007
+1955	-0.061	5	0.021	-0.042	0.012
+1954	-0.052	5	0.023	-0.033	0.016
+1953	-0.041	5	0.023	-0.021	0.013
+1952	-0.035	5	0.023	-0.013	0.008
+1951	-0.031	5	0.025	-0.009	0.014
+1950	-0.027	5	0.025	-0.007	0.021
+1949	-0.021	5	0.021	-0.006	0.020
+1948	-0.020	5	0.012	-0.012	0.012
+1947	-0.022	5	0.004	-0.021	0.006
+1946	-0.023	5	0.009	-0.031	0.007
+1945	-0.015	5	0.015	-0.029	0.009
+1944	0.002	5	0.018	-0.014	0.009
+1943	0.029	5	0.017	0.013	0.009
+1942	0.057	5	0.014	0.045	0.009
+1941	0.076	5	0.013	0.070	0.016
+1940	0.075	5	0.017	0.076	0.022
+1939	0.054	5	0.017	0.060	0.021
+1938	0.023	5	0.014	0.032	0.014
+1937	-0.008	5	0.015	0.003	0.012
+1936	-0.031	5	0.021	-0.017	0.021
+1935	-0.040	5	0.025	-0.025	0.026
+1934	-0.034	5	0.025	-0.018	0.024
+1933	-0.015	5	0.021	-0.002	0.022
+1932	0.016	5	0.016	0.022	0.018
+1931	0.048	5	0.012	0.044	0.014
+1930	0.068	5	0.020	0.051	0.011
+1929	0.064	5	0.034	0.031	0.012
+1928	0.047	5	0.046	0.001	0.013
+1927	0.031	5	0.053	-0.020	0.018
+1926	0.028	5	0.051	-0.020	0.024
+1925	0.026	5	0.042	-0.011	0.026
+1924	0.019	5	0.026	-0.002	0.020
+1923	0.003	5	0.011	-0.003	0.012
+1922	-0.017	5	0.012	-0.011	0.013
+1921	-0.036	5	0.018	-0.023	0.017
+1920	-0.053	5	0.021	-0.041	0.022
+1919	-0.071	5	0.020	-0.065	0.025
+1918	-0.082	5	0.020	-0.084	0.025
+1917	-0.075	5	0.020	-0.083	0.023
+1916	-0.045	5	0.020	-0.055	0.023
+1915	-0.006	5	0.018	-0.013	0.022
+1914	0.025	5	0.016	0.024	0.021
+1913	0.036	5	0.021	0.043	0.026
+1912	0.025	5	0.028	0.039	0.032
+1911	0.000	5	0.031	0.019	0.032
+1910	-0.027	5	0.032	-0.005	0.030
+1909	-0.040	5	0.032	-0.018	0.030
+1908	-0.032	5	0.033	-0.012	0.033
+1907	-0.002	5	0.028	0.015	0.029
+1906	0.037	5	0.019	0.049	0.019
+1905	0.072	5	0.009	0.075	0.010
+1904	0.092	5	0.011	0.084	0.009
+1903	0.098	5	0.021	0.078	0.009
+1902	0.089	5	0.029	0.061	0.012
+1901	0.067	5	0.030	0.039	0.013
+1900	0.035	5	0.023	0.014	0.013
+1899	0.007	5	0.012	-0.002	0.011
+1898	-0.011	5	0.012	-0.002	0.011
+1897	-0.015	5	0.027	0.010	0.012
+1896	-0.020	5	0.038	0.017	0.015
+1895	-0.034	5	0.041	0.005	0.018
+1894	-0.054	5	0.034	-0.023	0.019
+1893	-0.071	5	0.022	-0.056	0.021
+1892	-0.075	5	0.017	-0.079	0.022
+1891	-0.066	5	0.026	-0.087	0.020
+1890	-0.044	5	0.034	-0.075	0.017
+1889	-0.014	5	0.036	-0.048	0.016
+1888	0.016	5	0.033	-0.013	0.019
+1887	0.039	5	0.027	0.018	0.023
+1886	0.048	5	0.021	0.038	0.024
+1885	0.041	5	0.015	0.037	0.019
+1884	0.020	5	0.008	0.018	0.009
+1883	-0.006	5	0.006	-0.011	0.005
+1882	-0.026	5	0.015	-0.036	0.015
+1881	-0.034	5	0.023	-0.049	0.023
+1880	-0.024	5	0.027	-0.041	0.027
+1879	0.005	5	0.024	-0.011	0.023
+1878	0.042	5	0.015	0.032	0.014
+1877	0.069	5	0.008	0.069	0.011
+1876	0.075	5	0.015	0.085	0.015
+1875	0.062	5	0.022	0.079	0.017
+1874	0.035	5	0.026	0.058	0.016
+1873	0.003	5	0.027	0.028	0.014
+1872	-0.028	5	0.025	-0.005	0.015
+1871	-0.049	5	0.023	-0.031	0.019
+1870	-0.052	5	0.022	-0.041	0.023
+1869	-0.036	5	0.020	-0.029	0.024
+1868	-0.007	5	0.018	-0.004	0.023
+1867	0.023	5	0.019	0.023	0.025
+1866	0.046	5	0.022	0.042	0.028
+1865	0.055	5	0.023	0.047	0.028
+1864	0.048	5	0.024	0.038	0.029
+1863	0.026	5	0.026	0.016	0.031
+1862	-0.005	5	0.026	-0.015	0.031
+1861	-0.036	5	0.024	-0.046	0.028
+1860	-0.055	5	0.020	-0.065	0.023
+1859	-0.059	5	0.016	-0.066	0.019
+1858	-0.048	5	0.012	-0.051	0.015
+1857	-0.029	5	0.012	-0.028	0.016
+1856	-0.006	5	0.015	-0.002	0.019
+1855	0.014	5	0.015	0.021	0.017
+1854	0.026	5	0.011	0.035	0.009
+1853	0.028	5	0.011	0.038	0.007
+1852	0.020	5	0.016	0.031	0.014
+1851	0.005	5	0.018	0.016	0.018
+1850	-0.012	5	0.019	0.000	0.018
+1849	-0.026	5	0.016	-0.014	0.015
+1848	-0.030	5	0.012	-0.020	0.009
+1847	-0.021	5	0.010	-0.013	0.007
+1846	0.001	5	0.014	0.008	0.016
+1845	0.029	5	0.017	0.035	0.021
+1844	0.050	5	0.017	0.056	0.020
+1843	0.057	5	0.013	0.058	0.017
+1842	0.051	5	0.014	0.046	0.017
+1841	0.038	5	0.017	0.030	0.018
+1840	0.026	5	0.017	0.016	0.018
+1839	0.015	5	0.015	0.008	0.016
+1838	0.010	5	0.011	0.007	0.014
+1837	0.014	5	0.011	0.017	0.013
+1836	0.034	4	0.012	0.034	0.012
+1835	0.052	4	0.011	0.052	0.011
+1834	0.060	4	0.010	0.060	0.010
+1833	0.051	4	0.011	0.051	0.011
+1832	0.022	4	0.011	0.022	0.011
+1831	-0.019	4	0.011	-0.019	0.011
+1830	-0.062	4	0.013	-0.062	0.013
+1829	-0.092	4	0.013	-0.092	0.013
+1828	-0.107	4	0.014	-0.107	0.014
+1827	-0.103	4	0.019	-0.103	0.019
+1826	-0.086	4	0.026	-0.086	0.026
+1825	-0.060	4	0.031	-0.060	0.031
+1824	-0.035	4	0.033	-0.035	0.033
+1823	-0.012	4	0.029	-0.012	0.029
+1822	0.002	4	0.023	0.002	0.023
+1821	0.004	4	0.019	0.004	0.019
+1820	-0.008	4	0.019	-0.008	0.019
+1819	-0.028	4	0.020	-0.028	0.020
+1818	-0.043	4	0.019	-0.043	0.019
+1817	-0.046	4	0.012	-0.046	0.012
+1816	-0.033	4	0.005	-0.033	0.005
+1815	-0.011	4	0.008	-0.011	0.008
+1814	0.015	4	0.011	0.015	0.011
+1813	0.039	4	0.014	0.039	0.014
+1812	0.059	4	0.017	0.059	0.017
+1811	0.067	4	0.016	0.067	0.016
+1810	0.057	4	0.009	0.057	0.009
+1809	0.028	4	0.007	0.028	0.007
+1808	-0.010	4	0.018	-0.010	0.018
+1807	-0.043	4	0.025	-0.043	0.025
+1806	-0.054	4	0.026	-0.054	0.026
+1805	-0.039	4	0.024	-0.039	0.024
+1804	-0.003	4	0.027	-0.003	0.027
+1803	0.035	4	0.034	0.035	0.034
+1802	0.059	4	0.038	0.059	0.038
+1801	0.061	4	0.035	0.061	0.035
+1800	0.047	4	0.027	0.047	0.027
+1799	0.021	4	0.018	0.021	0.018
+1798	-0.010	4	0.015	-0.010	0.015
+1797	-0.039	4	0.017	-0.039	0.017
+1796	-0.057	4	0.019	-0.057	0.019
+1795	-0.057	4	0.020	-0.057	0.020
+1794	-0.037	4	0.015	-0.037	0.015
+1793	-0.005	4	0.005	-0.005	0.005
+1792	0.027	3	0.015	0.027	0.015
+1791	0.050	3	0.029	0.050	0.029
+1790	0.056	3	0.037	0.056	0.037
+1789	0.049	3	0.037	0.049	0.037
+1788	0.032	3	0.033	0.032	0.033
+1787	0.007	3	0.029	0.007	0.029
+1786	-0.018	3	0.030	-0.018	0.030
+1785	-0.032	3	0.031	-0.032	0.031
+1784	-0.026	3	0.027	-0.026	0.027
+1783	-0.003	3	0.022	-0.003	0.022
+1782	0.025	3	0.022	0.025	0.022
+1781	0.048	3	0.021	0.048	0.021
+1780	0.041	2	0.010	0.041	0.010
+1779	0.037	2	0.014	0.037	0.014
+1778	0.013	2	0.014	0.013	0.014
+1777	-0.027	2	0.010	-0.027	0.010
+1776	-0.065	2	0.007	-0.065	0.007
+1775	-0.088	2	0.010	-0.088	0.010
+1774	-0.088	2	0.015	-0.088	0.015
+1773	-0.066	2	0.015	-0.066	0.015
+1772	-0.026	2	0.011	-0.026	0.011
+1771	0.020	2	0.006	0.020	0.006
+1770	0.058	2	0.004	0.058	0.004
+1769	0.073	2	0.002	0.073	0.002
+1768	0.061	2	0.003	0.061	0.003
+1767	0.028	2	0.010	0.028	0.010
+1766	-0.007	2	0.023	-0.007	0.023
+1765	-0.031	2	0.039	-0.031	0.039
+1764	-0.039	2	0.045	-0.039	0.045
+1763	-0.030	2	0.036	-0.030	0.036
+1762	-0.006	2	0.015	-0.006	0.015
+1761	0.028	2	0.004	0.028	0.004
+1760	0.060	2	0.017	0.060	0.017
+1759	0.075	2	0.027	0.075	0.027
+1758	0.066	2	0.033	0.066	0.033
+1757	0.042	2	0.032	0.042	0.032
+1756	0.022	2	0.019	0.022	0.019
+1755	0.012	2	0.004	0.012	0.004
+1754	0.007	2	0.001	0.007	0.001
+1753	0.004	2	0.008	0.004	0.008
+1752	0.005	2	0.018	0.005	0.018
+1751	0.011	2	0.019	0.011	0.019
+1750	0.014	2	0.014	0.014	0.014
+1749	0.007	2	0.011	0.007	0.011
+1748	-0.006	2	0.010	-0.006	0.010
+1747	-0.011	2	0.005	-0.011	0.005
+1746	-0.001	2	0.007	-0.001	0.007
+1745	0.015	2	0.016	0.015	0.016
+1744	0.022	2	0.015	0.022	0.015
+1743	0.015	2	0.009	0.015	0.009
+1742	0.000	2	0.008	0.000	0.008
+1741	-0.017	2	0.019	-0.017	0.019
+1740	-0.037	2	0.031	-0.037	0.031
+1739	-0.058	2	0.037	-0.058	0.037
+1738	-0.069	2	0.035	-0.069	0.035
+1737	-0.058	2	0.031	-0.058	0.031
+1736	-0.025	2	0.025	-0.025	0.025
+1735	0.013	2	0.012	0.013	0.012
+1734	0.037	2	0.010	0.037	0.010
+1733	0.039	2	0.033	0.039	0.033
+1732	0.025	2	0.041	0.025	0.041
+1731	0.001	2	0.029	0.001	0.029
+1730	-0.035	2	0.008	-0.035	0.008
+1729	-0.074	2	0.011	-0.074	0.011
+1728	-0.092	2	0.027	-0.092	0.027
+1727	-0.091	2	0.021	-0.091	0.021
+1726	-0.067	2	0.004	-0.067	0.004
+1725	-0.016	2	0.033	-0.016	0.033
+1724	0.048	2	0.055	0.048	0.055
+1723	0.092	2	0.071	0.092	0.071
+1722	0.098	2	0.077	0.098	0.077
+1721	0.068	2	0.060	0.068	0.060
+1720	0.018	2	0.018	0.018	0.018
+1719	-0.035	2	0.037	-0.035	0.037
+1718	-0.081	2	0.079	-0.081	0.079
+1717	-0.108	2	0.093	-0.108	0.093
+1716	-0.100	2	0.081	-0.100	0.081
+1715	-0.053	2	0.052	-0.053	0.052
+1714	0.014	2	0.012	0.014	0.012
+1713	0.071	2	0.034	0.071	0.034
+1712	0.096	2	0.075	0.096	0.075
+1711	0.092	2	0.094	0.092	0.094
+1710	0.069	2	0.084	0.069	0.084
+1709	0.042	2	0.053	0.042	0.053
+1708	0.016	2	0.021	0.016	0.021
+1707	-0.003	2	0.000	-0.003	0.000
+1706	-0.011	2	0.013	-0.011	0.013
+1705	-0.005	2	0.024	-0.005	0.024
+1704	0.007	2	0.032	0.007	0.032
+1703	0.011	2	0.027	0.011	0.027
+1702	0.005	2	0.009	0.005	0.009
+1701	-0.001	2	0.010	-0.001	0.010
+1700	-0.001	2	0.021	-0.001	0.021
+1699	0.004	2	0.023	0.004	0.023
+1698	0.006	2	0.019	0.006	0.019
+1697	0.003	2	0.013	0.003	0.013
+1696	-0.001	2	0.006	-0.001	0.006
+1695	0.001	2	0.004	0.001	0.004
+1694	0.007	2	0.013	0.007	0.013
+1693	0.014	2	0.014	0.014	0.014
+1692	0.017	2	0.003	0.017	0.003
+1691	0.017	2	0.012	0.017	0.012
+1690	0.020	2	0.021	0.020	0.021
+1689	0.021	2	0.019	0.021	0.019
+1688	0.016	2	0.009	0.016	0.009
+1687	0.000	2	0.005	0.000	0.005
+1686	-0.023	2	0.021	-0.023	0.021
+1685	-0.046	2	0.037	-0.046	0.037
+1684	-0.063	2	0.052	-0.063	0.052
+1683	-0.071	2	0.058	-0.071	0.058
+1682	-0.073	2	0.047	-0.073	0.047
+1681	-0.063	2	0.023	-0.063	0.023
+1680	-0.036	2	0.000	-0.036	0.000
+1679	0.001	2	0.016	0.001	0.016
+1678	0.037	2	0.025	0.037	0.025
+1677	0.056	2	0.025	0.056	0.025
+1676	0.054	2	0.015	0.054	0.015
+1675	0.032	2	0.004	0.032	0.004
+1674	-0.003	2	0.028	-0.003	0.028
+1673	-0.046	2	0.049	-0.046	0.049
+1672	-0.088	2	0.052	-0.088	0.052
+1671	-0.117	2	0.036	-0.117	0.036
+1670	-0.115	2	0.011	-0.115	0.011
+1669	-0.077	2	0.010	-0.077	0.010
+1668	-0.020	2	0.022	-0.020	0.022
+1667	0.036	2	0.026	0.036	0.026
+1666	0.076	2	0.021	0.076	0.021
+1665	0.098	2	0.006	0.098	0.006
+1664	0.101	2	0.012	0.101	0.012
+1663	0.083	2	0.019	0.083	0.019
+1662	0.050	2	0.005	0.050	0.005
+1661	0.016	2	0.029	0.016	0.029
+1660	-0.004	2	0.067	-0.004	0.067
+1659	0.001	2	0.091	0.001	0.091
+1658	0.020	2	0.094	0.020	0.094
+1657	0.034	2	0.078	0.034	0.078
+1656	0.035	2	0.044	0.035	0.044
+1655	0.029	2	0.006	0.029	0.006
+1654	0.020	2	0.054	0.020	0.054
+1653	0.011	2	0.080	0.011	0.080
+1652	-0.001	2	0.073	-0.001	0.073
+1651	-0.012	2	0.039	-0.012	0.039
+1650	-0.018	2	0.000	-0.018	0.000

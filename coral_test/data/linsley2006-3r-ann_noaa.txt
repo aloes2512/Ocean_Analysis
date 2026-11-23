@@ -1,0 +1,256 @@
+# Rarotonga - Subseasonal Coral d18O and Sr/Ca Data
+#----------------------------------------------------
+#                World Data Service for Paleoclimatology, Boulder
+#                                  and
+#                     NOAA Paleoclimatology Program
+#             National Centers for Environmental Information (NCEI)
+#----------------------------------------------------
+# Template Version 4.0
+# Encoding: UTF-8
+# NOTE: Please cite original publication, NOAA Landing Page URL, dataset and publication DOIs (where available), and date accessed when using downloaded data. If there is no publication information, please cite investigator, study title, NOAA Landing Page URL, and date accessed.
+#
+# Description/Documentation lines begin with #
+# Data lines have no #
+#
+# NOAA_Landing_Page: https://www.ncei.noaa.gov/access/paleo-search/study/6089
+#   Landing_Page_Description: NOAA Landing Page of this file's parent study, which includes all study metadata.
+#
+# Study_Level_JSON_Metadata: https://www.ncei.noaa.gov/pub/data/metadata/published/paleo/json/noaa-coral-6089.json
+#   Study_Level_JSON_Description: JSON metadata of this data file's parent study, which includes all study metadata.
+#
+# Data_Type: Corals and Sclerosponges
+#
+# Dataset_DOI: 10.25921/1h5c-2a36
+#
+# Science_Keywords: PAGES 2k Network, PAGES Australasia 2k
+#--------------------
+# Resource_Links
+#
+# Data_Download_Resource:  https://www.ncei.noaa.gov/pub/data/paleo/coral/east_pacific/linsley2006-3r-ann_noaa.txt
+#   Data_Download_Description: NOAA Template File; Core 3R Annual Stable Isotope Data
+#
+#--------------------
+# Contribution_Date
+#   Date: 2008-03-01
+#--------------------
+# File_Last_Modified_Date
+#   Date: 2025-07-28
+#--------------------
+# Title
+#   Study_Name: Rarotonga - Subseasonal Coral d18O and Sr/Ca Data
+#--------------------
+# Investigators
+#   Investigators: Linsley, B.K.(https://orcid.org/0000-0003-2085-0662); Kaplan, A.(https://orcid.org/0000-0002-3384-8185); Gouriou, Y.; Salinger, M.J.(https://orcid.org/0000-0002-5782-1411); deMenocal, P.B.(https://orcid.org/0000-0002-7191-717X); Wellington, G.M.; Howe, S.S.
+#--------------------
+# Description_Notes_and_Keywords
+#   Description: Subannual stable isotope and Sr/Ca data for coral cores from Rarotonga, Cook Islands, 21º14'16"S, 159º49'40"E. Core 2R: (1726-1997AD) (w.d.= 18.3m) Core 3R: (1874-2000AD) (w.d.= 10m) Core 99: (1906-1999AD) (collected by A. Tudhope, w.d.= 18m). Detailed locations of the cores and sampling methods are discussed in Linsley et al., 2004.
+#--------------------
+# Publication
+#   Authors: Linsley, B.K., A. Kaplan, Y. Gouriou, J. Salinger, P.B. deMenocal, G.M. Wellington, and S.S. Howe
+#   Journal_Name: Geochemistry, Geophysics, Geosystems
+#   Published_Title: Tracking the extent of the South Pacific Convergence Zone since the early 1600s
+#   Published_Date_or_Year: 2006
+#   Volume: 7
+#   Issue: 
+#   Pages: 
+#   Report_Number: Q05003
+#   DOI: 10.1029/2005GC001115
+#   Full_Citation:
+#   Abstract: The South Pacific Convergence Zone (SPCZ) is the largest and most persistent spur of the Intertropical Convergence Zone. At the southeastern edge of the SPCZ near 170°W and 15°–20°S a surface ocean salinity frontal zone exists that separates fresher Western Pacific Warm Pool water from saltier and cooler waters in the east. This salinity front is known to shift east and west with the phase of the El Niño Southern Oscillation. We have generated subannually resolved and replicated coral oxygen isotopic time series from Fiji (17°S, 179°E) and Rarotonga (21.5°S, 160°W) that have recorded interannual displacements of the salinity front over the last 380 years and also indicate that at lower frequencies the decadal mean position of the salinity front, and eastern extent of the SPCZ, has shifted east-west through 10° to 20° of longitude three times during this interval. The most recent and largest shift began in the mid 1800s as the salinity front progressively moved eastward and salinity decreased at both sites. Our results suggest that sea surface salinity at these sites is now at the lowest levels recorded and is evidence for an unprecedented expansion of the SPCZ since the mid 1800s. The expansion of the SPCZ implies a gradual change in the South Pacific to more La Niña-like long-term mean conditions. This observation is consistent with the ocean thermostat mechanism for the Pacific coupled ocean-atmosphere system, whereby exogenous heating of the atmosphere would result in greater warming in the western Pacific and a greater east-west surface temperature gradient.
+#--------------------
+#   Authors: Linsley, B.K.; Wellington, G.M.; Schrag, D.P.; Ren, L.; Salinger, M.J.; Tudhope, A.W.
+#   Journal_Name: Climate Dynamics
+#   Published_Title: Geochemical evidence from corals for changes in the amplitude and spatial pattern of South Pacific interdecadal climate variability over the last 300 years.
+#   Published_Date_or_Year: 2004
+#   Volume: 22
+#   Issue: 
+#   Pages: 1-11
+#   Report_Number: 
+#   DOI: 10.1007/s00382-003-0364-y
+#   Full_Citation:
+#   Abstract: In the Pacific Ocean, the coherent pattern of interdecadal variations in sea surface temperature (SST) over the last ∼100 years has been termed the Interdecadal Pacific Oscillation (IPO). To examine past variations in the IPO we have generated time series of Sr/Ca and oxygen isotopes (δ18O) from South Pacific Porites coral colonies growing at Rarotonga (1997 to 1726) and Fiji (1997 to 1780). At both sites skeletal Sr/Ca is highly correlated with instrumental SST at least back to ∼1970 and δ18O appears to reflect both SST and South Pacific Convergence Zone (SPCZ) effects on seawater δ18O. Comparison of our results to a New Caledonia coral δ18O record and to indices of interdecadal Pacific climate variability demonstrates that these South Pacific corals have accurately recorded twentieth century variations in the IPO and SPCZ. The coral records also indicate that higher amplitude and more spatially coherent IPO-related variability existed from 1880 to 1950 with notably poor between-site correlations in the mid-1800s. These observations suggest that the spatial IPO pattern in South Pacific SST was significantly more complex and/or poorly defined in the mid-1800s compared to that observed in the twentieth century. Comparison with North Pacific IPO indices also indicates that the degree of cross-hemispheric symmetry of interdecadal oceanographic variability has changed over time with a lower correlation between the North and South Pacific in the mid-1800s. This evidence suggests that the spatial pattern of the IPO at least in the South Pacific has varied over the last 300 years, with a major reorganization occurring after ~1880 A.D.
+#--------------------
+#   Authors: Ren, L.; Linsley, B.K.; Wellington, G.M.; Schrag, D.P.; Hoegh-Guldberg, O.
+#   Journal_Name: Geochimica et Cosmochimica Acta
+#   Published_Title: Deconvolving the δ18O seawater component from subseasonal coral δ18O and Sr/Ca at Rarotonga in the southwestern subtropical Pacific for the period 1726 to 1997
+#   Published_Date_or_Year: 2003
+#   Volume: 67
+#   Issue: 9
+#   Pages: 1609-1621
+#   Report_Number: 
+#   DOI: 10.1016/S0016-7037(02)00917-1
+#   Full_Citation:
+#   Abstract: To reconstruct oceanographic variations in the subtropical South Pacific, 271-year long subseasonal time series of Sr/Ca and δ18O were generated from a coral growing at Rarotonga (21.5°S, 159.5°W). In this case, coral Sr/Ca appears to be an excellent proxy for sea surface temperature (SST) and coral δ18O is a function of both SST and seawater δ18O composition (δ18Osw). Here, we focus on extracting the δ18Osw signal from these proxy records. A method is presented assuming that coral Sr/Ca is solely a function of SST and that coral δ18O is a function of both SST and δ18Osw. This method separates the effects of δ18Osw from SST by breaking the instantaneous changes of coral δ18O into separate contributions by instantaneous SST and δ18Osw changes, respectively. The results show that on average δ18Osw at Rarotonga explains ∼39% of the variance in δ18O and that variations in SST explains the remaining ∼61% of δ18O variance. Reconstructed δ18Osw shows systematic increases in summer months (December–February) consistent with the regional pattern of variations in precipitation and evaporation. The δ18Osw also shows a positive linear correlation with satellite-derived estimated salinity for the period 1980 to 1997 (r = 0.72). This linear correlation between reconstructed δ18Osw and salinity makes it possible to use the reconstructed δ18Osw to estimate the past interannual and decadal salinity changes in this region. Comparisons of coral δ18O and δ18Osw at Rarotonga with the Pacific decadal oscillation index suggest that the decadal and interdecadal salinity and SST variability at Rarotonga appears to be related to basin-scale decadal variability in the Pacific.
+#--------------------
+# Funding_Agency
+#   Funding_Agency_Name: US National Science Foundation
+#   Grant: ATM-9901649, ATM-9619035, OCE-0318296, OCE-0317941
+#--------------------
+# Funding_Agency
+#   Funding_Agency_Name: US National Oceanic and Atmospheric Administration (NOAA)
+#   Grant: NA96GP0406, NA96GP0470
+#--------------------
+# Site_Information
+#   Site_Name: Rarotonga
+#   Location: Cook Islands
+#   Northernmost_Latitude: -21.2378
+#   Southernmost_Latitude: -21.2378
+#   Easternmost_Longitude: -159.8278
+#   Westernmost_Longitude: -159.8278
+#   Elevation_m: -18
+#--------------------
+# Data_Collection
+#   Collection_Name: 06cook02b
+#   First_Year: 1875
+#   Last_Year: 1999
+#   Time_Unit: CE
+#   Core_Length_m:
+#   Parameter_Keywords: del18O, del13C
+#   Notes: ANNUAL AVERAGES OF DATA IN 06cook02a.txt
+#--------------------
+# Chronology_Information
+# Chronology:
+#
+#
+#--------------------
+# Variables
+# PaST_Thesaurus_Download_Resource: https://www.ncei.noaa.gov/access/paleo-search/skos/past-thesaurus.rdf
+#   PaST_Thesaurus_Download_Description: Paleoenvironmental Standard Terms (PaST) Thesaurus terms, definitions, and relationships in SKOS format.
+#
+# Data variables follow that are preceded by '##' in columns one and two.
+# Variables list, one per line, shortname-tab-var components: what, material, error, units, seasonality, data type, detail, method, C or N for Character or Numeric data)
+#
+## age	age,,,year Common Era,,corals and sclerosponges,,,N,
+## d18O	delta 18O,Porites lutea,,per mil VPDB,annual,corals and sclerosponges,averaged,isotope ratio mass spectrometry,N,
+## d13C	delta 13C,Porites lutea,,per mil VPDB,annual,corals and sclerosponges,averaged,isotope ratio mass spectrometry,N,
+#--------------------
+# Data:
+# Data lines follow (have no #)
+# Data line format - tab-delimited text, variable short name as header
+# Missing_Values:
+age	d18O	d13C
+1999.5	-4.7916	-3.0936
+1998.5	-4.4486	-3.0526
+1997.5	-4.3902	-3.0122
+1996.5	-4.6799	-2.9482
+1995.5	-4.5313	-2.9497
+1994.5	-4.5470	-3.0368
+1993.5	-4.4165	-3.1943
+1992.5	-4.4093	-2.9828
+1991.5	-4.3841	-3.0736
+1990.5	-4.4290	-2.9188
+1989.5	-4.6133	-3.0228
+1988.5	-4.6419	-3.0052
+1987.5	-4.2852	-2.7763
+1986.5	-4.6130	-2.9935
+1985.5	-4.4644	-3.1707
+1984.5	-4.3572	-3.2556
+1983.5	-4.2148	-3.1030
+1982.5	-4.3176	-2.9453
+1981.5	-4.4253	-2.8565
+1980.5	-4.3202	-2.5296
+1979.5	-4.2833	-2.2712
+1978.5	-4.3214	-2.6985
+1977.5	-4.2997	-2.5502
+1976.5	-4.3957	-2.5299
+1975.5	-4.3631	-2.3397
+1974.5	-4.3863	-2.0607
+1973.5	-4.2995	-2.1865
+1972.5	-4.3814	-2.4438
+1971.5	-4.5910	-2.4283
+1970.5	-4.4135	-2.3828
+1969.5	-4.3773	-2.4821
+1968.5	-4.3803	-2.4722
+1967.5	-4.3500	-2.7375
+1966.5	-4.1498	-2.5275
+1965.5	-4.2099	-2.6139
+1964.5	-4.2945	-2.4785
+1963.5	-4.3190	-2.5787
+1962.5	-4.2890	-2.5387
+1961.5	-4.4378	-2.3831
+1960.5	-4.4864	-2.5301
+1959.5	-4.5064	-2.4331
+1958.5	-4.2402	-2.5116
+1957.5	-4.4791	-2.5135
+1956.5	-4.4728	-2.3981
+1955.5	-4.5180	-2.2977
+1954.5	-4.3380	-2.3069
+1953.5	-4.2839	-2.4784
+1952.5	-4.3357	-2.5180
+1951.5	-4.3921	-2.4393
+1950.5	-4.3929	-2.4023
+1949.5	-4.3707	-2.4180
+1948.5	-4.2140	-2.3738
+1947.5	-4.3638	-2.4032
+1946.5	-4.3044	-2.4394
+1945.5	-4.3041	-2.3088
+1944.5	-4.1855	-2.0363
+1943.5	-4.2204	-2.2375
+1942.5	-4.2082	-2.0450
+1941.5	-3.8599	-1.8882
+1940.5	-4.1968	-2.0301
+1939.5	-4.2303	-1.8966
+1938.5	-4.1027	-1.8836
+1937.5	-4.0381	-1.8789
+1936.5	-4.0451	-1.8125
+1935.5	-4.1065	-1.7826
+1934.5	-4.2848	-2.2221
+1933.5	-4.3104	-2.3574
+1932.5	-4.2724	-2.6740
+1931.5	-3.9401	-1.8619
+1930.5	-3.9556	-1.9548
+1929.5	-4.1114	-1.9625
+1928.5	-4.0364	-1.8128
+1927.5	-4.2481	-2.2665
+1926.5	-4.1357	-2.6374
+1925.5	-4.0287	-2.0540
+1924.5	-4.0844	-2.0210
+1923.5	-4.1281	-2.1902
+1922.5	-4.2598	-2.2733
+1921.5	-4.3538	-2.3486
+1920.5	-4.1737	-2.5579
+1919.5	-4.2947	-2.4192
+1918.5	-4.3855	-2.6936
+1917.5	-4.2652	-2.2560
+1916.5	-4.4998	-2.6373
+1915.5	-4.3064	-2.5314
+1914.5	-4.1874	-2.4589
+1913.5	-4.0875	-2.4133
+1912.5	-4.1749	-2.5476
+1911.5	-4.3315	-2.2556
+1910.5	-4.3155	-2.3371
+1909.5	-4.4285	-2.3795
+1908.5	-4.3027	-2.0810
+1907.5	-4.2161	-2.2522
+1906.5	-4.1029	-2.2429
+1905.5	-4.0884	-2.2498
+1904.5	-4.2028	-2.2491
+1903.5	-3.9052	-2.2160
+1902.5	-4.1527	-1.9100
+1901.5	-4.1140	-2.0077
+1900.5	-4.0780	-1.9693
+1899.5	-4.3100	-2.1069
+1898.5	-4.2541	-2.1532
+1897.5	-4.0803	-1.9981
+1896.5	-4.1402	-2.1385
+1895.5	-4.0649	-1.6508
+1894.5	-4.1484	-1.6354
+1893.5	-4.1245	-1.7774
+1892.5	-4.1648	-1.8353
+1891.5	-4.2135	-1.9987
+1890.5	-4.3137	-2.0522
+1889.5	-4.1726	-1.9307
+1888.5	-4.1777	-2.1616
+1887.5	-4.2054	-2.1587
+1886.5	-4.4943	-2.0252
+1885.5	-4.3341	-2.1241
+1884.5	-4.2022	-1.9773
+1883.5	-4.3430	-2.1475
+1882.5	-4.3902	-2.2888
+1881.5	-4.4183	-2.3434
+1880.5	-4.2889	-2.3356
+1879.5	-4.3545	-2.4700
+1878.5	-4.5215	-2.1647
+1877.5	-4.2099	-2.1403
+1876.5	-4.2544	-2.0989
+1875.5	-4.2256	-2.1682

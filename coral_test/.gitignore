@@ -1,0 +1,3 @@
+out/*.rds
+# the repo root ignores data/; keep the inputs of this experiment
+!data/
